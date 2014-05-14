@@ -9,16 +9,40 @@ module.exports = function(grunt) {
       }
     },
 
+    karma: {
+      options: {
+        configFile: 'karma.conf.js',
+        browsers: ['PhantomJS'],
+      },
+      unit: {
+        browsers: ['Chrome'],
+        logLevel: 'ERROR',
+        background: true
+      },
+      single: {
+        logLevel: 'ERROR',
+        singleRun: true
+      },
+    },
 
     watch: {
+      tests:{
+        files: [
+          'spec/**/*_spec.coffee',
+        ],
+        tasks: [
+          'karma:unit:run',
+        ]
+      },
       coffee:{
         files: [
           'src/**/*.coffee',
         ],
         tasks: [
+          'karma:unit:run',
           'coffee:compile',
           'optimize_rjs',
-          'uglify'
+          'uglify:payload',
         ]
       },
       vendor:{
@@ -27,6 +51,7 @@ module.exports = function(grunt) {
         ],
         tasks: [
           'concat:easyxdm_module',
+          'karma:unit:run',
         ]
       },
     },
@@ -144,6 +169,9 @@ module.exports = function(grunt) {
     'shell:build_easyxdm'
   ]);
 
+  grunt.registerTask('start_test_server', ['karma:unit:start']);
+  grunt.registerTask('run_tests', ['karma:unit:run']);
+
   grunt.registerTask('build', [
     'install_bower_deps',
     'create_easyxdm_module',
@@ -153,6 +181,6 @@ module.exports = function(grunt) {
     'uglify'
   ]);
   grunt.registerTask('cleanup', ['shell:cleanup']);
-  grunt.registerTask('default', ['watch']);
-  grunt.registerTask('test', ['coffee:compile_test', 'mocha']);
+  grunt.registerTask('default', ['start_test_server', 'watch']);
+  grunt.registerTask('test', ['karma:single']);
 };
