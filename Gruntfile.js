@@ -28,6 +28,8 @@ module.exports = function(grunt) {
       tests:{
         files: [
           'spec/**/*_spec.coffee',
+          'spec/**/*.html',
+          'spec/**/*.json',
         ],
         tasks: [
           'karma:unit:run',
