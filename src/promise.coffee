@@ -1,24 +1,42 @@
 define ->
+  UID = 1
+
   class Promise
     @all: (promises) ->
       promise_all = new Promise()
       rejected = false
 
+      results = {}
       done_count = promises.length
       if done_count is 0
         promise_all.resolve(true)
         return promise_all
 
-      success = -> promise_all.resolve(true) if --done_count is 0
+      create_ordered_array = (results)->
+        arr = []
+        for promise_id, data of results
+          arr[data.order] = data.result
+        return arr
+
+      success = (result)->
+        results[this._id].result = result
+        if --done_count is 0
+          promise_all.resolve(create_ordered_array(results))
       fail = ->
         unless rejected
           promise_all.reject(false)
           rejected = true
 
-      promise.then(success, fail) for promise in promises
+      i = 0
+      for promise in promises
+        results[promise._id] = {order: i++}
+        promise.then(success.bind(promise), fail)
+
+
       promise_all
 
     constructor: ->
+      @_id = UID++
       @state = 'pending'
       @_thens = []
 
