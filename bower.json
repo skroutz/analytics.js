@@ -1,0 +1,21 @@
+{
+  "name": "analytics",
+  "version": "0.0.1",
+  "authors": "Skroutz",
+  "description": "Analytics Client",
+  "keywords": [
+    "analytics client"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "easyxdm": "~2.4.19"
+  }
+}
