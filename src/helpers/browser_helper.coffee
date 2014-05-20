@@ -1,7 +1,7 @@
 define ['settings', 'promise'], (Settings, Promise)->
-  class Utils
+  class BrowserHelper
     @_setUpCallbacks: (base_obj, promise)->
-      base_obj.step1_complete = -> Utils._createScript(Settings.url.utils.third_party_step2())
+      base_obj.step1_complete = -> BrowserHelper._createScript(Settings.url.utils.third_party_step2())
       base_obj.step2_complete = (status)-> promise.resolve(status)
 
     @_cleanUpCallbacks: (base_obj)->
@@ -24,15 +24,15 @@ define ['settings', 'promise'], (Settings, Promise)->
     @_thirdPartyCookiesEnabled: ->
       promise = new Promise()
 
-      Utils._setUpCallbacks Settings.actions_queue, promise
-      Utils._createScript Settings.url.utils.third_party_step1()
+      BrowserHelper._setUpCallbacks Settings.actions_queue, promise
+      BrowserHelper._createScript Settings.url.utils.third_party_step1()
 
-      promise.then -> Utils._cleanUpCallbacks Settings.actions_queue
+      promise.then -> BrowserHelper._cleanUpCallbacks Settings.actions_queue
 
     @checkCookies: ->
       promise = new Promise()
 
-      Utils._thirdPartyCookiesEnabled().then (third_enabled)->
+      BrowserHelper._thirdPartyCookiesEnabled().then (third_enabled)->
         promise.resolve
           first: Utils._firstPartyCookiesEnabled()
           third: third_enabled
@@ -68,4 +68,5 @@ define ['settings', 'promise'], (Settings, Promise)->
 
       promise
 
-  return Utils
+
+  return BrowserHelper

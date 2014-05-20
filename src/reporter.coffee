@@ -1,8 +1,8 @@
 define [
   'settings'
   'promise'
-  'utils'
-], (Settings, Promise, Utils)->
+  'helpers/browser_helper'
+], (Settings, Promise, BrowserHelper)->
   unique_id = 1
 
   class Reporter
@@ -20,7 +20,7 @@ define [
       promise
 
     _determineTransport: ->
-      Utils.checkImages().then (images_enabled)->
+      BrowserHelper.checkImages().then (images_enabled)->
         @transport = 'script' unless images_enabled
 
     _enableProperJobHandler: =>
