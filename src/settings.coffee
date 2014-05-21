@@ -2,6 +2,11 @@ define ->
   Settings =
     actions_queue : (window._saq or window._saq = [])
     get_param_name: 'analytics_session'
+    cookies:
+      first_party_enabled: true
+      analytics:
+        name: 'analytics_session'
+        duration: 60 * 60 * 24 * 7 #In seconds: one week
     url:
       base: 'http://analytics.skroutz.dev:3040'
       current: window.location.href

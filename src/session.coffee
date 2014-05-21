@@ -10,22 +10,37 @@ define [
       @easyXDM = easyXDM
       @promise = new Promise()
 
-      @analytics_session = null
+      @analytics_session = Biskoto.get(Settings.cookies.analytics.name)
       @yogurt_session = Biskoto.get('yogurt_session')
 
-      @socket = @_createSocket @_socketUrl(@yogurt_session)
-
-      @_getAnalyticsSession()
-
+      if @analytics_session isnt null
+        ## TODO: SHOULD BE RE-SET expires ATTRIBUTE IF COOKIE ALREADY EXISTS?
+        @promise.resolve @analytics_session
+      else
+        @socket = @_createSocket @_socketUrl(@yogurt_session)
+        @_getAnalyticsSession()
 
     then: (callback)-> @promise.then(callback)
 
     _getAnalyticsSession: ->
-      Promise
-        .all([@_extractIframe(), @_extractGetParam()])
-        .then (results)=>
-          @analytics_session = results[0] or results[1]
-          @promise.resolve @analytics_session
+      Promise.all([
+        @_extractIframe()
+        @_extractGetParam()
+      ]).then (results) =>
+        analytics_session = results[0] or results[1]
+
+        @_createFirstPartyCookie(analytics_session)
+        @_registerAnalyticsSession(analytics_session)
+
+    _createFirstPartyCookie: (analytics_session)->
+      return unless Settings.cookies.first_party_enabled
+
+      Biskoto.set Settings.cookies.analytics.name, analytics_session,
+        expires: Settings.cookies.analytics.duration
+
+    _registerAnalyticsSession: (analytics_session)->
+      @analytics_session = analytics_session
+      @promise.resolve analytics_session
 
     _extractGetParam: ->
       promise = new Promise()
