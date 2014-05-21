@@ -4,6 +4,8 @@ define ->
     get_param_name: 'analytics_session'
     cookies:
       first_party_enabled: true
+      yogurt:
+        name: 'yogurt_session'
       analytics:
         name: 'analytics_session'
         duration: 60 * 60 * 24 * 7 #In seconds: one week
