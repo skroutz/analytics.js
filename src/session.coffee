@@ -11,7 +11,7 @@ define [
       @promise = new Promise()
 
       @analytics_session = Biskoto.get(Settings.cookies.analytics.name)
-      @yogurt_session = Biskoto.get('yogurt_session')
+      @yogurt_session = Biskoto.get(Settings.cookies.yogurt.name)
 
       if @analytics_session isnt null
         ## TODO: SHOULD BE RE-SET expires ATTRIBUTE IF COOKIE ALREADY EXISTS?
