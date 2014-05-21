@@ -1,6 +1,7 @@
 define ->
   Settings =
     actions_queue : (window._saq or window._saq = [])
+    get_param_name: 'analytics_session'
     url:
       base: 'http://analytics.skroutz.dev:3040'
       current: window.location.href
@@ -15,5 +16,6 @@ define ->
         third_party_step2: -> "#{Settings.url.base}/track/check/third_party/step_2.js"
     api:
       shop_code_key: '_setAccount'
+      redirect_key: 'redirect'
 
   return Settings

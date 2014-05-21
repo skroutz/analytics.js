@@ -1,4 +1,8 @@
-define ['settings','reporter'], (Settings, Reporter)->
+define [
+  'settings'
+  'reporter'
+  'helpers/url_helper'
+], (Settings, Reporter, URLHelper)->
   class ActionsManager
     constructor: () ->
       @reporter = new Reporter()
@@ -6,8 +10,22 @@ define ['settings','reporter'], (Settings, Reporter)->
       @actions = []
       @shop_code_val = null
       @actions_queue = Settings.actions_queue
+      @redirect_data = null
 
       @_parseActions()
+
+    redirect: (analytics_session) ->
+      return unless @redirect_data
+      data = {}
+      data[Settings.get_param_name] = analytics_session
+      url = URLHelper.appendData @redirect_data.url, URLHelper.serialize(data)
+      console.log 'INITING REDIRECT'
+      setTimeout (->
+        console.log 'REDIRECT TO:'
+        console.log url
+        # window.location.replace url
+      ), @redirect_data.time
+      @
 
     sendTo: (url) ->
       promises =
@@ -24,6 +42,10 @@ define ['settings','reporter'], (Settings, Reporter)->
       while item = @actions_queue.pop()
         if typeof item is 'function' then @callbacks.push item
         else if item[0] is Settings.api.shop_code_key then @shop_code_val = item[1]
+        else if item[0] is Settings.api.redirect_key
+          @redirect_data =
+            url: item[1]
+            time: parseInt(item[2],10)
         else
           @actions.push type: item[0], data: (item[1] || '')
 
