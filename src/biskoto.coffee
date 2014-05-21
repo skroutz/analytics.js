@@ -9,17 +9,15 @@ define ->
 
         for cookie in cookies
           if cookie.indexOf(name) is 0
-            return cookie.split('=')[1]
+            try
+              return JSON.parse(cookie.split('=')[1])
+            catch err
+              return cookie.split('=')[1]
 
       return null
 
     @set: (name, value, options = {}) ->
-      if typeof value is 'string'
-        json_value = value
-      else
-        json_value = JSON.stringify(value)
-
-      document.cookie = "#{name}=#{json_value}#{@_cookieOptions(options)}"
+      document.cookie = "#{name}=#{JSON.stringify(value)}#{@_cookieOptions(options)}"
 
     @expire: (name, options = {}) ->
       options.expires = -1

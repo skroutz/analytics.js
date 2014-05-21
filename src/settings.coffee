@@ -4,6 +4,7 @@ define ->
     get_param_name: 'analytics_session'
     cookies:
       first_party_enabled: true
+      version: 1
       yogurt:
         name: 'yogurt_session'
       analytics:
