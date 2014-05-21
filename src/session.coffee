@@ -20,7 +20,7 @@ define [
         @socket = @_createSocket @_socketUrl(@yogurt_session)
         @_getAnalyticsSession()
 
-    then: (callback)-> @promise.then(callback)
+    then: (success, fail)-> @promise.then(success, fail)
 
     _getAnalyticsSession: ->
       Promise.all([
@@ -29,8 +29,11 @@ define [
       ]).then (results) =>
         analytics_session = results[0] or results[1]
 
-        @_createFirstPartyCookie(analytics_session)
-        @_registerAnalyticsSession(analytics_session)
+        if analytics_session
+          @_createFirstPartyCookie(analytics_session)
+          @_registerAnalyticsSession(analytics_session)
+        else
+          @promise.reject()
 
     _createFirstPartyCookie: (analytics_session)->
       return unless Settings.cookies.first_party_enabled
