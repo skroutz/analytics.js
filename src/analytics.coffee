@@ -8,13 +8,17 @@ define [
       @session = new Session()
       @actions = new ActionsManager()
 
-      @session.then (analytics_session) =>
-        console.log "%canalytics_session: #{analytics_session}", 'color: green'
+      @session.then @onSession, @onNoSession
 
-        beacon_url = Settings.url.beacon(analytics_session)
+    onNoSession: () =>
+      console.log 'no session returned'
 
-        @actions.sendTo(beacon_url).then =>
-          console.log "%cAll actions reported!!", 'color: green'
-          @actions.redirect(analytics_session)
+    onSession: (analytics_session) =>
+      console.log "%canalytics_session: #{analytics_session}", 'color: green'
+      beacon_url = Settings.url.beacon(analytics_session)
+
+      @actions.sendTo(beacon_url).then =>
+        console.log "%cAll actions reported!!", 'color: green'
+        @actions.redirect(analytics_session)
 
   return Analytics
