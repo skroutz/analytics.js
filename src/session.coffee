@@ -15,7 +15,9 @@ define [
       @analytics_session = @_getCookieAnalyticsSession()
       @yogurt_session = Biskoto.get(Settings.cookies.yogurt.name)
 
-      if @analytics_session isnt null
+      # Always create third party cookie on analytics domain
+      # if on create phase
+      if @analytics_session isnt null and @yogurt_session is null
         ## TODO: SHOULD BE RE-SET expires ATTRIBUTE IF COOKIE ALREADY EXISTS?
         @promise.resolve @analytics_session
       else
