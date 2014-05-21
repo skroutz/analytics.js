@@ -10,7 +10,9 @@ define [
       @easyXDM = easyXDM
       @promise = new Promise()
 
-      @analytics_session = Biskoto.get(Settings.cookies.analytics.name)
+      @_cleanUpCookies()
+
+      @analytics_session = @_getCookieAnalyticsSession()
       @yogurt_session = Biskoto.get(Settings.cookies.yogurt.name)
 
       if @analytics_session isnt null
@@ -35,10 +37,27 @@ define [
         else
           @promise.reject()
 
+    _cleanUpCookies: ->
+      cookie_settings = Settings.cookies
+      cookie_name = cookie_settings.analytics.name
+      cookie_data = Biskoto.get(cookie_name)
+      return unless cookie_data
+
+      if cookie_data.version isnt cookie_settings.version or !cookie_settings.first_party_enabled
+        Biskoto.expire(cookie_name)
+
+    _getCookieAnalyticsSession: ->
+      data = Biskoto.get(Settings.cookies.analytics.name)
+      if data then data.analytics_session else null
+
     _createFirstPartyCookie: (analytics_session)->
       return unless Settings.cookies.first_party_enabled
 
-      Biskoto.set Settings.cookies.analytics.name, analytics_session,
+      cookie_data =
+        version: Settings.cookies.version
+        analytics_session: analytics_session
+
+      Biskoto.set Settings.cookies.analytics.name, cookie_data,
         expires: Settings.cookies.analytics.duration
 
     _registerAnalyticsSession: (analytics_session)->
