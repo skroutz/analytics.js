@@ -12,26 +12,21 @@ define [
       @queue = []
       @transport = 'img'
 
-      @_determineTransport().then @_enableProperJobHandler
+      @transport_ready = @_determineTransport()
+
+    then: (success, fail) -> @transport_ready.then(success, fail)
 
     report: (url, payload) ->
       promise = new Promise()
-
-      @_handleJob url, payload, promise
+      @transport_ready.then =>
+        @_handleJob url, payload, promise
       promise
 
     _determineTransport: ->
-      BrowserHelper.checkImages().then (images_enabled)=>
+      BrowserHelper.checkImages().then (images_enabled) =>
         @transport = 'script' unless images_enabled
 
-    _enableProperJobHandler: =>
-      @_handleJob = @_properHandleJob
-      while job_args = @queue.reverse().pop()
-        @_handleJob.apply this, job_args
-
-    _handleJob: -> @queue.push arguments
-
-    _properHandleJob: (url, payload, promise)->
+    _handleJob: (url, payload, promise)->
       data = URLHelper.serialize payload, true
       url = URLHelper.appendData(url, data)
 
