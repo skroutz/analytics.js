@@ -11,7 +11,7 @@ define ->
         name: 'analytics_session'
         duration: 60 * 60 * 24 * 7 #In seconds: one week
     url:
-      base: 'http://analytics.skroutz.dev:3040'
+      base: 'http://analytics.skroutz.dev:9000'
       current: window.location.href
       analytics_session:
         create: (yogurt_session)->
