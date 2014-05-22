@@ -21,7 +21,7 @@ define [
       promise
 
     _determineTransport: ->
-      BrowserHelper.checkImages().then (images_enabled)->
+      BrowserHelper.checkImages().then (images_enabled)=>
         @transport = 'script' unless images_enabled
 
     _enableProperJobHandler: =>
