@@ -1,8 +1,9 @@
 define [
   'settings'
   'reporter'
+  'promise'
   'helpers/url_helper'
-], (Settings, Reporter, URLHelper)->
+], (Settings, Reporter, Promise, URLHelper)->
   class ActionsManager
     constructor: () ->
       @reporter = new Reporter()
