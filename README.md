@@ -13,9 +13,9 @@ To use the script in your page in your footer / header.
   _saq.push(['_setAccount', 'XX-YYY-ZZZ']);
 
   (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = '//analytics.skroutz.gr/analytics.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    var sa = document.createElement('script'); sa.type = 'text/javascript'; sa.async = true;
+    sa.src = '//analytics.skroutz.gr/analytics.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(sa, s);
    })();
 </script>
 ```
