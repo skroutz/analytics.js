@@ -10,7 +10,7 @@ define [
       @callbacks = []
       @actions = []
       @shop_code_val = null
-      @actions_queue = Settings.actions_queue
+      @actions_queue = window[Settings.actions_queue_name] ?= []
       @redirect_data = null
 
       @_parseActions()
