@@ -21,7 +21,7 @@ define [
       data[Settings.get_param_name] = analytics_session
       url = URLHelper.appendData @redirect_data.url, URLHelper.serialize(data)
       setTimeout (->
-        window.location.replace url
+        Settings.redirectTo url
       ), @redirect_data.time
       @
 

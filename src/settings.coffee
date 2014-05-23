@@ -1,5 +1,6 @@
 define ->
   Settings =
+    redirectTo: (url)-> window.location.replace(url)
     actions_queue : (window._saq or window._saq = [])
     actions_queue_name : '_saq'
     get_param_name: 'analytics_session'
