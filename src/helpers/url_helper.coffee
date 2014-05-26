@@ -13,4 +13,16 @@ define ->
 
       query_string[0...-1]
 
+    extractGetParam: (name) ->
+      extracted = URLHelper.getParamsFromUrl()
+      return extracted[name] or null
+
+    getParamsFromUrl: (url = window.location.href) ->
+      regex  = /[?&;](.+?)=([^&;]+)/g
+      params = {}
+      if url
+        while match = regex.exec(url)
+          params[match[1]] = decodeURIComponent(match[2])
+      return params
+
   return URLHelper
