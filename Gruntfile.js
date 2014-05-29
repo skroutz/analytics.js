@@ -3,6 +3,12 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
+    bump: {
+      options: {
+        pushTo: 'origin',
+      }
+    },
+
     optimize_rjs: {
       analytics: {
         dest: "dist/analytics.js"
