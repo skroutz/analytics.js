@@ -1,4 +1,6 @@
 bower_components
 compiled
+config/deploy.rb
+config/deploy/
 dist
 node_modules
