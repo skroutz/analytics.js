@@ -5,19 +5,20 @@ define ->
 
     @get: (name) ->
       if document.cookie
-        cookies = decode(document.cookie).split(/;\s/g)
+        cookies = document.cookie.split(/;\s/g)
 
         for cookie in cookies
           if cookie.indexOf(name) is 0
+            value = decode(cookie.split('=')[1])
             try
-              return JSON.parse(cookie.split('=')[1])
+              return JSON.parse(value)
             catch err
-              return cookie.split('=')[1]
+              return value
 
       return null
 
     @set: (name, value, options = {}) ->
-      document.cookie = "#{name}=#{JSON.stringify(value)}#{@_cookieOptions(options)}"
+      document.cookie = "#{name}=#{encode( JSON.stringify(value) )}#{@_cookieOptions(options)}"
 
     @expire: (name, options = {}) ->
       options.expires = -1
@@ -49,5 +50,4 @@ define ->
         +new Date() + (seconds * 1000)
       ).toUTCString()
 
-  window.Biskoto = Biskoto
   return Biskoto
