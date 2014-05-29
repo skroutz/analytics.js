@@ -5,7 +5,7 @@
   "license": "MIT",
   "version": "0.0.1-1",
   "scripts": {
-    "build": "npm install && grunt build",
+    "build": "npm update && grunt build",
     "cleanup": "rm -rf node_modules bower_components dist compiled",
     "dev": "grunt",
     "test": "grunt test"

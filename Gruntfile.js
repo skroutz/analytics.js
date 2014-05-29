@@ -146,8 +146,6 @@ module.exports = function(grunt) {
         expand: true,
         cwd: 'bower_components/easyxdm/work',
         src: [
-          'easyXDM.debug.js',
-          'easyXDM.min.js',
           'easyXDM.js'
         ],
         dest: 'compiled/vendor',
@@ -158,7 +156,7 @@ module.exports = function(grunt) {
         src: [
           'easyXDM.min.js'
         ],
-        dest: 'dist',
+        dest: 'dist/js',
       },
     },
   });
