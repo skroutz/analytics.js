@@ -1,4 +1,4 @@
-# Analytics Client
+# Analytics Client [![Build Status](https://travis-ci.org/skroutz/analytics.js.svg?branch=master)](https://travis-ci.org/skroutz/analytics.js)
 
 A short description about the client in a single sentence.
 
