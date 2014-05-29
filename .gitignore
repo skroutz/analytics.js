@@ -1,3 +1,5 @@
+.ruby-gemset
+.ruby-version
 bower_components
 compiled
 config/deploy.rb
