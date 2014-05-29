@@ -1,0 +1,38 @@
+lock '3.2.1'
+
+set :application, 'client'
+set :repo_url, 'git@github.com:skroutz/analytics.js.git'
+
+set :user, 'INSERT_DEPLOY_USER_HERE'
+set :deploy_to, 'INSERT_DEPLOY_DIRECTORY_HERE'
+
+set :use_sudo, false
+
+set :log_level, :info
+
+set :linked_dirs, %w{node_modules bower_components}
+
+# Application variables
+set :environment, :production
+namespace :deploy do
+  desc 'Build application'
+  task :build do
+    on roles(:web), in: :sequence, wait: 5 do
+      within(fetch(:release_path)) do
+        execute :npm, 'run build'
+      end
+    end
+  end
+
+  after :publishing, :build
+
+  desc 'Copy assets to public folder'
+  after :build, :copy_assets do
+    on roles(:web) do
+      within(fetch(:release_path)) do
+        execute :mkdir, 'public'
+        execute :cp, 'dist/*', 'public/'
+      end
+    end
+  end
+end
