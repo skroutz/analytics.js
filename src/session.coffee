@@ -12,24 +12,27 @@ define [
 
       @_cleanUpCookies()
 
+      @yogurt_session = @_getCookieYogurtSession()
       @analytics_session = @_getCookieAnalyticsSession()
-      @yogurt_session = Biskoto.get(Settings.cookies.yogurt.name)
 
-      # Always create third party cookie on analytics domain
-      # if on create phase
-      if @analytics_session isnt null and @yogurt_session is null
-        ## TODO: SHOULD BE RE-SET expires ATTRIBUTE IF COOKIE ALREADY EXISTS?
-        @promise.resolve @analytics_session
-      else
-        @socket = @_createSocket @_socketUrl(@yogurt_session)
-        @_getAnalyticsSession()
+      @_establishSession(@yogurt_session, @analytics_session)
 
     then: (success, fail)-> @promise.then(success, fail)
 
-    _getAnalyticsSession: ->
+    _establishSession: (yogurt_session, analytics_session)->
+      # Always create third party cookie on analytics domain
+      # if on create phase
+      if analytics_session isnt null and yogurt_session is null
+        ## TODO: SHOULD BE RE-SET expires ATTRIBUTE IF COOKIE ALREADY EXISTS?
+        @promise.resolve analytics_session
+      else
+        @socket = @_createSocket @_socketUrl(yogurt_session)
+        @_extractAnalyticsSession()
+
+    _extractAnalyticsSession: ->
       Promise.all([
-        @_extractIframe()
-        @_extractGetParam()
+        @_extractFromIframe()
+        @_extractFromGetParam()
       ]).then (results) =>
         analytics_session = results[0] or results[1]
 
@@ -47,6 +50,8 @@ define [
 
       if cookie_data.version isnt cookie_settings.version or !cookie_settings.first_party_enabled
         Biskoto.expire(cookie_name)
+
+    _getCookieYogurtSession: -> Biskoto.get(Settings.cookies.yogurt.name)
 
     _getCookieAnalyticsSession: ->
       data = Biskoto.get(Settings.cookies.analytics.name)
@@ -66,11 +71,11 @@ define [
       @analytics_session = analytics_session
       @promise.resolve analytics_session
 
-    _extractGetParam: ->
+    _extractFromGetParam: ->
       promise = new Promise()
       promise.resolve URLHelper.extractGetParam(Settings.get_param_name)
 
-    _extractIframe: ->
+    _extractFromIframe: ->
       @socket.promise = new Promise()
       @socket.postMessage('get_analytics_session')
       @socket.promise
