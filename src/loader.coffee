@@ -28,5 +28,5 @@
 
   doc.write('<body onload="document._l();">')
   doc.close()
-)('analytics.js')
+)('@@payload_hash')
 
