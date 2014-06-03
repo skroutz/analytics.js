@@ -24,7 +24,7 @@ module.exports = function(grunt) {
 
     optimize_rjs: {
       analytics: {
-        dest: "dist/analytics.js"
+        dest: "dist/js/analytics.js"
       }
     },
 
@@ -93,7 +93,7 @@ module.exports = function(grunt) {
     uglify: {
       payload: {
         files: {
-          "dist/analytics.min.js": [ "dist/analytics.js" ]
+          'dist/js/analytics.min.js': 'dist/js/analytics.js',
         },
         options: {
           banner: "/*! <%= pkg.name %> v<%= pkg.version %> \n " +
