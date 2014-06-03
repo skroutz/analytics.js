@@ -16,6 +16,39 @@ module.exports = function(grunt) {
       }
     },
 
+    hash: {
+      options: {
+        mapping: 'compiled/assets.json',
+        srcBasePath: 'dist/',
+        destBasePath: 'dist/',
+        hashFunction: function(source, encoding){ // default is md5
+          return require('crypto').createHash('sha1').update(source, encoding).digest('hex');
+        }
+      },
+      payload: {
+        src: 'dist/js/analytics.js',
+        dest: 'dist/js'
+      },
+    },
+
+    replace: {
+      loader: {
+        options: {
+          patterns: [{
+            match: 'payload_hash',
+            replacement: function(){
+              filename = grunt.file.readJSON('compiled/assets.json')['js/analytics.js']
+              return filename.replace('.js','.min.js')
+            }
+          }]
+        },
+        files: [{
+          src: 'compiled/loader.js',
+          dest: 'dist/loader.js'
+        }]
+      }
+    },
+
     bump: {
       options: {
         pushTo: 'origin',
@@ -55,61 +88,85 @@ module.exports = function(grunt) {
           'karma:unit:run',
         ]
       },
-      coffee:{
+      loader:{
         files: [
-          'src/**/*.coffee',
+          'src/loader.coffee',
         ],
         tasks: [
-          'karma:unit:run',
-          'coffee:compile',
-          'optimize_rjs',
-          'uglify:payload',
+          'clean:payload',
+          'build_dist',
         ]
       },
-      vendor:{
+      payload:{
         files: [
-          'compiled/vendor/**/*.js',
+          'src/**/*.coffee',
+          '!src/loader.coffee',
         ],
         tasks: [
-          'concat:easyxdm_module',
           'karma:unit:run',
+          'clean:payload',
+          'build_dist',
         ]
       },
     },
 
     coffee: {
-      compile: {
-        options: {
-          bare: true
-        },
+      options: {
+        bare: true
+      },
+      payload: {
         expand: true,
         cwd: 'src',
-        src: ['**/*.coffee'],
+        src: [
+          '**/*.coffee',
+          '!loader.coffee'
+        ],
         dest: 'compiled/',
         ext: '.js'
+      },
+      loader: {
+        src: [
+          'src/loader.coffee'
+        ],
+        dest: 'compiled/loader.js',
       },
     },
 
     uglify: {
+      options: {
+        mangle: false,
+        beautify: {
+          ascii_only: true
+        },
+        preserveComments: false,
+        report: "min",
+        compress: {
+          hoist_funs: false,
+          loops: false,
+          unused: false
+        }
+      },
       payload: {
+        files: [{
+          expand: true,
+          cwd: 'dist/js',
+          extDot: 'last',
+          src: [
+            '**/*.js',
+            '!**/*.min.js',
+          ],
+          dest: 'dist/js',
+          ext: '.min.js'
+        }],
+      },
+      loader: {
         files: {
-          'dist/js/analytics.min.js': 'dist/js/analytics.js',
+          'dist/loader.min.js': 'dist/loader.js',
         },
         options: {
           banner: "/*! <%= pkg.name %> v<%= pkg.version %> \n " +
             "(c) 2014, <%= grunt.template.today('yyyy') %> <%= pkg.company %> \n " +
             "<%= pkg.license %> */\n",
-          mangle: false,
-          beautify: {
-            ascii_only: true
-          },
-          preserveComments: false,
-          report: "min",
-          compress: {
-            hoist_funs: false,
-            loops: false,
-            unused: false
-          }
         }
       }
     },
@@ -177,29 +234,61 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
   grunt.loadTasks( "tasks" );
 
+  //TEST TASKS
+  grunt.registerTask('start_test_server', ['karma:unit:start']);
+  grunt.registerTask('run_tests', ['karma:unit:run']);
+
+
+  //BOWER TASKS
+  grunt.registerTask('bower_install', [
+    'bower:install',
+    'shell:build_easyxdm'
+  ]);
+
+
+  //BUILD PAYLOAD
+  grunt.registerTask('build_payload', [
+    'clean:payload',
+    'create_easyxdm_module',
+    'coffee:payload',
+    'optimize_rjs',
+  ]);
 
   grunt.registerTask('create_easyxdm_module', [
     'copy:easyxdm_module',
     'concat:easyxdm_module'
   ]);
 
-  grunt.registerTask('install_bower_deps', [
-    'bower:install',
-    'shell:build_easyxdm'
+
+  //BUILD LOADER
+  grunt.registerTask('build_loader', [
+    'coffee:loader',
+    'hash:payload',
+    'replace:loader'
   ]);
 
-  grunt.registerTask('start_test_server', ['karma:unit:start']);
-  grunt.registerTask('run_tests', ['karma:unit:run']);
 
-  grunt.registerTask('build', [
-    'install_bower_deps',
-    'create_easyxdm_module',
+  //CREATE DIST ASSETS
+  grunt.registerTask('build_dist', [
+    'vendor_assets',
+    'build_payload',
+    'build_loader',
+    'uglify'
+  ]);
+
+  grunt.registerTask('vendor_assets', [
     'copy:easyxdm_dist',
-    'coffee:compile',
-    'optimize_rjs',
-    'uglify',
+  ]);
+
+
+  //ON DEPLOY
+  grunt.registerTask('build', [
+    'bower_install',
+    'build_dist',
     'compress'
   ]);
+
+  //DEFAULT TASKS
   grunt.registerTask('cleanup', ['shell:cleanup']);
   grunt.registerTask('default', ['start_test_server', 'watch']);
   grunt.registerTask('test', ['karma:single']);
