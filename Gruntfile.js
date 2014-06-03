@@ -3,6 +3,12 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
+    clean: {
+      payload: {
+        src: ['dist/js/analytics*']
+      }
+    },
+
     compress: {
       dist: {
         options: {
