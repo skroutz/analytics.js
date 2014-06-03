@@ -3,6 +3,19 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
+    compress: {
+      dist: {
+        options: {
+          mode: 'gzip'
+        },
+        expand: true,
+        extDot: 'last',
+        cwd: 'dist/',
+        src: ['**/*'],
+        dest: 'dist/'
+      }
+    },
+
     bump: {
       options: {
         pushTo: 'origin',
@@ -184,7 +197,8 @@ module.exports = function(grunt) {
     'copy:easyxdm_dist',
     'coffee:compile',
     'optimize_rjs',
-    'uglify'
+    'uglify',
+    'compress'
   ]);
   grunt.registerTask('cleanup', ['shell:cleanup']);
   grunt.registerTask('default', ['start_test_server', 'watch']);
