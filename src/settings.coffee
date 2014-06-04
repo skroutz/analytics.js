@@ -1,8 +1,8 @@
 define ->
   Settings =
-    redirectTo: (url)-> window.location.replace(url)
-    actions_queue : (window._saq or window._saq = [])
-    actions_queue_name : '_saq'
+    window: (global or this)
+    redirectTo: (url)-> Settings.window.location.replace(url)
+    actions_queue_name: '_saq'
     get_param_name: 'analytics_session'
     cookies:
       first_party_enabled: true
@@ -14,7 +14,6 @@ define ->
         duration: 60 * 60 * 24 * 7 #In seconds: one week
     url:
       base: 'http://analytics.local:9000'
-      current: window.location.href
       analytics_session:
         create: (yogurt_session)->
           "#{Settings.url.base}/track/new?yogurt_session=#{yogurt_session}"
@@ -27,5 +26,8 @@ define ->
     api:
       shop_code_key: '_setAccount'
       redirect_key: 'redirect'
+
+  Settings.actions_queue = (Settings.window._saq or Settings.window._saq = [])
+  Settings.url.current   = Settings.window.location.href
 
   return Settings
