@@ -46,6 +46,10 @@ module.exports = function(grunt) {
               filename = grunt.file.readJSON('compiled/assets.json')['js/analytics.js']
               return filename.replace('.js','.min.js')
             }
+          },
+          {
+            match: 'base_url',
+            replacement: 'http://analytics.local:9000/public'
           }]
         },
         files: [{
