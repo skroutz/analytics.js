@@ -7,6 +7,16 @@ describe 'Settings', ->
       done()
 
   describe 'API', ->
+    it 'has property .window', ->
+      expect(@settings)
+        .to.have.property('window')
+        .that.is.an('object')
+
+    it 'has property .redirectTo', ->
+      expect(@settings)
+        .to.have.property('redirectTo')
+        .that.is.an('function')
+
     it 'has property .actions_queue', ->
       expect(@settings)
         .to.have.property('actions_queue')

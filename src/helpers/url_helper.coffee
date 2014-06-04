@@ -1,4 +1,4 @@
-define ->
+define ['settings'], (Settings)->
   URLHelper =
     appendData: (url, payload) ->
         sign = if url.indexOf('?') isnt -1 then '&' else '?'
@@ -17,7 +17,7 @@ define ->
       extracted = URLHelper.getParamsFromUrl()
       return extracted[name] or null
 
-    getParamsFromUrl: (url = window.location.href) ->
+    getParamsFromUrl: (url = Settings.window.location.href) ->
       regex  = /[?&;](.+?)=([^&;]+)/g
       params = {}
       if url
