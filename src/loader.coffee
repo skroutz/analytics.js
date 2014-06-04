@@ -26,7 +26,7 @@
     js.src = "@@base_url/#{url}"
     this.body.appendChild(js)
 
-  doc.write('<body onload="document._l();">')
+  doc.write('<body onload="window.inDapIF=true; document._l();">')
   doc.close()
 )('@@payload_hash')
 
