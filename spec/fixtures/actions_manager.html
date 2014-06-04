@@ -1,10 +1,21 @@
 <script>
-  var
-    _saq = window._saq || (window._saq = []),
-    product = {
-      'id'   : 1,
-      'name' : 'product_name',
+  (function (s, k, r, o, u, t, z) {
+    s['SkroutzAnalyticsObject'] = u;
+    s[u] = s[u] || function () {
+      (s[u].q = s[u].q || []).push(arguments);
     };
-  window._saq.push(['_product_click', product]);
-  window._saq.push(['_product_click2', product]);
+    s[u].l = +new Date();
+
+//    t = k.createElement(r);
+//    z = k.getElementsByTagName(r)[0];
+//    t.async = true;
+//    t.src = o;
+//    z.parentNode.insertBefore(t, z);
+  })(window, document, 'script', '//analytics.local:9000/js/analytics.js', 'sa');
+
+  sa('settings', 'setAccount', 'SA-XXXX-Y');
+
+  sa('ecommerce', 'addTransaction', 'data1', 'sig1');
+  sa('ecommerce', 'addItem', 'data2', 'sig2');
+  sa('ecommerce', 'addItem', 'data3', 'sig3');
 </script>
