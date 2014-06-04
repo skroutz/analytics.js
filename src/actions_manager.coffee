@@ -26,15 +26,12 @@ define [
       @
 
     sendTo: (url) ->
-      promises =
-        (for action in @actions
-          action.url = Settings.url.current
-          action.shop_code_val = @shop_code_val if @shop_code_val
+      for action in @actions
+        action.url = Settings.url.current
+        action.shop_code_val = @shop_code_val if @shop_code_val
 
-          @reporter.report(url, action)
-        )
-
-      Promise.all(promises).then => callback() for callback in @callbacks
+      @reporter.report(url, @actions).then =>
+        callback() for callback in @callbacks
 
     _parseActions: ->
       api = Settings.api

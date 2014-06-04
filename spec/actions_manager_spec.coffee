@@ -28,7 +28,7 @@ describe 'ActionsManager', ->
     fixture.cleanup()
     window.sa.q = []
 
-  describe '.contructor', ->
+  describe '.constructor', ->
     beforeEach ->
       a = fixture.load 'actions_manager.html'
       @instance = new @subject()
@@ -77,7 +77,7 @@ describe 'ActionsManager', ->
         @url = 'some_url'
         @timeout_seconds = 10
 
-      it "default to 0 seconds for timeout_seconds, if no argument is passed", ->
+      it "defaults to 0 seconds for timeout_seconds, if no argument is passed", ->
         sa(@settings.api.settings.name, @settings.api.settings.redirect_to, @url)
         @instance = new @subject()
 
@@ -136,23 +136,20 @@ describe 'ActionsManager', ->
           expect(@report_stub.args[0][0]).to.equal('dummy_url')
           done()
 
-      it 'passes data from _saq as second argument to @reporter.report', (done)->
+      it 'passes actions as second argument to @reporter.report', (done)->
         @instance.sendTo('dummy_url').then =>
-          expect(@report_stub.args[0][1]).to.contain
-            category: 'some_category'
-            type: 'some_type'
-            data: 'some_data'
+          expect(@report_stub.args[0][1]).to.deep.eql @instance.actions
           done()
 
       it 'appends url to reported data', (done)->
         @instance.sendTo('dummy_url').then =>
-          expect(@report_stub.args[0][1]).to.contain
+          expect(@report_stub.args[0][1][0]).to.contain
             url: window.location.href
           done()
 
       it 'appends shop_code to reported data if passed by action', (done)->
         @instance.sendTo('dummy_url').then =>
-          expect(@report_stub.args[0][1]).to.contain
+          expect(@report_stub.args[0][1][0]).to.contain
             shop_code_val: 'shop_code_1'
           done()
 

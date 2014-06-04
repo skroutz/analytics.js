@@ -3,6 +3,7 @@ define ->
     window: (global or this)
     redirectTo: (url)-> Settings.window.location.replace(url)
     get_param_name: 'analytics_session'
+    single_beacon: false
     cookies:
       first_party_enabled: true
       version: 1
