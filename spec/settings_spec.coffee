@@ -78,7 +78,7 @@ describe 'Settings', ->
         it 'returns the proper create endpoint', ->
           base = @settings.url.base
           session = 'foo'
-          endpoint = "#{base}/track/new?yogurt_session=#{session}"
+          endpoint = "#{base}/track/create?yogurt_session=#{session}"
           expect(@settings.url.analytics_session.create(session))
             .to.equal(endpoint)
 
@@ -90,8 +90,10 @@ describe 'Settings', ->
     describe '.beacon', ->
       it 'returns the proper beacon endpoint', ->
         base = @settings.url.base
+        get_param_name = @settings.get_param_name
         session = 'foo'
-        endpoint = "#{base}/track/beacons/new?analytics_session=#{session}"
+        endpoint = "#{base}/track/actions/create?#{get_param_name}=#{session}"
+
         expect(@settings.url.beacon(session))
           .to.equal(endpoint)
 

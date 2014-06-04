@@ -16,10 +16,10 @@ define ->
       base: 'http://analytics.local:9000'
       analytics_session:
         create: (yogurt_session)->
-          "#{Settings.url.base}/track/new?yogurt_session=#{yogurt_session}"
+          "#{Settings.url.base}/track/create?yogurt_session=#{yogurt_session}"
         connect: -> "#{Settings.url.base}/track/connect"
       beacon: (analytics_session)->
-        "#{Settings.url.base}/track/beacons/new?analytics_session=#{analytics_session}"
+        "#{Settings.url.base}/track/actions/create?#{Settings.get_param_name}=#{analytics_session}"
       utils:
         third_party_step1: -> "#{Settings.url.base}/track/check/third_party/step_1.js"
         third_party_step2: -> "#{Settings.url.base}/track/check/third_party/step_2.js"
