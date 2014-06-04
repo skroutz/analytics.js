@@ -4,5 +4,3 @@
   if(global.inDapIF){
     global = global.top;
   }
-
-  global._saq = global._saq || []

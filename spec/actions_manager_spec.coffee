@@ -26,7 +26,7 @@ describe 'ActionsManager', ->
     @settings.redirectTo = @old_redirect
     @clock.restore()
     fixture.cleanup()
-    window._saq = []
+    window.sa.q = []
 
   describe '.contructor', ->
     beforeEach ->
@@ -37,18 +37,19 @@ describe 'ActionsManager', ->
       expect(@instance.reporter).to.be.instanceof @reporter
 
     it 'parses actions', ->
-      expect(@instance.actions).to.have.length 2
+      expect(@instance.actions).to.have.length 3
 
-    it 'empties _saq', ->
-      expect(window._saq).to.have.length 0
+    it 'empties sa.q', ->
+      expect(window.sa.q).to.have.length 0
 
   describe 'Actions Implemented', ->
     it 'processes pushed generic actions', ->
-      window._saq.push ['some_action', 'some_data']
+      sa('action_category', 'action_type', 'action_data')
       @instance = new @subject()
       expect(@instance.actions[0]).to.contain
-        type: 'some_action'
-        data: 'some_data'
+        category: 'action_category'
+        type: 'action_type'
+        data: 'action_data'
 
     context 'when no action specified', ->
       beforeEach ->
@@ -57,24 +58,27 @@ describe 'ActionsManager', ->
       it 'creates an action', ->
         expect(@instance.actions).to.have.length 1
 
-      it 'creates an action with type "visit"', ->
-        expect(@instance.actions[0]).to.contain {type:'visit'}
+      it 'creates an action with category "site"', ->
+        expect(@instance.actions[0]).to.contain {category:'site'}
 
-    context "when shop_code action is passed", ->
+      it 'creates an action with type "sendPageview"', ->
+        expect(@instance.actions[0]).to.contain {type:'sendPageview'}
+
+    context "when settings:setAccount action is passed", ->
       beforeEach ->
-        window._saq.push [@settings.api.shop_code_key, 'shop_code_1']
+        sa(@settings.api.settings.name, @settings.api.settings.set_account, 'shop_code_1')
         @instance = new @subject()
 
       it "registers shop_code to @shop_code_val", ->
         expect(@instance.shop_code_val).to.equal 'shop_code_1'
 
-    context "when redirect action is passed", ->
+    context "when settings:redirectTo action is passed", ->
       beforeEach ->
         @url = 'some_url'
         @timeout_seconds = 10
 
       it "default to 0 seconds for timeout_seconds, if no argument is passed", ->
-        window._saq.push [@settings.api.redirect_key, @url]
+        sa(@settings.api.settings.name, @settings.api.settings.redirect_to, @url)
         @instance = new @subject()
 
         expect(@instance.redirect_data).to.contain {
@@ -83,7 +87,7 @@ describe 'ActionsManager', ->
         }
 
       it "registers redirection details to @redirect_data", ->
-        window._saq.push [@settings.api.redirect_key, @url, @timeout_seconds]
+        sa(@settings.api.settings.name, @settings.api.settings.redirect_to, @url, @timeout_seconds)
         @instance = new @subject()
 
         expect(@instance.redirect_data).to.contain {
@@ -94,7 +98,7 @@ describe 'ActionsManager', ->
     context "when a function is passed as action", ->
       beforeEach ->
         @spy = sinon.spy()
-        window._saq.push @spy
+        sa(@settings.api.settings.name, @settings.api.settings.set_callback, @spy)
         @instance = new @subject()
 
       it 'adds the function to the @callbacks array', ->
@@ -107,12 +111,12 @@ describe 'ActionsManager', ->
   describe 'API', ->
     describe 'sendTo', ->
       beforeEach ->
-        window._saq.push [@settings.api.shop_code_key, 'shop_code_1']
-        window._saq.push ['some_action', 'some_data']
+        sa(@settings.api.settings.name, @settings.api.settings.set_account, 'shop_code_1')
+        sa('some_category', 'some_type', 'some_data')
 
         @instance = new @subject()
 
-        @report_stub = sinon.stub(@instance.reporter, "report")
+        @report_stub = sinon.stub(@instance.reporter, 'report')
           .returns (new @promise()).resolve()
 
       afterEach ->
@@ -135,7 +139,8 @@ describe 'ActionsManager', ->
       it 'passes data from _saq as second argument to @reporter.report', (done)->
         @instance.sendTo('dummy_url').then =>
           expect(@report_stub.args[0][1]).to.contain
-            type: 'some_action'
+            category: 'some_category'
+            type: 'some_type'
             data: 'some_data'
           done()
 
@@ -153,10 +158,10 @@ describe 'ActionsManager', ->
 
       it 'does not appends shop_code to reported data if not passed by action', (done)->
         @report_stub?.restore()
-        window._saq = []
-        window._saq.push ['some_action', 'some_data']
+        window.sa.q = []
+        sa('some_action', 'some_data')
         @instance = new @subject()
-        @report_stub = sinon.stub(@instance.reporter, "report")
+        @report_stub = sinon.stub(@instance.reporter, 'report')
           .returns (new @promise()).resolve()
 
         @instance.sendTo('dummy_url').then =>
@@ -167,15 +172,15 @@ describe 'ActionsManager', ->
       context 'when functions are added as callback actions', ->
         beforeEach ->
           @report_stub?.restore()
-          window._saq = []
+          window.sa.q = []
 
           @spy = sinon.spy()
 
-          window._saq.push ['some_action', 'some_data']
-          window._saq.push @spy
+          sa('some_category', 'some_action', 'some_data')
+          sa(@settings.api.settings.name, @settings.api.settings.set_callback, @spy)
 
           @instance = new @subject()
-          @report_stub = sinon.stub(@instance.reporter, "report")
+          @report_stub = sinon.stub(@instance.reporter, 'report')
             .returns (new @promise()).resolve()
 
         it 'invokes function actions after all other actions are reported', (done)->
@@ -189,7 +194,7 @@ describe 'ActionsManager', ->
         @analytics_session = 'some_id'
         @url = 'some_url'
 
-        window._saq.push [@settings.api.redirect_key, @url]
+        sa(@settings.api.settings.name, @settings.api.settings.redirect_to, @url)
         @instance = new @subject()
 
         @instance.redirect(@analytics_session)

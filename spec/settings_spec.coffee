@@ -21,7 +21,6 @@ describe 'Settings', ->
       expect(@settings)
         .to.have.property('actions_queue')
         .that.is.an('array')
-        .that.deep.equals(window._saq)
 
     it 'has property .get_param_name', ->
       expect(@settings)

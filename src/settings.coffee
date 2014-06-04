@@ -2,7 +2,6 @@ define ->
   Settings =
     window: (global or this)
     redirectTo: (url)-> Settings.window.location.replace(url)
-    actions_queue_name: '_saq'
     get_param_name: 'analytics_session'
     cookies:
       first_party_enabled: true
@@ -24,10 +23,25 @@ define ->
         third_party_step1: -> "#{Settings.url.base}/track/check/third_party/step_1.js"
         third_party_step2: -> "#{Settings.url.base}/track/check/third_party/step_2.js"
     api:
+      settings:
+        key: 'settings'
+        set_account: 'setAccount'
+        set_callback: 'setCallback'
+        redirect_to: 'redirectTo'
+      yogurt:
+        key: 'yogurt'
+        product_click: 'productClick'
+      site:
+        key: 'site'
+        send_pageview: 'sendPageview'
+      ecommerce:
+        key: 'ecommerce'
+        add_item: 'addItem'
+        add_transaction: 'addTransaction'
       shop_code_key: '_setAccount'
       redirect_key: 'redirect'
 
-  Settings.actions_queue = (Settings.window._saq or Settings.window._saq = [])
+  Settings.actions_queue = (Settings.window.sa?.q or [])
   Settings.url.current   = Settings.window.location.href
 
   return Settings

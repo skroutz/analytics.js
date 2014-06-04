@@ -10,7 +10,7 @@ define [
       @callbacks = []
       @actions = []
       @shop_code_val = null
-      @actions_queue = window[Settings.actions_queue_name] ?= []
+      @actions_queue = Settings.actions_queue
       @redirect_data = null
 
       @_parseActions()
@@ -37,17 +37,23 @@ define [
       Promise.all(promises).then => callback() for callback in @callbacks
 
     _parseActions: ->
+      api = Settings.api
       while item = @actions_queue.pop()
-        if typeof item is 'function' then @callbacks.push item
-        else if item[0] is Settings.api.shop_code_key then @shop_code_val = item[1]
-        else if item[0] is Settings.api.redirect_key
-          @redirect_data =
-            url: item[1]
-            time: parseInt(item[2],10) or 0
-        else
-          @actions.push type: item[0], data: (item[1] || '')
+        switch item[1]
+          when api.settings.set_account
+            @shop_code_val = item[2]
+          when api.settings.set_callback
+            @callbacks.push item[2]
+          when api.settings.redirect_to
+            @redirect_data =
+              url: item[2]
+              time: parseInt(item[3],10) or 0
+          when Settings.api.ecommerce.add_transaction, Settings.api.ecommerce.add_item
+            @actions.push category: item[0], type: item[1], data: item[2], sig: item[3]
+          else
+            @actions.push category: item[0], type: item[1], data: item[2]
 
-      @actions.push {type: 'visit'} unless @actions.length
+      @actions.push {category: api.site.key, type: api.site.send_pageview} unless @actions.length
       return
 
   return ActionsManager
