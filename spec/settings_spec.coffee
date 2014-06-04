@@ -28,6 +28,12 @@ describe 'Settings', ->
         .that.is.a('string')
         .that.equals('analytics_session')
 
+    it 'has property .single_beacon', ->
+      expect(@settings)
+        .to.have.property('single_beacon')
+        .that.is.a('boolean')
+        .that.is.false
+
     it 'has property .cookies', ->
       expect(@settings)
         .to.have.property('cookies')

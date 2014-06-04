@@ -3,8 +3,9 @@ describe 'Reporter', ->
 
   before (done) ->
     window.__requirejs__.clearRequireState()
-    require ['promise'], (Promise) =>
+    require ['promise', 'settings'], (Promise, Settings) =>
       @promise = Promise
+      @settings = Settings
 
       # mock BrowserHelper
       requirejs.undef 'helpers/browser_helper'
@@ -33,7 +34,8 @@ describe 'Reporter', ->
 
     @url = 'foo.bar'
     @payload = {k1: 'v1', k2: 'v2'}
-    @url_with_payload = 'foo.bar?k1=%22v1%22&k2=%22v2%22'
+    @payload2 = {k3: 'v3', k4: 'v4'}
+    @url_with_payload = 'foo.bar?k1=v1&k2=v2'
 
   describe 'instance', ->
     beforeEach (done) ->
@@ -66,6 +68,42 @@ describe 'Reporter', ->
     it 'returns a promise', ->
       res = @subject.report(@url, @payload)
       expect(res).to.be.an.instanceof @promise
+
+    context 'when Settings.single_beacon is true', ->
+      beforeEach ->
+        @settings.single_beacon = true
+        @spy = sinon.spy(@subject, '_handleJob')
+        @actions = [@payload, @payload, @payload]
+
+        @subject.report(@url, @actions)
+
+      afterEach ->
+        @settings.single_beacon = false
+        @spy.restore()
+
+      it 'sends a beacon for all actions', ->
+        expect(@spy).to.be.calledOnce
+
+      it 'sends the proper arguments', ->
+        expect(@spy).to.be.calledWith(@url, @actions)
+
+    context 'when Settings.single_beacon is false', ->
+      beforeEach ->
+        @settings.single_beacon = false
+        @spy = sinon.spy(@subject, '_handleJob')
+        @actions = [@payload, @payload, @payload2]
+
+        @subject.report(@url, @actions)
+
+      afterEach ->
+        @settings.single_beacon = false
+        @spy.restore()
+
+      it 'sends a beacon for each action', ->
+        expect(@spy.callCount).to.equal @actions.length
+
+      it 'sends the proper arguments', ->
+        expect(@spy.args[2]).to.contain @actions[2]
 
     context 'when transport uses image', ->
       beforeEach ->

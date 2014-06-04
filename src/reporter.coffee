@@ -16,20 +16,37 @@ define [
 
     then: (success, fail) -> @transport_ready.then(success, fail)
 
-    report: (url, payload) ->
-      promise = new Promise()
-      @transport_ready.then =>
-        @_handleJob url, payload, promise
-      promise
+    report: (url, actions) ->
+      if Settings.single_beacon
+        promise = new Promise()
+        @transport_ready.then =>
+          @_handleJob url, actions, promise
+        promises = [promise]
+      else
+        promises =
+          for action in actions
+            promise = new Promise()
+            @transport_ready.then =>
+              @_handleJob url, action, promise
+            promise
+
+      Promise.all(promises)
 
     _determineTransport: ->
       BrowserHelper.checkImages().then (images_enabled) =>
         @transport = 'script' unless images_enabled
 
     _handleJob: (url, payload, promise)->
-      data = URLHelper.serialize payload, true
+      if payload instanceof Array
+        data = URLHelper.serialize(payload, true)
+      else
+        data = URLHelper.serialize(payload)
+
       url = URLHelper.appendData(url, data)
 
+      ## WE HAVE A VALID URL THAT CONTAINS THE PAYLOAD
+      ## WE MUST CHECK THAT THE URL.length IS BELOW THE MAXIMUM ALLOWED
+      ## OTHERWISE WE SHOULD CHUNK THE string AND SEND MULTIPLE TRANSPORTS
       @_createTransport(promise, url)
 
     _createTransport: (promise, url) ->
