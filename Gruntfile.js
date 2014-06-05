@@ -5,7 +5,7 @@ module.exports = function(grunt) {
 
     clean: {
       payload: {
-        src: ['dist/js/analytics*']
+        src: ['dist/js/payload*']
       }
     },
 
@@ -32,7 +32,7 @@ module.exports = function(grunt) {
         }
       },
       payload: {
-        src: 'dist/js/analytics.js',
+        src: 'dist/js/payload.js',
         dest: 'dist/js'
       },
     },
@@ -43,7 +43,7 @@ module.exports = function(grunt) {
           patterns: [{
             match: 'payload_hash',
             replacement: function(){
-              filename = grunt.file.readJSON('compiled/assets.json')['js/analytics.js']
+              filename = grunt.file.readJSON('compiled/assets.json')['js/payload.js']
               return filename.replace('.js','.min.js')
             }
           },
@@ -54,7 +54,7 @@ module.exports = function(grunt) {
         },
         files: [{
           src: 'compiled/loader.js',
-          dest: 'dist/loader.js'
+          dest: 'dist/analytics.js'
         }]
       }
     },
@@ -67,7 +67,7 @@ module.exports = function(grunt) {
 
     optimize_rjs: {
       analytics: {
-        dest: "dist/js/analytics.js"
+        dest: "dist/js/payload.js"
       }
     },
 
@@ -171,7 +171,7 @@ module.exports = function(grunt) {
       },
       loader: {
         files: {
-          'dist/loader.min.js': 'dist/loader.js',
+          'dist/analytics.min.js': 'dist/analytics.js',
         },
         options: {
           banner: "/*! <%= pkg.name %> v<%= pkg.version %> \n " +
