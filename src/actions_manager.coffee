@@ -26,10 +26,6 @@ define [
       @
 
     sendTo: (url) ->
-      for action in @actions
-        action.url = Settings.url.current
-        action.shop_code_val = @shop_code_val if @shop_code_val
-
       @reporter.report(url, @actions).then =>
         callback() for callback in @callbacks
 
@@ -44,12 +40,22 @@ define [
             @redirect_data =
               url: item[2]
               time: parseInt(item[3],10) or 0
-          when Settings.api.ecommerce.add_transaction, Settings.api.ecommerce.add_item
-            @actions.push category: item[0], type: item[1], data: item[2], sig: item[3]
           else
-            @actions.push category: item[0], type: item[1], data: item[2]
+            action = {
+              category: item[0]
+              type: item[1]
+              data: item[2]
+              url: Settings.url.current
+            }
+            action.sig = item[3] if item[0] is Settings.api.ecommerce.key
+
+            @actions.push action
 
       @actions.push {category: 'site', type: 'sendPageview'} unless @actions.length
+
+      for action in @actions
+        action.shop_code_val = @shop_code_val if @shop_code_val
+
       return
 
   return ActionsManager
