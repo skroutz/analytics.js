@@ -109,7 +109,7 @@ describe 'ActionsManager', ->
         expect(@spy).to.not.be.called
 
   describe 'API', ->
-    describe 'sendTo', ->
+    describe '#sendTo', ->
       beforeEach ->
         sa(@settings.api.settings.name, @settings.api.settings.set_account, 'shop_code_1')
         sa('some_category', 'some_type', 'some_data')
@@ -139,18 +139,6 @@ describe 'ActionsManager', ->
       it 'passes actions as second argument to @reporter.report', (done)->
         @instance.sendTo('dummy_url').then =>
           expect(@report_stub.args[0][1]).to.deep.eql @instance.actions
-          done()
-
-      it 'appends url to reported data', (done)->
-        @instance.sendTo('dummy_url').then =>
-          expect(@report_stub.args[0][1][0]).to.contain
-            url: window.location.href
-          done()
-
-      it 'appends shop_code to reported data if passed by action', (done)->
-        @instance.sendTo('dummy_url').then =>
-          expect(@report_stub.args[0][1][0]).to.contain
-            shop_code_val: 'shop_code_1'
           done()
 
       it 'does not appends shop_code to reported data if not passed by action', (done)->
@@ -186,7 +174,7 @@ describe 'ActionsManager', ->
             expect(@spy.callCount).to.equal(1)
             done()
 
-    describe 'redirect', ->
+    describe '#redirect', ->
       beforeEach ->
         @analytics_session = 'some_id'
         @url = 'some_url'
@@ -204,3 +192,21 @@ describe 'ActionsManager', ->
       it 'appends passed argument as get_param to the redirect url', (done)->
         expect(@location_replace_stub.args[0][0]).to.contain(@analytics_session)
         done()
+
+  describe '#_parseActions', ->
+    beforeEach ->
+      sa(@settings.api.settings.name, @settings.api.settings.set_account, 'shop_code_1')
+      sa('foo1', 'bar1', 'data1')
+      sa('foo2', 'bar2', 'data2')
+
+      @instance = new @subject()
+
+    it 'appends url to each action', ->
+      expect(@instance.actions[0])
+        .to.have.property('url')
+        .that.equals(window.location.href)
+
+    it 'appends shop_code to each action', ->
+      expect(@instance.actions[0])
+        .to.have.property('shop_code_val')
+        .that.equals('shop_code_1')
