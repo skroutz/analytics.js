@@ -2,7 +2,8 @@ describe 'URLHelper', ->
   @timeout(0) # Disable the spec's timeout
 
   before (done) ->
-    require ['helpers/url_helper'], (UrlHelper) =>
+    require ['helpers/url_helper', 'settings'], (UrlHelper, Settings) =>
+      @settings = Settings
       @subject = UrlHelper
       done()
 
@@ -98,14 +99,12 @@ describe 'URLHelper', ->
 
   describe '.extractGetParam', ->
     it 'returns the proper get param', ->
-      url = 'http://foo.bar?foo=bar'
-      o = {
-        foo: 'bar'
-      }
-      stub = sinon.stub(@subject, 'getParamsFromUrl').returns(o)
+      current_url_backup = @settings.url.current
+      @settings.url.current = 'http://foo.bar?foo=bar&zzz=xxx'
 
       expect(@subject.extractGetParam('foo')).to.equal('bar')
-      stub.restore()
+
+      @settings.url.current = current_url_backup
 
   describe '.getParamsFromUrl', ->
     it 'returns the proper JSON object', ->
