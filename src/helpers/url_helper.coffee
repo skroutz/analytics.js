@@ -17,7 +17,7 @@ define ['settings'], (Settings)->
       extracted = URLHelper.getParamsFromUrl()
       return extracted[name] or null
 
-    getParamsFromUrl: (url = Settings.window.location.href) ->
+    getParamsFromUrl: (url = Settings.url.current) ->
       regex  = /[?&;](.+?)=([^&;]+)/g
       params = {}
       if url
