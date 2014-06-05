@@ -13,8 +13,8 @@ define ['settings'], (Settings)->
 
       query_string[0...-1]
 
-    extractGetParam: (name) ->
-      extracted = URLHelper.getParamsFromUrl()
+    extractGetParam: (name, url) ->
+      extracted = URLHelper.getParamsFromUrl(url)
       return extracted[name] or null
 
     getParamsFromUrl: (url = Settings.url.current) ->

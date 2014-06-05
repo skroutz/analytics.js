@@ -98,13 +98,26 @@ describe 'URLHelper', ->
           expect(@serialize(o, true)).to.equal(q)
 
   describe '.extractGetParam', ->
-    it 'returns the proper get param', ->
-      current_url_backup = @settings.url.current
+    beforeEach ->
+      @current_url_backup = @settings.url.current
       @settings.url.current = 'http://foo.bar?foo=bar&zzz=xxx'
 
-      expect(@subject.extractGetParam('foo')).to.equal('bar')
+    afterEach ->
+      @settings.url.current = @current_url_backup
 
-      @settings.url.current = current_url_backup
+    it 'acceps param_name as first argument', ->
+      expect(@subject.extractGetParam('zzz')).to.equal('xxx')
+
+    it 'acceps url to search into as second argument', ->
+      url = 'http://foo.bar?foo=xxx&zzz=bar'
+
+      expect(@subject.extractGetParam('zzz', url)).to.equal('bar')
+
+    it 'searches on the current.url if no second argument is passed', ->
+      expect(@subject.extractGetParam('zzz')).to.equal('xxx')
+
+    it 'returns the proper get param', ->
+      expect(@subject.extractGetParam('foo')).to.equal('bar')
 
   describe '.getParamsFromUrl', ->
     it 'returns the proper JSON object', ->
