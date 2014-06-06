@@ -42,7 +42,14 @@ define ->
       shop_code_key: '_setAccount'
       redirect_key: 'redirect'
 
-  Settings.actions_queue = (Settings.window.sa?.q or [])
+
+  # TODO MAKE IT BETTER
+  Settings.window.sa = Settings.window.sa or ->
+    (Settings.window.sa.q = Settings.window.sa.q || []).push(arguments)
+    return
+  Settings.window.sa.q = Settings.window.sa.q or []
+
+  Settings.actions_queue = Settings.window.sa.q
   Settings.url.current   = Settings.window.location.href
 
   return Settings

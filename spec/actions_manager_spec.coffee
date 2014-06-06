@@ -1,3 +1,8 @@
+# Helper to clear API queue whithout messing with the references
+clear_q = ->
+  while a = window.sa.q.pop()
+    ;
+
 describe 'ActionsManager', ->
   @timeout(0) # Disable the spec's timeout
 
@@ -26,7 +31,8 @@ describe 'ActionsManager', ->
     @settings.redirectTo = @old_redirect
     @clock.restore()
     fixture.cleanup()
-    window.sa.q = []
+    clear_q()
+
 
   describe '.constructor', ->
     beforeEach ->
@@ -66,7 +72,7 @@ describe 'ActionsManager', ->
 
     context "when settings:setAccount action is passed", ->
       beforeEach ->
-        sa(@settings.api.settings.name, @settings.api.settings.set_account, 'shop_code_1')
+        sa(@settings.api.settings.key, @settings.api.settings.set_account, 'shop_code_1')
         @instance = new @subject()
 
       it "registers shop_code to @shop_code_val", ->
@@ -78,7 +84,7 @@ describe 'ActionsManager', ->
         @timeout_seconds = 10
 
       it "defaults to 0 seconds for timeout_seconds, if no argument is passed", ->
-        sa(@settings.api.settings.name, @settings.api.settings.redirect_to, @url)
+        sa(@settings.api.settings.key, @settings.api.settings.redirect_to, @url)
         @instance = new @subject()
 
         expect(@instance.redirect_data).to.contain {
@@ -87,7 +93,7 @@ describe 'ActionsManager', ->
         }
 
       it "registers redirection details to @redirect_data", ->
-        sa(@settings.api.settings.name, @settings.api.settings.redirect_to, @url, @timeout_seconds)
+        sa(@settings.api.settings.key, @settings.api.settings.redirect_to, @url, @timeout_seconds)
         @instance = new @subject()
 
         expect(@instance.redirect_data).to.contain {
@@ -98,7 +104,7 @@ describe 'ActionsManager', ->
     context "when a function is passed as action", ->
       beforeEach ->
         @spy = sinon.spy()
-        sa(@settings.api.settings.name, @settings.api.settings.set_callback, @spy)
+        sa(@settings.api.settings.key, @settings.api.settings.set_callback, @spy)
         @instance = new @subject()
 
       it 'adds the function to the @callbacks array', ->
@@ -111,7 +117,7 @@ describe 'ActionsManager', ->
   describe 'API', ->
     describe '#sendTo', ->
       beforeEach ->
-        sa(@settings.api.settings.name, @settings.api.settings.set_account, 'shop_code_1')
+        sa(@settings.api.settings.key, @settings.api.settings.set_account, 'shop_code_1')
         sa('some_category', 'some_type', 'some_data')
 
         @instance = new @subject()
@@ -143,7 +149,8 @@ describe 'ActionsManager', ->
 
       it 'does not appends shop_code to reported data if not passed by action', (done)->
         @report_stub?.restore()
-        window.sa.q = []
+        clear_q()
+
         sa('some_action', 'some_data')
         @instance = new @subject()
         @report_stub = sinon.stub(@instance.reporter, 'report')
@@ -157,12 +164,12 @@ describe 'ActionsManager', ->
       context 'when functions are added as callback actions', ->
         beforeEach ->
           @report_stub?.restore()
-          window.sa.q = []
+          clear_q()
 
           @spy = sinon.spy()
 
           sa('some_category', 'some_action', 'some_data')
-          sa(@settings.api.settings.name, @settings.api.settings.set_callback, @spy)
+          sa(@settings.api.settings.key, @settings.api.settings.set_callback, @spy)
 
           @instance = new @subject()
           @report_stub = sinon.stub(@instance.reporter, 'report')
@@ -179,7 +186,7 @@ describe 'ActionsManager', ->
         @analytics_session = 'some_id'
         @url = 'some_url'
 
-        sa(@settings.api.settings.name, @settings.api.settings.redirect_to, @url)
+        sa(@settings.api.settings.key, @settings.api.settings.redirect_to, @url)
         @instance = new @subject()
 
         @instance.redirect(@analytics_session)
@@ -195,7 +202,7 @@ describe 'ActionsManager', ->
 
   describe '#_parseActions', ->
     beforeEach ->
-      sa(@settings.api.settings.name, @settings.api.settings.set_account, 'shop_code_1')
+      sa(@settings.api.settings.key, @settings.api.settings.set_account, 'shop_code_1')
       sa('foo1', 'bar1', 'data1')
       sa('foo2', 'bar2', 'data2')
 
