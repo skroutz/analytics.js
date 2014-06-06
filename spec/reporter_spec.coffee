@@ -4,6 +4,7 @@ describe 'Reporter', ->
   before (done) ->
     window.__requirejs__.clearRequireState()
     require ['promise', 'settings'], (Promise, Settings) =>
+      @settings = Settings
       @promise = Promise
       @settings = Settings
 
@@ -206,8 +207,26 @@ describe 'Reporter', ->
           stub.restore()
           done()
 
+  # describe '#_handleJob', ->
+  #   beforeEach ->
+  #     @pr = new @promise()
+  #     @subject = new @reporter()
+  #     @stub = sinon.stub(@subject, '_createTransport')
+
+  #     @subject._handleJob(@url, @payload, @pr)
+
+  #   afterEach ->
+  #     @stub.restore()
+
+  #   it 'calls #_createTransport', ->
+  #     expect(@stub).to.be.calledOnce
+
+  #   it 'calls #_createTransport with proper args', ->
+  #     expect(@stub).to.be.calledWith(@pr, @url_with_payload)
   describe '#_handleJob', ->
     beforeEach ->
+      @transport_url_length_backup = @settings.transport_url_length
+
       @pr = new @promise()
       @subject = new @reporter()
       @stub = sinon.stub(@subject, '_createTransport')
@@ -215,10 +234,29 @@ describe 'Reporter', ->
       @subject._handleJob(@url, @payload, @pr)
 
     afterEach ->
+      @settings.transport_url_length = @transport_url_length_backup
       @stub.restore()
 
-    it 'calls #_createTransport', ->
-      expect(@stub).to.be.calledOnce
+    context 'when serialized payload is bigger than settings.transport_url_length', ->
+      beforeEach ->
+        @settings.transport_url_length = 10
 
-    it 'calls #_createTransport with proper args', ->
-      expect(@stub).to.be.calledWith(@pr, @url_with_payload)
+      it 'calls #_createTransport', ->
+        expect(@stub).to.be.calledOnce
+
+      it 'calls #_createTransport with proper args', ->
+        expect(@stub).to.be.calledWith(@pr, @url_with_payload)
+
+    context 'when serialized payload is smaller than settings.transport_url_length', ->
+      beforeEach ->
+        @settings.transport_url_length = 5000
+
+      it 'calls #_createTransport', ->
+        expect(@stub).to.be.calledOnce
+
+      it 'calls #_createTransport with proper args', ->
+        debugger
+        "foo.bar?k1=v1&k2=v2"
+        expect(@stub).to.be.calledWith(@pr, @url_with_payload)
+
+

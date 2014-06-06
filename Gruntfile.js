@@ -44,7 +44,8 @@ module.exports = function(grunt) {
             match: 'payload_hash',
             replacement: function(){
               filename = grunt.file.readJSON('compiled/assets.json')['js/payload.js']
-              return filename.replace('.js','.min.js')
+              // return filename.replace('.js','.min.js')
+              return filename
             }
           },
           {
@@ -113,7 +114,7 @@ module.exports = function(grunt) {
           '!src/loader.coffee',
         ],
         tasks: [
-          'karma:unit:run',
+          // 'karma:unit:run',
           'clean:payload',
           'build_dist',
         ]

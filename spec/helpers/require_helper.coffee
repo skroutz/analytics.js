@@ -2,7 +2,8 @@ allTestFiles = []
 TEST_REGEXP = /(spec|test)\.js$/i
 
 Object.keys(window.__karma__.files).forEach (file) ->
-  allTestFiles.push(file) if TEST_REGEXP.test(file)
+  # allTestFiles.push(file) if TEST_REGEXP.test(file)
+  allTestFiles.push(file) if file.indexOf('reporter_spec') isnt -1
 
 window.__requirejs__ =
   loaded_amds: {}

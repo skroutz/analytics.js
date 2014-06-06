@@ -12,6 +12,11 @@ describe 'Settings', ->
         .to.have.property('window')
         .that.is.an('object')
 
+    it 'has property .transport_url_length', ->
+      expect(@settings)
+        .to.have.property('transport_url_length')
+        .that.is.an('number')
+
     it 'has property .redirectTo', ->
       expect(@settings)
         .to.have.property('redirectTo')
