@@ -22,6 +22,12 @@ describe 'Settings', ->
         .to.have.property('actions_queue')
         .that.is.an('array')
 
+    it 'has property .iframe_message', ->
+      expect(@settings)
+        .to.have.property('iframe_message')
+        .that.is.a('string')
+        .that.equals('get_analytics_session')
+
     it 'has property .get_param_name', ->
       expect(@settings)
         .to.have.property('get_param_name')

@@ -77,7 +77,7 @@ define [
 
     _extractFromIframe: ->
       @socket.promise = new Promise()
-      @socket.postMessage('get_analytics_session')
+      @socket.postMessage(Settings.iframe_message)
       @socket.promise
 
     _onSocketMessage: (analytics_session, origin)=>

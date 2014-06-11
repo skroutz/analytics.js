@@ -2,6 +2,7 @@ define ->
   Settings =
     window: (global or this)
     redirectTo: (url)-> Settings.window.location.replace(url)
+    iframe_message: 'get_analytics_session'
     get_param_name: 'analytics_session'
     single_beacon: false
     cookies:
