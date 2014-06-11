@@ -1,6 +1,8 @@
 module.exports = function(grunt) {
+  ENV = grunt.option('env') || process.env.GRUNT_ENV || 'development';
 
   grunt.initConfig({
+    env: ENV,
     pkg: grunt.file.readJSON('package.json'),
 
     clean: {
