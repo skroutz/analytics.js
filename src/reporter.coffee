@@ -17,18 +17,12 @@ define [
     then: (success, fail) -> @transport_ready.then(success, fail)
 
     report: (url, actions) ->
-      if Settings.single_beacon
-        promise = new Promise()
-        @transport_ready.then =>
-          @_handleJob url, actions, promise
-        promises = [promise]
-      else
-        promises =
-          for action in actions
-            promise = new Promise()
-            @transport_ready.then =>
-              @_handleJob url, action, promise
-            promise
+      promises =
+        for action in actions
+          promise = new Promise()
+          @transport_ready.then =>
+            @_handleJob url, action, promise
+          promise
 
       Promise.all(promises)
 

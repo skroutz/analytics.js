@@ -25,11 +25,31 @@ define [
       ), @redirect_data.time
       @
 
+    _prepareData: (data)->
+      result = []
+      params = Settings.params
+
+      ## TODO REFACTOR
+      if Settings.single_beacon
+        payload = {}
+        payload[params.url] = Settings.url.current
+        payload[params.shop_code] = @shop_code if @shop_code
+        payload[params.actions] = data
+        result.push payload
+      else
+        for action in data
+          payload = {}
+          payload[params.url] = Settings.url.current
+          payload[params.shop_code] = @shop_code if @shop_code
+          payload[params.actions] = [action]
+          result.push payload
+
+      return result
+
+
+
     sendTo: (url) ->
-      payload = {}
-      payload[Settings.params.url] = Settings.url.current
-      payload[Settings.params.shop_code] = @shop_code if @shop_code
-      payload[Settings.params.actions] = @actions
+      payload = @_prepareData(@actions)
 
       @reporter.report(url, payload).then =>
         callback() for callback in @callbacks
