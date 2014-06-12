@@ -3,12 +3,23 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     env: ENV,
+
     pkg: grunt.file.readJSON('package.json'),
 
     clean: {
       payload: {
         src: ['dist/js/payload*']
       }
+    },
+
+    environment: {
+      src: './config/settings/',
+      default: 'default',
+      format: 'yaml',
+      active: 'development',
+
+      configVariable: 'env_settings',
+      envFilePath: '.environment'
     },
 
     compress: {
@@ -40,6 +51,19 @@ module.exports = function(grunt) {
     },
 
     replace: {
+      settings: {
+        options: {
+          patterns: [{
+            json:function (done) {
+              done(grunt.config('env_settings'));
+            },
+          }]
+        },
+        files: [{
+          src: 'src/settings.coffee.sample',
+          dest: 'src/settings.coffee'
+        }]
+      },
       loader: {
         options: {
           patterns: [{
@@ -50,8 +74,10 @@ module.exports = function(grunt) {
             }
           },
           {
-            match: 'base_url',
-            replacement: 'http://analytics.local:9000'
+            match: 'base',
+            replacement: function(){
+              return grunt.config('env_settings').base
+            }
           }]
         },
         files: [{
@@ -219,7 +245,7 @@ module.exports = function(grunt) {
         options: {
           stdout: true
         },
-        command: 'rm -rf compiled dist'
+        command: 'rm -rf compiled dist src/settings.coffee'
       }
     },
 
@@ -257,10 +283,15 @@ module.exports = function(grunt) {
     'shell:build_easyxdm'
   ]);
 
+  grunt.registerTask('create_env_settings', [
+    'environment:' + ENV,
+    'replace:settings',
+  ]);
 
   //BUILD PAYLOAD
   grunt.registerTask('build_payload', [
     'clean:payload',
+    'create_env_settings',
     'create_easyxdm_module',
     'coffee:payload',
     'optimize_rjs',
@@ -274,6 +305,7 @@ module.exports = function(grunt) {
 
   //BUILD LOADER
   grunt.registerTask('build_loader', [
+    'create_env_settings',
     'coffee:loader',
     'hash:payload',
     'replace:loader'

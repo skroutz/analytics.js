@@ -6,3 +6,8 @@ config/deploy.rb
 config/deploy/
 dist
 node_modules
+src/settings.coffee
+config/settings/development.yml
+config/settings/testing.yml
+config/settings/production.yml
+config/settings/.environment

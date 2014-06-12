@@ -2,47 +2,46 @@ define ->
   Settings =
     window: (global or this)
     redirectTo: (url)-> Settings.window.location.replace(url)
-    iframe_message: 'get_analytics_session'
-    get_param_name: 'analytics_session'
-    single_beacon: false
+    iframe_message: '@@common.iframe_message'
+    get_param_name: '@@common.get_param_name'
+    single_beacon: @@common.single_beacon
     cookies:
-      first_party_enabled: true
-      version: 1
+      first_party_enabled: @@cookies.first_party_enabled
+      version: @@cookies.version
       yogurt:
-        name: 'yogurt_session'
+        name: '@@cookies.yogurt.name'
       analytics:
-        name: 'analytics_session'
-        duration: 60 * 60 * 24 * 7 #In seconds: one week
+        name: '@@cookies.analytics.name'
+        duration: @@cookies.analytics.duration #In seconds: one week
     url:
-      base: 'http://analytics.local:9000'
+      base: '@@base'
       analytics_session:
         create: (yogurt_session)->
-          "#{Settings.url.base}/track/create?yogurt_session=#{yogurt_session}"
-        connect: -> "#{Settings.url.base}/track/connect"
+          "@@base@@url.analytics_session.create"
+        connect: -> "@@base@@url.analytics_session.connect"
       beacon: (analytics_session)->
-        "#{Settings.url.base}/track/actions/create?#{Settings.get_param_name}=#{analytics_session}"
+        "@@base@@url.beacon"
       utils:
-        third_party_step1: -> "#{Settings.url.base}/track/check/third_party/step_1.js"
-        third_party_step2: -> "#{Settings.url.base}/track/check/third_party/step_2.js"
+        third_party_step1: -> "@@base@@url.utils.third_party_step1"
+        third_party_step2: -> "@@base@@url.utils.third_party_step2"
     api:
       settings:
-        key: 'settings'
-        set_account: 'setAccount'
-        set_callback: 'setCallback'
-        redirect_to: 'redirectTo'
+        key: '@@api.settings.key'
+        set_account: '@@api.settings.set_account'
+        set_callback: '@@api.settings.set_callback'
+        redirect_to: '@@api.settings.redirect_to'
       yogurt:
-        key: 'yogurt'
-        product_click: 'productClick'
+        key: '@@api.yogurt.key'
+        product_click: '@@api.yogurt.product_click'
       site:
-        key: 'site'
-        send_pageview: 'sendPageview'
+        key: '@@api.site.key'
+        send_pageview: '@@api.site.send_pageview'
       ecommerce:
-        key: 'ecommerce'
-        add_item: 'addItem'
-        add_transaction: 'addTransaction'
-      shop_code_key: '_setAccount'
-      redirect_key: 'redirect'
-
+        key: '@@api.ecommerce.key'
+        add_item: '@@api.ecommerce.add_item'
+        add_transaction: '@@api.ecommerce.add_transaction'
+      shop_code_key: '@@api.shop_code_key'
+      redirect_key: '@@api.redirect_key'
 
   # TODO MAKE IT BETTER
   Settings.window.sa = Settings.window.sa or ->

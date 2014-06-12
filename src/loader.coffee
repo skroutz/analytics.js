@@ -23,7 +23,7 @@
 
     this.domain = dom if(dom)
     js.id = "js-iframe-async"
-    js.src = "@@base_url/#{url}"
+    js.src = "@@base/#{url}"
     this.body.appendChild(js)
 
   doc.write('<body onload="window.inDapIF=true; document._l();">')

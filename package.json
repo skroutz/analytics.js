@@ -6,9 +6,9 @@
   "version": "0.0.1-1",
   "scripts": {
     "build": "npm install && grunt build",
-    "cleanup": "rm -rf node_modules bower_components dist compiled",
+    "cleanup": "rm -rf node_modules bower_components dist compiled src/settings.coffee",
     "dev": "grunt",
-    "test": "grunt test"
+    "test": "grunt create_env_settings && grunt test"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
     "grunt-contrib-compress": "^0.9.1",
     "grunt-contrib-concat": "^0.4.0",
     "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-environment": "^0.1.0",
     "grunt-contrib-uglify": "^0.4.0",
     "grunt-git-authors": "^1.2.0",
     "grunt-hash": "^0.5.0",
