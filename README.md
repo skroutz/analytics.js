@@ -1,146 +1,258 @@
 # Analytics Client [![Build Status](https://travis-ci.org/skroutz/analytics.js.svg?branch=master)](https://travis-ci.org/skroutz/analytics.js)
 
-A short description about the client in a single sentence.
+Minimal cross-domain user tracking library to measure user interaction across Skroutz and partners' websites or web applications.
+
+## How To Use
+
+### Tracking Code Quick Installation
+
+Add the following JavaScript snippet into your website template page. You may paste it just before closing either `<head>` or `<body>` section.
+
+```javascript
+<!-- [start] Skroutz Analytics -->
+<script>
+  (function(s,k,r,o,u,t,z){s['SkroutzAnalyticsObject']=u;s[u] = s[u] || function(){
+  (s[u].q = s[u].q || []).push(arguments)};t=k.createElement(r);
+  z=k.getElementsByTagName(r)[0];t.async=true;t.src=o;z.parentNode.insertBefore(t,z)
+  })(window,document,'script','//analytics.skroutz.gr/analytics.js','sa');
+  
+  sa('settings', 'setAccount', 'SA-XXXX-Y');
+  sa('site', 'sendPageView');
+</script>
+<!-- [end] Skroutz Analytics -->
+```
+
+### API Quick Reference
+
+#### Settings
+
+  * **setAccount**
+
+    Sets the tracker object to your Account ID.
+
+    ```javascript
+    sa.push('settings', 'setAccount', 'SA-XXXX-Y');
+    ```
+
+  * **setCallback**
+  
+    Invokes a function after all data have been reported.
+    
+    ```javascript
+    sa.push('settings', 'setCallback', doSomethingAfter);
+    ```
+  
+  * **redirectTo**
+  
+    Redirects to a url after all data have been reported and callbacks (if any set) have been executed.
+    
+    ```javascript
+    sa.push('settings', 'redirectTo', 'http://www.example.com/');
+    ```
+
+#### Yogurt
+
+  * **productClick**
+
+    Sends a product click for the specified product and shop.
+
+    ```javascript
+    sa.push('yogurt', 'productClick', {
+      'product_id': '15400722',  // Product ID as knonwn at yogurt. Required.
+      'shop_product_id': '752',  // Shop Product ID as known at merchant. Required.
+      'shop_id': '2032'          // Shop ID. Required.
+    });
+    ```
+
+#### Site
+
+  * **sendPageView**
+
+    Sends a page view for the current page. 
+    > *This action is automatically generated if no other actions are defined.*
+
+    ```javascript
+    sa.push('site', 'sendPageView');
+    ```
+
+#### Ecommerce
+
+  * **addOrder**
+
+    Creates a new shopping cart object.
+
+    ```javascript
+    sa.push('ecommerce', 'addOrder', {
+      'order_id': '123456',  // Order ID. Required.
+      'revenue': '120.99',   // Grand Total.
+      'shipping': '5.45',    // Total Shipping Cost.
+      'tax': '10.50'         // Total Tax.
+    });
+    ```
+  
+  * **addItem**
+
+    Adds a new item to the shopping cart object.
+
+    ```javascript
+    sa.push('ecommerce', 'addItem', {
+      'order_id': '123456',  // Order ID. Required.
+      'product_id': '987',   // Product ID. Required.
+      'price': '10.50',      // Price per Unit. Required.
+      'quantity': '4'        // Quantity of Items. Required.
+    });
+    ```
+
+---
 
 ## Installation
 
-To use the script in your page in your footer / header.
+First, install [`Node.js`](http://nodejs.org/) and its package manager, [`npm`](https://github.com/npm/npm) (`npm` comes by default with `node` now).
 
-```Javascript
-<script type="text/javascript">
+Configure `npm` and make available locally installed binaries to your `$PATH`. To do so, just append the following line to your `.{bash|zsh}rc`:
 
-  var _saq = _saq || [];
-  _saq.push(['_setAccount', 'XX-YYY-ZZZ']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = '//analytics.skroutz.gr/analytics.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-   })();
-</script>
+```bash
+# .{bash|zsh}rc file
+export PATH=$(npm bin):$PATH
 ```
 
-## API
+Finally, install project dependencies:
 
-Describe the API.
+```bash
+$ npm install && grunt bower
+```
 
-  * **_setAccount**
+---
+## Environments
 
-    It sets your Account.
+You have two options to invoke a specific environment:
 
-    ```Javascript
-      _saq.push(['_setAccount', 'XX-YYY-ZZZ']);
+ 1. Prepend `GRUNT_ENV=desired_environment` to any `npm` or `grunt` command. For example:
+    ```bash
+    $ GRUNT_ENV=production npm run build
     ```
 
-  * **_anotherCall**
+ 2. Append `--env=some_environment` to any `grunt` command. For example:
+    ```bash
+    $ grunt create_env_settings --env=production
+    ```
 
-## Building
+> By default the project run in `development` environment.
 
-The files inside `dist` folder are the **production assets**. They get created from a `build` script provided.
+The available *environment* are:
 
-Make sure you have `node` (and `npm`) installed and made available to your `$PATH`
+ - development (**default**)
+ - staging
+ - production
 
-Then make sure that locally installed npm binaries are included in your `$PATH` by appending
- this line to your `.(bash|zsh)rc`:
+**`src/settings.coffee`**
+The `src/settings.coffee` file gets created according to the environment settings. The file gets created dynamically by the following `grunt` task:
 
 ```bash
-  PATH=$(npm bin):$PATH
+$ grunt create_env_settings
 ```
 
-Finally all you have to do is
+---
+
+## Build
+
+You can build the project with the command:
 
 ```bash
-  $ npm run build
+$ npm run build
 ```
 
-**That is it!** Once the above command ends, there will be a freshly baked batch of production assets in the `dist` directory.
+Once the build process is successfully completed you should end up with a new `dist` directory created at the root of the project. 
+
+The contents of the `dist` directory should look like this:
+
+```bash
+# dist directory
+|- js/
+    |- easyXDM.min.js
+    |- payload.1A2B3C4D.js
+    |- payload.1A2B3C4D.min.js
+    |- payload.js
+    |- payload.min.js
+|- analytics.js
+|- analytics.min.js
+```
+
+
+---
 
 ## Development
 
-For development (provided that you have executed `build` first) you should just execute:
+For development, you may just run:
 
 ```bash
-  $ grunt
+$ grunt
 ```
 
-This starts the default grunt script, which in turn loads the testing server and
-then executes a `watch` script.
+This executes the *default* `grunt` task that:
 
-The `watch` script does the following:
+- starts the test server
+- watches for file changes and
+    - runs all tests
+    - recompiles assets
 
-* Runs tests if dev, test or vendor files are changed
-* Recompiles production assets if dev or vendor assets are changed
+---
 
-## Testing
+## Test
 
-For the test to run the `karma` server has to be loaded. There are two options to do that:
+Tests run with the help of [`karma`](http://karma-runner.github.io/) test runner.
 
-* Start the server just for the tests to run once.
-* Start the server and keep it open so that tests can be run arbitrarily.
-
-The first option is the *continuous integration* one and can easily be executed by running:
+You can run all tests with:
 
 ```bash
-  $ grunt test
+$ npm run test
 ```
 
-The second option is the one used in the development workflow.
-First you have to start the server.
+> *If you wish to run tests continuously check the Development section.*
+
+## Clean Up
+
+#### Deep Cleanup
+You can perform a project **deep cleanup** with:
 
 ```bash
-  $ grunt start_test_server
+$ npm run cleanup
 ```
 
-The above task is the one that is used internally on the development task:
+The above command will:
+
+ -  remove local `node modules`
+ -  remove local `bower components`
+ -  delete `dist` directory
+ -  delete `compiled` directory
+ -  delete `src/settings.coffee` file
+
+> *After a deep cleanup you have to install again the project dependencies. Please check the Installation section.*
+
+#### Soft Cleanup
+You can perform a **soft cleanup** with:
 
 ```bash
-  $ grunt
+$ grunt cleanup
 ```
 
-So if you have already run the above your server is already up and waiting.
+The above command is useful when in development and it will just:
 
-With the server running and waiting for tests you can now run them:
+ -  delete `dist` directory
+ -  delete `compiled` directory
+ -  delete `src/settings.coffee` file
 
-* either from the console via: `karma run`
-* or by changing a watched file (if on the development section)
-
-You can also register a browser to the server that will automatically run the tests triggered above.
-This way you can easily debug code in a familiar environment.
-
-## Cleaning Up
-
-The are two clean up scripts:
-
-```bash
-  $ npm run cleanup
-```
-
-This one removes the directories of the downloaded npm and bower packages as well as the directories
-of the produced assets (`dist`, `compiled`), thus it performs a **deep cleanup**.
-
-After a **deep cleanup**,
-
-```bash
-  $ npm run build
-```
-
-must be executed.
-
-The other way is:
-
-```bash
-  $ grunt cleanup
-```
-
-This one only cleans up the produced asset directories (`dist`, `compiled`), thus it can be seen as a **soft cleanup**.
-
-It is useful in development scenarios, as all the files delete get rebuild by the `watch` scripts.
+---
 
 ## Authors
 
-- Bill Trikalinos
-- Chrisovalantis Kefalidis
+- Bill Trikalinos (*[billtrik](https://github.com/billtrik)*)
+- Chrisovalantis Kefalidis (*[cvkef](https://github.com/cvkef)*)
+- Fotos Georgiadis (*[fotos](https://github.com/fotos)*)
+- Dimitrios Zorbas (*[Zorbash](https://github.com/Zorbash)*)
+
+---
 
 ## License
 
-This software is licensed under MIT. For details see LICENSE.txt
+This software is released under the MIT License. For more details read [this](https://github.com/skroutz/analytics.js/blob/master/LICENSE.txt).
