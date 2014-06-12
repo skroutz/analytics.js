@@ -5,7 +5,7 @@
   "license": "MIT",
   "version": "0.0.1-1",
   "scripts": {
-    "build": "npm update && grunt build",
+    "build": "npm install && grunt build",
     "cleanup": "rm -rf node_modules bower_components dist compiled",
     "dev": "grunt",
     "test": "grunt test"
@@ -48,6 +48,7 @@
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-requirejs": "^0.2.1",
     "karma-sinon-chai": "^0.1.5",
+    "mocha": "^1.20.1",
     "supertest": "^0.11.0"
   }
 }
