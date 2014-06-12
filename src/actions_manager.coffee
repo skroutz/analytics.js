@@ -9,7 +9,7 @@ define [
       @reporter = new Reporter()
       @callbacks = []
       @actions = []
-      @shop_code_val = null
+      @shop_code = null
       @actions_queue = Settings.actions_queue
       @redirect_data = null
 
@@ -26,7 +26,12 @@ define [
       @
 
     sendTo: (url) ->
-      @reporter.report(url, @actions).then =>
+      payload = {}
+      payload[Settings.params.url] = Settings.url.current
+      payload[Settings.params.shop_code] = @shop_code if @shop_code
+      payload[Settings.params.actions] = @actions
+
+      @reporter.report(url, payload).then =>
         callback() for callback in @callbacks
 
     _parseActions: ->
@@ -34,7 +39,7 @@ define [
       while item = @actions_queue.pop()
         switch item[1]
           when api.settings.set_account
-            @shop_code_val = item[2]
+            @shop_code = item[2]
           when api.settings.set_callback
             @callbacks.push item[2]
           when api.settings.redirect_to
@@ -46,7 +51,6 @@ define [
               category: item[0]
               type: item[1]
               data: item[2]
-              url: Settings.url.current
             }
             action.sig = item[3] if item[0] is api.ecommerce.key
 
@@ -54,8 +58,6 @@ define [
 
       @actions.push {category: api.site.key, type: api.site.send_pageview} unless @actions.length
 
-      for action in @actions
-        action.shop_code_val = @shop_code_val if @shop_code_val
       return
 
   return ActionsManager

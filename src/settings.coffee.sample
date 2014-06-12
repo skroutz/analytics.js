@@ -9,6 +9,7 @@ define ->
       signature: '@@params.signature'
       url: '@@params.url'
       shop_code: '@@params.shop_code'
+      actions: '@@params.actions'
     cookies:
       first_party_enabled: @@cookies.first_party_enabled
       version: @@cookies.version

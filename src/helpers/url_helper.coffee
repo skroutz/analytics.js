@@ -8,7 +8,8 @@ define ['settings'], (Settings)->
       query_string = ''
 
       for key, value of object
-        value = JSON.stringify(value) if should_stringify
+        ## FIX TESTS
+        value = JSON.stringify(value) if typeof value isnt 'string'
         query_string += "#{encodeURIComponent(key)}=#{encodeURIComponent(value)}&"
 
       query_string[0...-1]

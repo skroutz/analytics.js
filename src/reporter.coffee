@@ -37,10 +37,7 @@ define [
         @transport = 'script' unless images_enabled
 
     _handleJob: (url, payload, promise)->
-      if payload instanceof Array
-        data = URLHelper.serialize(payload, true)
-      else
-        data = URLHelper.serialize(payload)
+      data = URLHelper.serialize(payload)
 
       url = URLHelper.appendData(url, data)
 
