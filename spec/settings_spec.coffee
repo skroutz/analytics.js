@@ -28,17 +28,10 @@ describe 'Settings', ->
         .that.is.a('string')
         .that.equals('get_analytics_session')
 
-    it 'has property .get_param_name', ->
-      expect(@settings)
-        .to.have.property('get_param_name')
-        .that.is.a('string')
-        .that.equals('analytics_session')
-
     it 'has property .single_beacon', ->
       expect(@settings)
         .to.have.property('single_beacon')
         .that.is.a('boolean')
-        .that.is.false
 
     it 'has property .cookies', ->
       expect(@settings)
@@ -50,6 +43,31 @@ describe 'Settings', ->
 
     it 'has property .api', ->
       expect(@settings).to.have.property('api')
+
+  describe '.params', ->
+    it 'has property .analytics_session', ->
+      expect(@settings.params)
+        .to.have.property('analytics_session')
+        .that.is.a('string')
+        .that.equals('analytics_session')
+
+    it 'has property .signature', ->
+      expect(@settings.params)
+        .to.have.property('signature')
+        .that.is.a('string')
+        .that.equals('sig')
+
+    it 'has property .url', ->
+      expect(@settings.params)
+        .to.have.property('url')
+        .that.is.a('string')
+        .that.equals('url')
+
+    it 'has property .shop_code', ->
+      expect(@settings.params)
+        .to.have.property('shop_code')
+        .that.is.a('string')
+        .that.equals('shop_code')
 
   describe '.cookies', ->
     it 'has proper .yogurt.name', ->
@@ -101,22 +119,8 @@ describe 'Settings', ->
     describe '.beacon', ->
       it 'returns the proper beacon endpoint', ->
         base = @settings.url.base
-        get_param_name = @settings.get_param_name
         session = 'foo'
-        endpoint = "#{base}/track/actions/create?#{get_param_name}=#{session}"
+        endpoint = "#{base}/track/actions/create?analytics_session=#{session}"
 
         expect(@settings.url.beacon(session))
           .to.equal(endpoint)
-
-  describe '.api', ->
-    it 'has proper .shop_code_key', ->
-      expect(@settings)
-        .to.have.deep.property('api.shop_code_key')
-        .that.is.a('string')
-        .that.equals('_setAccount')
-
-    it 'has proper .redirect_key', ->
-      expect(@settings)
-        .to.have.deep.property('api.redirect_key')
-        .that.is.a('string')
-        .that.equals('redirect')

@@ -18,7 +18,7 @@ define [
     redirect: (analytics_session) ->
       return unless @redirect_data
       data = {}
-      data[Settings.get_param_name] = analytics_session
+      data[Settings.params.analytics_session] = analytics_session
       url = URLHelper.appendData @redirect_data.url, URLHelper.serialize(data)
       setTimeout (->
         Settings.redirectTo url

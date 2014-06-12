@@ -73,7 +73,7 @@ define [
 
     _extractFromGetParam: ->
       promise = new Promise()
-      promise.resolve URLHelper.extractGetParam(Settings.get_param_name)
+      promise.resolve URLHelper.extractGetParam(Settings.params.analytics_session)
 
     _extractFromIframe: ->
       @socket.promise = new Promise()
