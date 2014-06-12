@@ -44,58 +44,40 @@ describe 'URLHelper', ->
       }
       @serialize = @subject.serialize
 
-    it 'accepts optional parameter should_stringify', ->
-      expect(@serialize(@o)).to.equal('foo=bar')
+    context 'when param is null', ->
+      it 'returns false', ->
+        expect(@serialize(null)).to.equal(false)
 
-    it 'accepts optional parameter should_stringify that defaults to false', ->
-      expect(@serialize(@o))
-        .to.equal(@serialize(@o, false))
+    context 'when param is undefined', ->
+      it 'returns false', ->
+        expect(@serialize(null)).to.equal(false)
 
-    context 'when stringify is false', ->
-      it 'does not stringify the passed object', ->
-        expect(@serialize(@o))
-          .to.equal(@serialize(@o, false))
-          .and
-          .not.equal(@serialize(@o, true))
+    context 'when param is string', ->
+      it 'returns false', ->
+        expect(@serialize('foo')).to.equal(false)
 
-    context 'when stringify is true', ->
-      context 'and object is empty', ->
-        it 'returns empty string for empty object', ->
-          expect(@serialize('', true)).to.equal('')
+    context 'when param is json', ->
+      it 'returns proper serialized string', ->
+        o = {
+          "foo1": '=&foo10=bar10&'
+          "foo2": "bar '2'"
+          "foo3": "bar 3"
+        }
+        q = "foo1=%3D%26foo10%3Dbar10%26&foo2=bar%20'2'&foo3=bar%203"
+        expect(@serialize(o)).to.equal(q)
 
-      context 'and object is null', ->
-        it 'returns empty string for null object', ->
-          expect(@serialize(null, true)).to.equal('')
-
-      context 'and object is string', ->
-        it 'returns proper serialized string', ->
-          q = '0=%22f%22&1=%22o%22&2=%22o%22'
-          expect(@serialize('foo', true)).to.equal(q)
-
-      context 'and object is json', ->
-        it 'returns proper serialized string', ->
-          o = {
-            foo1: '=&foo10=bar10&'
-            foo2: "bar '2'"
-            foo3: "bar 3"
+    context 'when param contains nested object', ->
+      it 'returns proper serialized string', ->
+        o = {
+          foo1: '=&foo10=bar10&'
+          foo2: "bar '2'"
+          foo3: {
+            k1: 'v1'
+            k2: 'v2'
           }
-          q = "foo1=%22%3D%26foo10%3Dbar10%26%22&foo2=%22bar%20'2'%22&foo3=%22"
-          q += "bar%203%22"
-          expect(@serialize(o, true)).to.equal(q)
-
-      context 'and object contains nested object', ->
-        it 'returns proper serialized string', ->
-          o = {
-            foo1: '=&foo10=bar10&'
-            foo2: "bar '2'"
-            foo3: {
-              k1: 'v1'
-              k2: 'v2'
-            }
-          }
-          q = "foo1=%22%3D%26foo10%3Dbar10%26%22&foo2=%22bar%20'2'%22&foo3=%7B"
-          q += "%22k1%22%3A%22v1%22%2C%22k2%22%3A%22v2%22%7D"
-          expect(@serialize(o, true)).to.equal(q)
+        }
+        q = "foo1=%3D%26foo10%3Dbar10%26&foo2=bar%20'2'&foo3=%7B%22k1%22%3A%22v1%22%2C%22k2%22%3A%22v2%22%7D"
+        expect(@serialize(o)).to.equal(q)
 
   describe '.extractGetParam', ->
     beforeEach ->

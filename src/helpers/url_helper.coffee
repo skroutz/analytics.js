@@ -1,14 +1,14 @@
 define ['settings'], (Settings)->
   URLHelper =
     appendData: (url, payload) ->
-        sign = if url.indexOf('?') isnt -1 then '&' else '?'
-        "#{url}#{sign}#{payload}"
+      sign = if url.indexOf('?') isnt -1 then '&' else '?'
+      "#{url}#{sign}#{payload}"
 
-    serialize: (object, should_stringify = false) ->
+    serialize: (object) ->
+      return false if !object or typeof object isnt 'object'
       query_string = ''
 
       for key, value of object
-        ## FIX TESTS
         value = JSON.stringify(value) if typeof value isnt 'string'
         query_string += "#{encodeURIComponent(key)}=#{encodeURIComponent(value)}&"
 
