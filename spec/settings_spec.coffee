@@ -124,3 +124,94 @@ describe 'Settings', ->
 
         expect(@settings.url.beacon(session))
           .to.equal(endpoint)
+
+  describe '.api', ->
+    it 'has property .settings', ->
+      expect(@settings.api)
+        .to.have.property('settings')
+        .that.is.an('object')
+
+    it 'has property .yogurt', ->
+      expect(@settings.api)
+        .to.have.property('yogurt')
+        .that.is.an('object')
+
+    it 'has property .site', ->
+      expect(@settings.api)
+        .to.have.property('site')
+        .that.is.an('object')
+
+    it 'has property .ecommerce', ->
+      expect(@settings.api)
+        .to.have.property('ecommerce')
+        .that.is.an('object')
+
+    describe '.settings', ->
+      it 'has property .key', ->
+        expect(@settings.api.settings)
+          .to.have.property('key')
+          .that.is.a('string')
+          .that.equals('settings')
+
+      it 'has property .set_account', ->
+        expect(@settings.api.settings)
+          .to.have.property('set_account')
+          .that.is.a('string')
+          .that.equals('setAccount')
+
+      it 'has property .set_callback', ->
+        expect(@settings.api.settings)
+          .to.have.property('set_callback')
+          .that.is.a('string')
+          .that.equals('setCallback')
+
+      it 'has property .redirect_to', ->
+        expect(@settings.api.settings)
+          .to.have.property('redirect_to')
+          .that.is.a('string')
+          .that.equals('redirectTo')
+
+    describe '.yogurt', ->
+      it 'has property .key', ->
+        expect(@settings.api.yogurt)
+          .to.have.property('key')
+          .that.is.a('string')
+          .that.equals('yogurt')
+
+      it 'has property .product_click', ->
+        expect(@settings.api.yogurt)
+          .to.have.property('product_click')
+          .that.is.a('string')
+          .that.equals('productClick')
+
+    describe '.site', ->
+      it 'has property .key', ->
+        expect(@settings.api.site)
+          .to.have.property('key')
+          .that.is.a('string')
+          .that.equals('site')
+
+      it 'has property .send_pageview', ->
+        expect(@settings.api.site)
+          .to.have.property('send_pageview')
+          .that.is.a('string')
+          .that.equals('sendPageview')
+
+    describe '.ecommerce', ->
+      it 'has property .key', ->
+        expect(@settings.api.ecommerce)
+          .to.have.property('key')
+          .that.is.a('string')
+          .that.equals('ecommerce')
+
+      it 'has property .add_transaction', ->
+        expect(@settings.api.ecommerce)
+          .to.have.property('add_transaction')
+          .that.is.a('string')
+          .that.equals('addTransaction')
+
+      it 'has property .add_item', ->
+        expect(@settings.api.ecommerce)
+          .to.have.property('add_item')
+          .that.is.a('string')
+          .that.equals('addItem')
