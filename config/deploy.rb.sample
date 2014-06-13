@@ -13,7 +13,12 @@ set :ssh_options, {
 
 set :log_level, :info
 
+set :linked_files, %w{config/settings/production.yml}
 set :linked_dirs, %w{node_modules bower_components public/js}
+
+set :default_env, {
+  grunt_env: 'production'
+}
 
 namespace :deploy do
   desc 'Build client'
