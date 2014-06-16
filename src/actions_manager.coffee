@@ -25,6 +25,12 @@ define [
       ), @redirect_data.time
       @
 
+    sendTo: (url) ->
+      payload = @_prepareData(@actions)
+
+      @reporter.report(url, payload).then =>
+        callback() for callback in @callbacks
+
     _prepareData: (data)->
       result = []
       params = Settings.params
@@ -45,14 +51,6 @@ define [
           result.push payload
 
       return result
-
-
-
-    sendTo: (url) ->
-      payload = @_prepareData(@actions)
-
-      @reporter.report(url, payload).then =>
-        callback() for callback in @callbacks
 
     _parseActions: ->
       api = Settings.api
