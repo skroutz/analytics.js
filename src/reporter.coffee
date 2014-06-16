@@ -4,25 +4,25 @@ define [
   'helpers/browser_helper'
   'helpers/url_helper'
 ], (Settings, Promise, BrowserHelper, URLHelper)->
-  unique_id = 1
+  unique_id = 0
 
   class Reporter
     constructor: (options)->
-      @base = Settings.url.base
-      @queue = []
       @transport = 'img'
-
       @transport_ready = @_determineTransport()
 
     then: (success, fail) -> @transport_ready.then(success, fail)
 
-    report: (url, actions) ->
-      promises =
-        for action in actions
-          promise = new Promise()
-          @transport_ready.then =>
-            @_handleJob url, action, promise
-          promise
+    report: (url, data_array) ->
+      promises = []
+
+      for data in data_array
+        promise = new Promise()
+
+        @transport_ready.then =>
+          @_handleJob url, data, promise
+
+        promises.push promise
 
       Promise.all(promises)
 
@@ -38,9 +38,9 @@ define [
       ## WE HAVE A VALID URL THAT CONTAINS THE PAYLOAD
       ## WE MUST CHECK THAT THE URL.length IS BELOW THE MAXIMUM ALLOWED
       ## OTHERWISE WE SHOULD CHUNK THE string AND SEND MULTIPLE TRANSPORTS
-      @_createTransport(promise, url)
+      @_createTransport(url, promise)
 
-    _createTransport: (promise, url) ->
+    _createTransport: (url, promise) ->
       cache_buster = "buster=#{+new Date()}_#{unique_id++}"
       element = document.createElement(@transport)
 
