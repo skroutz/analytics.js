@@ -70,7 +70,7 @@ define [
               type: item[1]
               data: item[2]
             }
-            action.sig = item[3] if item[0] is api.ecommerce.key
+            action.sig = item[3] if item[0] is api.ecommerce.key and item[3]
 
             @actions.push action
 
