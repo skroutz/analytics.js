@@ -33,9 +33,26 @@ describe 'Reporter', ->
     @scr_len_before = document.getElementsByTagName('script').length
 
     @url = 'foo.bar'
-    @payload = {k1: 'v1', k2: 'v2'}
-    @payload2 = {k3: 'v3', k4: 'v4'}
-    @url_with_payload = 'foo.bar?k1=v1&k2=v2'
+    @payload = {
+      url: 'http://www.yogurt.foo/products/show/15400722'
+      shop_code: 'SA-XXXX-Y'
+      actions: [
+        {
+          category: 'site'
+          type: 'sendPageView'
+        },
+        {
+          category: 'yogurt'
+          type: 'productClick'
+          data: {
+            product_id: '15400722'
+            shop_product_id: '752'
+            shop_id: '2032'
+          }
+        },
+      ]
+    }
+    @serialized_data = 'foo.bar?url=http%3A%2F%2Fwww.yogurt.foo%2Fproducts%2Fshow%2F15400722&shop_code=SA-XXXX-Y&actions=%5B%7B%22category%22%3A%22site%22%2C%22type%22%3A%22sendPageView%22%7D%2C%7B%22category%22%3A%22yogurt%22%2C%22type%22%3A%22productClick%22%2C%22data%22%3A%7B%22product_id%22%3A%2215400722%22%2C%22shop_product_id%22%3A%22752%22%2C%22shop_id%22%3A%222032%22%7D%7D%5D'
 
   describe 'instance', ->
     beforeEach (done) ->
@@ -62,48 +79,42 @@ describe 'Reporter', ->
 
   describe '#report', ->
     beforeEach ->
-      @pr = new @promise()
       @subject = new @reporter()
+      @pr = new @promise()
+      @spy = sinon.spy(@subject, 'report')
+      @subject.report(@url, @payload)
+
+    afterEach ->
+      @spy.restore()
+
+    it 'accepts as 1st argument the url to report to', ->
+      expect(@spy.args[0][0]).to.equal @url
+
+    it 'accepts as 2nd argument the payload to report', ->
+      expect(@spy.args[0][1]).to.deep.equal @payload
+
+    describe 'payload argument', ->
+      it 'has property String url', ->
+        payload = @spy.args[0][1]
+        expect(payload)
+          .to.have.property('url')
+          .that.is.a('string')
+
+      it 'has property String shop_code', ->
+        payload = @spy.args[0][1]
+        expect(payload)
+          .to.have.property('shop_code')
+          .that.is.a('string')
+
+      it 'has property Array actions', ->
+        payload = @spy.args[0][1]
+        expect(payload)
+          .to.have.property('actions')
+          .that.is.an('array')
 
     it 'returns a promise', ->
-      res = @subject.report(@url, @payload)
-      expect(res).to.be.an.instanceof @promise
-
-    context 'when Settings.single_beacon is true', ->
-      beforeEach ->
-        @settings.single_beacon = true
-        @spy = sinon.spy(@subject, '_handleJob')
-        @actions = [@payload, @payload, @payload]
-
-        @subject.report(@url, @actions)
-
-      afterEach ->
-        @settings.single_beacon = false
-        @spy.restore()
-
-      it 'sends a beacon for all actions', ->
-        expect(@spy).to.be.calledOnce
-
-      it 'sends the proper arguments', ->
-        expect(@spy).to.be.calledWith(@url, @actions)
-
-    context 'when Settings.single_beacon is false', ->
-      beforeEach ->
-        @settings.single_beacon = false
-        @spy = sinon.spy(@subject, '_handleJob')
-        @actions = [@payload, @payload, @payload2]
-
-        @subject.report(@url, @actions)
-
-      afterEach ->
-        @settings.single_beacon = false
-        @spy.restore()
-
-      it 'sends a beacon for each action', ->
-        expect(@spy.callCount).to.equal @actions.length
-
-      it 'sends the proper arguments', ->
-        expect(@spy.args[2]).to.contain @actions[2]
+      expect(@subject.report(@url, @payload))
+        .to.be.an.instanceof @promise
 
     context 'when transport uses image', ->
       beforeEach ->
@@ -221,4 +232,4 @@ describe 'Reporter', ->
       expect(@stub).to.be.calledOnce
 
     it 'calls #_createTransport with proper args', ->
-      expect(@stub).to.be.calledWith(@pr, @url_with_payload)
+      expect(@stub).to.be.calledWith(@pr, @serialized_data)
