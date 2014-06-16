@@ -250,6 +250,15 @@ module.exports = function(grunt) {
     },
 
     copy: {
+      ymls: {
+        expand: true,
+        cwd: 'config/settings',
+        src: [
+          '*.yml.sample'
+        ],
+        dest: 'config/settings',
+        ext: '.yml'
+      },
       easyxdm_module: {
         expand: true,
         cwd: 'bower_components/easyxdm/work',
