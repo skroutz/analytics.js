@@ -10,15 +10,12 @@ define [
 
       @session.then @onSession, @onNoSession
 
-    onNoSession: () =>
-      console.log 'no session returned'
+    onNoSession: ->
 
     onSession: (analytics_session) =>
-      console.log "%canalytics_session: #{analytics_session}", 'color: green'
       beacon_url = Settings.url.beacon(analytics_session)
 
       @actions.sendTo(beacon_url).then =>
-        console.log "%cAll actions reported!!", 'color: green'
         @actions.redirect(analytics_session)
 
   return Analytics
