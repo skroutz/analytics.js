@@ -2,6 +2,86 @@ describe 'Reporter', ->
   @timeout(0) # Disable the spec's timeout
 
   before (done) ->
+    @url = 'foo.bar'
+
+    @single_beacon_data_array = [{
+      url: 'some_url'
+      shop_code: 'SA-XXXX-Y'
+      actions: [
+        {
+          category: 'site'
+          type: 'sendPageView'
+        },
+        {
+          category: 'yogurt'
+          type: 'productClick'
+          data: {
+            product_id: '15400722'
+            shop_product_id: '752'
+            shop_id: '2032'
+          }
+        },
+        {
+          category: 'yogurt'
+          type: 'productClick'
+          data: {
+            product_id: '15400722'
+            shop_product_id: '752'
+            shop_id: '2032'
+          }
+        }
+      ]
+    }]
+
+    @multiple_beacon_data_array = [
+      {
+        url: 'some_url'
+        shop_code: 'SA-XXXX-Y'
+        actions: [{
+          category: 'site'
+          type: 'sendPageView'
+        }]
+      },
+      {
+        url: 'some_url'
+        shop_code: 'SA-XXXX-Y'
+        actions: [{
+          category: 'yogurt'
+          type: 'productClick'
+          data: {
+            product_id: '15400722'
+            shop_product_id: '752'
+            shop_id: '2032'
+          }
+        }]
+      },
+      {
+        url: 'some_url'
+        shop_code: 'SA-XXXX-Y'
+        actions: [{
+          category: 'yogurt'
+          type: 'productClick'
+          data: {
+            product_id: '15400722'
+            shop_product_id: '752'
+            shop_id: '2032'
+          }
+        }]
+      }
+    ]
+
+    @mockup_dom_methods = =>
+      @createElement_stub = sinon.stub()
+      document.createElement = @createElement_stub.returns({})
+      Node::insertBefore = (who, where)-> who.onload()
+
+    @start = =>
+      @subject = new @reporter()
+      @handleJob_spy = sinon.spy(@subject, '_handleJob')
+      @report_spy = sinon.spy(@subject, 'report')
+      @clock.tick 10
+
+    @serialized_data = '?url=some_url&shop_code=SA-XXXX-Y&actions=%5B%7B%22category%22%3A%22site%22%2C%22type%22%3A%22sendPageView%22%7D%2C%7B%22category%22%3A%22yogurt%22%2C%22type%22%3A%22productClick%22%2C%22data%22%3A%7B%22product_id%22%3A%2215400722%22%2C%22shop_product_id%22%3A%22752%22%2C%22shop_id%22%3A%222032%22%7D%7D%2C%7B%22category%22%3A%22yogurt%22%2C%22type%22%3A%22productClick%22%2C%22data%22%3A%7B%22product_id%22%3A%2215400722%22%2C%22shop_product_id%22%3A%22752%22%2C%22shop_id%22%3A%222032%22%7D%7D%5D'
     window.__requirejs__.clearRequireState()
     require ['promise', 'settings'], (Promise, Settings) =>
       @promise = Promise
@@ -12,7 +92,15 @@ describe 'Reporter', ->
 
       class BrowserHelperMock
         @checkImages: ->
-          new Promise().resolve(true)
+          promise = new Promise()
+
+          ## TODO EXPLAIN THE REGRESSION TEST
+          setTimeout ->
+            # console.log 'RESOLVING CHECK IMAGE WITH TRUE'
+            promise.resolve(true)
+          , 0
+
+          promise
 
       @browser_helper = BrowserHelperMock
 
@@ -29,41 +117,24 @@ describe 'Reporter', ->
     window.__requirejs__.clearRequireState()
 
   beforeEach ->
-    @img_len_before = document.getElementsByTagName('img').length
-    @scr_len_before = document.getElementsByTagName('script').length
+    @clock = sinon.useFakeTimers()
+    @_createElement = document.createElement
+    @_insertBefore  = Node::insertBefore
 
-    @url = 'foo.bar'
-    @payload = {
-      url: 'http://www.yogurt.foo/products/show/15400722'
-      shop_code: 'SA-XXXX-Y'
-      actions: [
-        {
-          category: 'site'
-          type: 'sendPageView'
-        },
-        {
-          category: 'yogurt'
-          type: 'productClick'
-          data: {
-            product_id: '15400722'
-            shop_product_id: '752'
-            shop_id: '2032'
-          }
-        },
-      ]
-    }
-    @serialized_data = 'foo.bar?url=http%3A%2F%2Fwww.yogurt.foo%2Fproducts%2Fshow%2F15400722&shop_code=SA-XXXX-Y&actions=%5B%7B%22category%22%3A%22site%22%2C%22type%22%3A%22sendPageView%22%7D%2C%7B%22category%22%3A%22yogurt%22%2C%22type%22%3A%22productClick%22%2C%22data%22%3A%7B%22product_id%22%3A%2215400722%22%2C%22shop_product_id%22%3A%22752%22%2C%22shop_id%22%3A%222032%22%7D%7D%5D'
+  afterEach ->
+    @clock.restore()
+    @createElement_stub?.reset()
+
+    @report_spy?.restore()
+    @handleJob_spy?.restore()
+
+    document.createElement = @_createElement
+    Node::insertBefore = @_insertBefore
 
   describe 'instance', ->
-    beforeEach (done) ->
+    beforeEach ->
       @subject = new @reporter()
-      done()
-
-    it 'has own property base', ->
-      expect(@subject).to.have.ownProperty('base')
-
-    it 'has own property queue', ->
-      expect(@subject).to.have.ownProperty('queue')
+      @clock.tick 10
 
     it 'has own property transport', ->
       expect(@subject).to.have.ownProperty('transport')
@@ -77,159 +148,155 @@ describe 'Reporter', ->
     it 'responds to then', ->
       expect(@subject).to.respondTo('then')
 
-  describe '#report', ->
-    beforeEach ->
-      @subject = new @reporter()
-      @pr = new @promise()
-      @spy = sinon.spy(@subject, 'report')
-      @subject.report(@url, @payload)
-
-    afterEach ->
-      @spy.restore()
-
-    it 'accepts as 1st argument the url to report to', ->
-      expect(@spy.args[0][0]).to.equal @url
-
-    it 'accepts as 2nd argument the payload to report', ->
-      expect(@spy.args[0][1]).to.deep.equal @payload
-
-    describe 'payload argument', ->
-      it 'has property String url', ->
-        payload = @spy.args[0][1]
-        expect(payload)
-          .to.have.property('url')
-          .that.is.a('string')
-
-      it 'has property String shop_code', ->
-        payload = @spy.args[0][1]
-        expect(payload)
-          .to.have.property('shop_code')
-          .that.is.a('string')
-
-      it 'has property Array actions', ->
-        payload = @spy.args[0][1]
-        expect(payload)
-          .to.have.property('actions')
-          .that.is.an('array')
-
-    it 'returns a promise', ->
-      expect(@subject.report(@url, @payload))
-        .to.be.an.instanceof @promise
-
-    context 'when transport uses image', ->
+  describe 'API', ->
+    describe '#then', ->
       beforeEach ->
-        @subject.transport = 'img'
-        @res   = @subject._createTransport(@pr, @url)
-        ## Get element's src
-        images = document.getElementsByTagName('img')
-        @src   = images[images.length - 1].src
+        @checkImage_promise = new @promise()
+        @checkImage_stub = sinon.stub(@browser_helper, 'checkImages').returns(@checkImage_promise)
 
-      it 'inserts an image element into the DOM', ->
-        expect(document.getElementsByTagName('img').length)
-          .to.be.above @img_len_before
+      afterEach ->
+        @checkImage_stub.restore()
 
-      describe 'image element', ->
-        it 'has the proper url', ->
-          expect(@src).to.contain(@url)
+      it 'returns a promise', ->
+        @subject = new @reporter()
+        res = @subject.then()
+        expect(res).to.be.an.instanceof @promise
 
-        it 'has the buster parameter', ->
-          expect(@src).to.contain('buster=')
-
-    context 'when transport uses script', ->
-      beforeEach ->
-        @subject.transport = 'script'
-        @res = @subject._createTransport(@pr, @url)
-        ## Get element's src
-        @src = document.getElementsByTagName('script')[0].src
-
-      it 'inserts a script element into the DOM', ->
-        expect(document.getElementsByTagName('script').length)
-          .to.be.above @scr_len_before
-
-      describe 'script element', ->
-        it 'has the proper url', ->
-          expect(@src).to.contain(@url)
-
-        it 'has the buster parameter', ->
-          expect(@src).to.contain('buster=')
-
-  describe '#then', ->
-    beforeEach ->
-      @pr = new @promise()
-      @stub = sinon.stub(@browser_helper, 'checkImages').returns(@pr)
-
-    afterEach ->
-      @stub.restore()
-
-    it 'returns a promise', ->
-      @subject = new @reporter()
-      res = @subject.then(@success, @failure)
-      expect(res).to.be.an.instanceof @promise
-
-    context 'when fulfilled', ->
-      it 'calls the success callback', (done)->
+      it 'calls success argument when transport_ready succeeds', (done)->
+        @subject = new @reporter()
         @success = ->
           expect(true).to.equal(true)
           done()
         @failure = ->
           expect(true).to.equal(false)
           done()
-
-        @subject = new @reporter()
         res = @subject.then(@success, @failure)
-        @pr.resolve()
+        @checkImage_promise.resolve()
 
-    context 'when rejected', ->
-      it 'calls the failure callback', (done)->
+      it 'calls error argument when transport_ready fails', (done)->
+        @subject = new @reporter()
         @success = ->
           expect(true).to.equal(false)
           done()
         @failure = ->
           expect(true).to.equal(true)
           done()
-
-        @subject = new @reporter()
         res = @subject.then(@success, @failure)
-        @pr.reject()
+        @checkImage_promise.reject()
 
-  describe '#_determineTransport', ->
+    describe '#report', ->
+      beforeEach ->
+        @mockup_dom_methods()
+
+      it 'returns a promise', (done)->
+        @start()
+        result = @subject.report(@url, @single_beacon_data_array)
+        result.then =>
+          expect(result).to.be.an.instanceof @promise
+          done()
+
+      it 'accepts as 1st argument the url to report to', (done)->
+        @start()
+        @subject.report(@url, @single_beacon_data_array).then =>
+          expect(@report_spy.args[0][0]).to.equal @url
+          done()
+
+      it 'accepts as 2nd argument to be the data_array', (done)->
+        @start()
+        @subject.report(@url, @single_beacon_data_array).then =>
+          expect(@report_spy.args[0][1]).to.deep.equal @single_beacon_data_array
+          done()
+
+      context 'when we have multiple data items to report', ->
+        it 'creates multiple transport elements', (done)->
+          @start()
+
+          callback = =>
+            expect(@createElement_stub.callCount).to.equal 3
+            done()
+
+          @subject.report(@url, @multiple_beacon_data_array).then callback, callback
+
+        it 'waits for every transport element to finish before fulfilling the promise returned', (done)->
+          @start()
+          callback = =>
+            states = []
+            for call in @handleJob_spy.getCalls()
+              states.push call.args[2].state
+
+            expect(states).to.not.contain 'pending'
+            done()
+
+          @subject.report(@url, @multiple_beacon_data_array).then callback, callback
+
+      context 'when we have one data to report', ->
+        it 'creates one transport element', (done)->
+          @start()
+
+          callback = =>
+            expect(@createElement_stub.callCount).to.equal 1
+            done()
+
+          @subject.report(@url, @single_beacon_data_array).then callback, callback
+
+        it 'waits for every transport element to finish before fulfilling the promise returned', (done)->
+          @start()
+          callback = =>
+            states = []
+            for call in @handleJob_spy.getCalls()
+              states.push call.args[2].state
+
+            expect(states).to.not.contain 'pending'
+            done()
+
+          @subject.report(@url, @single_beacon_data_array).then callback, callback
+
+  describe 'Reporting', ->
+    beforeEach ->
+      @mockup_dom_methods()
+
+    it 'serializes data', (done)->
+      @start()
+      callback = =>
+        transport = @createElement_stub.returnValues[0]
+        expect(transport.src).to.contain("#{@url}#{@serialized_data}")
+        done()
+      @subject.report(@url, @single_beacon_data_array).then callback, callback
+      done()
+
+    it 'appends a cache busting param in the transport url', (done)->
+      @start()
+      callback = =>
+        transport = @createElement_stub.returnValues[0]
+        expect(transport.src).to.contain('buster=')
+        done()
+      @subject.report(@url, @single_beacon_data_array).then callback, callback
+
+    context 'when images are disabled', ->
+      beforeEach ->
+        @checkImage_stub = sinon.stub(@browser_helper, 'checkImages').returns( new @promise().resolve(false) )
+
+      afterEach ->
+        @checkImage_stub.restore()
+
+      it 'creates script element transports', (done)->
+        @start()
+        callback = =>
+          expect(@createElement_stub.args[0][0]).to.equal('script')
+          done()
+        @subject.report(@url, @single_beacon_data_array).then callback, callback
+
+
     context 'when images are enabled', ->
-      it 'sets transport to image', (done) ->
-        stub = sinon
-          .stub(@browser_helper, 'checkImages')
-          .returns(new @promise().resolve(true))
+      beforeEach ->
+        @checkImage_stub = sinon.stub(@browser_helper, 'checkImages').returns( new @promise().resolve(true) )
 
-        @subject = new @reporter()
-        @subject.then =>
-          expect(@subject.transport).to.equal('img')
-          stub.restore()
+      afterEach ->
+        @checkImage_stub.restore()
+
+      it 'creates image element transports', (done)->
+        @start()
+        callback = =>
+          expect(@createElement_stub.args[0][0]).to.equal('img')
           done()
-
-    context 'when images are not enabled', ->
-      it 'sets transport to script', (done) ->
-        stub = sinon
-          .stub(@browser_helper, 'checkImages')
-          .returns((new @promise()).resolve(false))
-
-        @subject = new @reporter()
-        @subject.then =>
-          expect(@subject.transport).to.equal('script')
-          stub.restore()
-          done()
-
-  describe '#_handleJob', ->
-    beforeEach ->
-      @pr = new @promise()
-      @subject = new @reporter()
-      @stub = sinon.stub(@subject, '_createTransport')
-
-      @subject._handleJob(@url, @payload, @pr)
-
-    afterEach ->
-      @stub.restore()
-
-    it 'calls #_createTransport', ->
-      expect(@stub).to.be.calledOnce
-
-    it 'calls #_createTransport with proper args', ->
-      expect(@stub).to.be.calledWith(@pr, @serialized_data)
+        @subject.report(@url, @single_beacon_data_array).then callback, callback
