@@ -30,8 +30,12 @@ define ->
       i = 0
       for promise in promises
         results[promise._id] = {order: i++}
-        promise.then(success.bind(promise), fail)
 
+        binded_success = ((success, promise)->
+          return -> success.apply promise, arguments
+        )(success, promise)
+
+        promise.then(binded_success, fail)
 
       promise_all
 
