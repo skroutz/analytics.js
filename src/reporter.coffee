@@ -19,8 +19,10 @@ define [
       for data in data_array
         promise = new Promise()
 
-        @transport_ready.then =>
-          @_handleJob url, data, promise
+        ((url, data, promise)=>
+          @transport_ready.then =>
+            @_handleJob url, data, promise
+        )(url, data, promise)
 
         promises.push promise
 

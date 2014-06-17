@@ -217,6 +217,24 @@ describe 'Reporter', ->
 
           @subject.report(@url, @multiple_beacon_data_array).then callback, callback
 
+        it 'gives every transport element its own promise', (done)->
+          @clock.restore()
+          @start()
+
+          callback = =>
+            ids = []
+            length = 0
+            for call in @handleJob_spy.getCalls()
+              id = call.args[2]._id
+              if !ids[id]
+                ids[id] = true
+                length += 1
+
+            expect(length).to.equal @multiple_beacon_data_array.length
+            done()
+
+          @subject.report(@url, @multiple_beacon_data_array).then callback, callback
+
         it 'waits for every transport element to finish before fulfilling the promise returned', (done)->
           @start()
           callback = =>
@@ -235,6 +253,24 @@ describe 'Reporter', ->
 
           callback = =>
             expect(@createElement_stub.callCount).to.equal 1
+            done()
+
+          @subject.report(@url, @single_beacon_data_array).then callback, callback
+
+        it 'gives transport element its own promise', (done)->
+          @clock.restore()
+          @start()
+
+          callback = =>
+            ids = []
+            length = 0
+            for call in @handleJob_spy.getCalls()
+              id = call.args[2]._id
+              if !ids[id]
+                ids[id] = true
+                length += 1
+
+            expect(length).to.equal @single_beacon_data_array.length
             done()
 
           @subject.report(@url, @single_beacon_data_array).then callback, callback
