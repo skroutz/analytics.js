@@ -36,7 +36,7 @@ namespace :deploy do
   after :build, :copy_assets do
     on roles(:web) do
       within(release_path) do
-        execute :cp, 'dist/*.js', 'public/'
+        execute :cp, 'dist/*{.js,.js.gz}', 'public/'
         execute :cp, 'dist/js/*', 'public/js/'
       end
     end
