@@ -31,11 +31,11 @@ define ->
       for promise in promises
         results[promise._id] = {order: i++}
 
-        binded_success = ((success, promise)->
+        bound_success = ((success, promise)->
           return -> success.apply promise, arguments
         )(success, promise)
 
-        promise.then(binded_success, fail)
+        promise.then(bound_success, fail)
 
       promise_all
 
