@@ -32,6 +32,7 @@ define ->
     api:
       settings:
         key: '@@api.settings.key'
+        yogurt_session: '@@api.settings.yogurt_session'
         set_account: '@@api.settings.set_account'
         set_callback: '@@api.settings.set_callback'
         redirect_to: '@@api.settings.redirect_to'

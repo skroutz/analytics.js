@@ -7,6 +7,7 @@ define [
   class ActionsManager
     constructor: () ->
       @reporter = new Reporter()
+      @parsed_settings = {}
       @callbacks = []
       @actions = []
       @shop_code = null
@@ -30,6 +31,8 @@ define [
 
       @reporter.report(url, payload).then =>
         callback() for callback in @callbacks
+
+    getSettings: -> @parsed_settings
 
     _prepareData: (data)->
       result = []
@@ -56,6 +59,8 @@ define [
       api = Settings.api
       while item = @actions_queue.pop()
         switch item[1]
+          when api.settings.yogurt_session
+            @parsed_settings.yogurt_session = item[2]
           when api.settings.set_account
             @shop_code = item[2]
           when api.settings.set_callback

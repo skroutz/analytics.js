@@ -15,6 +15,7 @@ cookies:
 api:
   settings:
     key: "settings"
+    yogurt_session: "setYogurtSession"
     set_account: "setAccount"
     set_callback: "setCallback"
     redirect_to: "redirectTo"

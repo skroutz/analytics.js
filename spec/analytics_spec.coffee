@@ -15,22 +15,24 @@ describe 'Analytics', ->
         then: (success, fail) ->
           @promise.then success, fail
 
-      @session = SessionMock
+      @session_mock = SessionMock
+      @session_spy = sinon.spy this, 'session_mock'
 
-      define 'session', [], ->
-        return SessionMock
+      define 'session', [], =>
+        return @session_mock
 
       # mock ActionsManager
       requirejs.undef 'actions_manager'
 
       class ActionsManagerMock
+        getSettings: -> {koko:'lala'}
         sendTo: -> new Promise().resolve()
         redirect: (session) ->
 
-      @actions = ActionsManagerMock
+      @actions_mock = ActionsManagerMock
 
-      define 'actions_manager', [], ->
-        return ActionsManagerMock
+      define 'actions_manager', [], =>
+        return @actions_mock
 
       require ['analytics'], (Analytics) =>
         @analytics = Analytics
@@ -40,6 +42,9 @@ describe 'Analytics', ->
     requirejs.undef 'session'
     requirejs.undef 'actions_manager'
     window.__requirejs__.clearRequireState()
+
+  afterEach ->
+    @session_spy.reset()
 
   describe 'instance', ->
     beforeEach ->
@@ -57,6 +62,15 @@ describe 'Analytics', ->
 
     it 'responds to onSession', ->
       expect(@subject).to.respondTo('onSession')
+
+  describe '.constructor', ->
+    it 'creates new Session with parsed_settings_from ActionsManager', ->
+      obj = {a_new:'obj'}
+      stub = sinon.stub(@actions_mock.prototype, 'getSettings').returns(obj)
+      @subject = new @analytics()
+      expect(@session_spy).to.be.calledOnce
+        .and.to.be.calledWith(obj)
+      stub.restore()
 
   context 'when there is no analytics session', ->
     it 'calls #onNoSession', ->
@@ -91,13 +105,13 @@ describe 'Analytics', ->
       @spy?.restore()
 
     it 'reports a beacon', ->
-      @spy = sinon.spy(@actions.prototype, 'sendTo')
+      @spy = sinon.spy(@actions_mock.prototype, 'sendTo')
       @subject.session.promise.resolve(@analytics_session)
 
       expect(@spy).to.be.calledOnce
 
     it 'and then redirects with proper argument', ->
-      @spy = sinon.spy(@actions.prototype, 'redirect')
+      @spy = sinon.spy(@actions_mock.prototype, 'redirect')
       @subject.session.promise.resolve(@analytics_session)
 
       expect(@spy).to.be.calledOnce.calledWith(@analytics_session)

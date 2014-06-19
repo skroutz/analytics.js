@@ -6,13 +6,13 @@ define [
   'helpers/url_helper'
 ], (Settings, Promise, easyXDM, Biskoto, URLHelper)->
   class Session
-    constructor: ()->
+    constructor: (parsed_settings = {})->
       @easyXDM = easyXDM
       @promise = new Promise()
 
       @_cleanUpCookies()
 
-      @yogurt_session = @_getCookieYogurtSession()
+      @yogurt_session = parsed_settings.yogurt_session or @_getCookieYogurtSession()
       @analytics_session = @_getCookieAnalyticsSession()
 
       @_establishSession(@yogurt_session, @analytics_session)
