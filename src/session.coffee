@@ -12,7 +12,7 @@ define [
 
       @_cleanUpCookies()
 
-      @yogurt_session = parsed_settings.yogurt_session or @_getCookieYogurtSession()
+      @yogurt_session = parsed_settings.yogurt_session or null
       @analytics_session = @_getCookieAnalyticsSession()
 
       @_establishSession(@yogurt_session, @analytics_session)
@@ -50,8 +50,6 @@ define [
 
       if cookie_data.version isnt cookie_settings.version or !cookie_settings.first_party_enabled
         Biskoto.expire(cookie_name)
-
-    _getCookieYogurtSession: -> Biskoto.get(Settings.cookies.yogurt.name)
 
     _getCookieAnalyticsSession: ->
       data = Biskoto.get(Settings.cookies.analytics.name)

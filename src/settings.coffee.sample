@@ -13,8 +13,6 @@ define ->
     cookies:
       first_party_enabled: @@cookies.first_party_enabled
       version: @@cookies.version
-      yogurt:
-        name: '@@cookies.yogurt.name'
       analytics:
         name: '@@cookies.analytics.name'
         duration: @@cookies.analytics.duration #In seconds: one week

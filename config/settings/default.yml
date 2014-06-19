@@ -6,8 +6,6 @@ common:
 cookies:
   first_party_enabled: true
   version: 1
-  yogurt:
-    name: "yogurt_session"
   analytics:
     name: "analytics_session"
     duration: 604800 # 1 week
