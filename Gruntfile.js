@@ -95,7 +95,7 @@ module.exports = function(grunt) {
 
     optimize_rjs: {
       analytics: {
-        dest: "dist/js/payload.js"
+        dest: "compiled/payload.js"
       }
     },
 
@@ -213,6 +213,18 @@ module.exports = function(grunt) {
       options: {
         separator: ';\n'
       },
+      payload: {
+        options: {
+          separator: '\n'
+        },
+        src: [
+          'bower_components/json2/json2.js',
+          'tasks/wrappers/analytics/intro.js',
+          'compiled/payload.js',
+          'tasks/wrappers/analytics/outro.js',
+        ],
+        dest: 'dist/js/payload.js'
+      },
       easyxdm_module: {
         src: [
           'tasks/wrappers/easyxdm/intro.js',
@@ -304,6 +316,7 @@ module.exports = function(grunt) {
     'create_easyxdm_module',
     'coffee:payload',
     'optimize_rjs',
+    'concat:payload'
   ]);
 
   grunt.registerTask('create_easyxdm_module', [
