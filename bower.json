@@ -16,6 +16,7 @@
     "tests"
   ],
   "dependencies": {
-    "easyxdm": "~2.4.19"
+    "easyxdm": "~2.4.19",
+    "json2": "*"
   }
 }

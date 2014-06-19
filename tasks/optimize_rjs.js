@@ -19,10 +19,6 @@ module.exports = function( grunt ) {
 			baseUrl  : "compiled",
 			name     : "analytics",
 			optimize : "none",
-			wrap     : {
-				startFile : "tasks/wrappers/analytics/intro.js",
-				endFile   : "tasks/wrappers/analytics/outro.js"
-			},
 			paths                  : {
 				easyxdm : "../compiled/easyXDM"
 			},
