@@ -70,12 +70,6 @@ describe 'Settings', ->
         .that.equals('shop_code')
 
   describe '.cookies', ->
-    it 'has proper .yogurt.name', ->
-      expect(@settings)
-        .to.have.deep.property('cookies.yogurt.name')
-        .that.is.a('string')
-        .that.equals('yogurt_session')
-
     it 'has proper .analytics.name', ->
       expect(@settings)
         .to.have.deep.property('cookies.analytics.name')
