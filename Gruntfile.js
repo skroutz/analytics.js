@@ -126,23 +126,14 @@ module.exports = function(grunt) {
           'karma:unit:run',
         ]
       },
-      loader:{
-        files: [
-          'src/loader.coffee',
-        ],
-        tasks: [
-          'clean:payload',
-          'build_dist',
-        ]
-      },
       payload:{
         files: [
+          'config/settings/*.yml',
           'src/**/*.coffee',
-          '!src/loader.coffee',
+          'src/settings.coffee.sample',
         ],
         tasks: [
-          'karma:unit:run',
-          'clean:payload',
+          'create_env_settings',
           'build_dist',
         ]
       },
@@ -312,7 +303,6 @@ module.exports = function(grunt) {
   //BUILD PAYLOAD
   grunt.registerTask('build_payload', [
     'clean:payload',
-    'create_env_settings',
     'create_easyxdm_module',
     'coffee:payload',
     'optimize_rjs',
@@ -327,7 +317,6 @@ module.exports = function(grunt) {
 
   //BUILD LOADER
   grunt.registerTask('build_loader', [
-    'create_env_settings',
     'coffee:loader',
     'hash:payload',
     'replace:loader'
@@ -349,6 +338,8 @@ module.exports = function(grunt) {
 
   //ON DEPLOY
   grunt.registerTask('build', [
+    'copy:ymls',
+    'create_env_settings',
     'bower_install',
     'build_dist',
     'compress'
@@ -357,5 +348,9 @@ module.exports = function(grunt) {
   //DEFAULT TASKS
   grunt.registerTask('cleanup', ['shell:cleanup']);
   grunt.registerTask('default', ['start_test_server', 'watch']);
-  grunt.registerTask('test', ['karma:single']);
+  grunt.registerTask('test', [
+    'copy:ymls',
+    'create_env_settings',
+    'karma:single'
+  ]);
 };
