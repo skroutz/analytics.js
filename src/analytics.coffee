@@ -5,8 +5,8 @@ define [
 ], (Settings, ActionsManager, Session)->
   class Analytics
     constructor: ->
-      @session = new Session()
       @actions = new ActionsManager()
+      @session = new Session(@actions.getSettings())
 
       @session.then @onSession, @onNoSession
 

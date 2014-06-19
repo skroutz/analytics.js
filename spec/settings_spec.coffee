@@ -153,6 +153,12 @@ describe 'Settings', ->
           .that.is.a('string')
           .that.equals('settings')
 
+      it 'has property .yogurt_session', ->
+        expect(@settings.api.settings)
+          .to.have.property('yogurt_session')
+          .that.is.a('string')
+          .that.equals('setYogurtSession')
+
       it 'has property .set_account', ->
         expect(@settings.api.settings)
           .to.have.property('set_account')

@@ -74,6 +74,16 @@ describe 'ActionsManager', ->
       it 'creates an action with type "sendPageview"', ->
         expect(@instance.actions[0]).to.contain {type: @settings.api.site.send_pageview}
 
+    context "when a settings:setYogurtSession action is passed", ->
+      beforeEach ->
+        @yogurt_session = 'session_id'
+        sa(@settings.api.settings.key, @settings.api.settings.yogurt_session, @yogurt_session)
+        @instance = new @subject()
+
+      it "registers yogurt_session to @parsed_settings", ->
+        expect(@instance.parsed_settings).to.contain
+          yogurt_session: @yogurt_session
+
     context "when a settings:setAccount action is passed", ->
       beforeEach ->
         @shop_code = 'shop_code_1'
@@ -255,6 +265,18 @@ describe 'ActionsManager', ->
         expect(reported_item.actions).to.have.length 1
 
   describe 'API', ->
+    describe '#getSettings', ->
+      beforeEach ->
+        @yogurt_session = 'session_id'
+        sa(@settings.api.settings.key, @settings.api.settings.yogurt_session, @yogurt_session)
+        @instance = new @subject()
+
+      it "returns a parsed_data object", ->
+        expect(@instance.getSettings())
+          .to.be.an('object')
+          .and.to.contain
+            yogurt_session: @yogurt_session
+
     describe '#sendTo', ->
       beforeEach ->
         sa(@settings.api.settings.key, @settings.api.settings.set_account, 'shop_code_1')
