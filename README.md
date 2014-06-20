@@ -11,10 +11,10 @@ Add the following JavaScript snippet into your website template page. You may pa
 ```javascript
 <!-- [start] Skroutz Analytics -->
 <script>
-  (function(s,k,r,o,u,t,z){s['SkroutzAnalyticsObject']=u;s[u] = s[u] || function(){
-  (s[u].q = s[u].q || []).push(arguments)};t=k.createElement(r);
-  z=k.getElementsByTagName(r)[0];t.async=true;t.src=o;z.parentNode.insertBefore(t,z)
-  })(window,document,'script','//analytics.skroutz.gr/analytics.js','sa');
+  (function(a,b,c,d,e,f,g){a[e]= a[e] || function(){
+    (a[e].q = a[e].q || []).push(arguments);};f=b.createElement(c);f.async=true;
+    f.src=d;g=b.getElementsByTagName(c)[0];g.parentNode.insertBefore(f,g);
+  })(window,document,'script','https://analytics.skroutz.gr','sa');
   
   sa('settings', 'setAccount', 'SA-XXXX-Y');
   sa('site', 'sendPageView');
