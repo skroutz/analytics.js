@@ -338,7 +338,6 @@ module.exports = function(grunt) {
 
   //ON DEPLOY
   grunt.registerTask('build', [
-    'copy:ymls',
     'create_env_settings',
     'bower_install',
     'build_dist',
