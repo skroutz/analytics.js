@@ -238,6 +238,12 @@ module.exports = function(grunt) {
     },
 
     shell:{
+      fix_easyxdm_build_number: {
+        options: {
+          stdout: true
+        },
+        command: 'echo "build.number=0" > bower_components/easyxdm/build.number ',
+      },
       build_easyxdm: {
         options: {
           stdout: true
@@ -292,7 +298,8 @@ module.exports = function(grunt) {
   //BOWER TASKS
   grunt.registerTask('bower_install', [
     'bower:install',
-    'shell:build_easyxdm'
+    'shell:fix_easyxdm_build_number',
+    'shell:build_easyxdm',
   ]);
 
   grunt.registerTask('create_env_settings', [
