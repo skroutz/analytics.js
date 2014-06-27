@@ -37,9 +37,10 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '**/*.coffee' : ['coffee'],
-      '**/*.html'   : ['html2js'],
-      '**/*.json'   : ['html2js']
+      'src/**/*.coffee'  : ['coverage'],
+      'spec/**/*.coffee' : ['coffee'],
+      '**/*.html'        : ['html2js'],
+      '**/*.json'        : ['html2js']
     },
 
     coffeePreprocessor: {
@@ -53,7 +54,15 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress', 'mocha'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['mocha'],
+    reporters: ['mocha', 'coverage'],
+
+    // configure the coverage reporter
+    coverageReporter: {
+      reporters: [
+        { type: 'html', dir: 'spec/coverage/' },
+        { type: 'cobertura', dir: 'spec/coverage/cobertura' }
+      ]
+    },
 
     // web server port
     port: 9876,
