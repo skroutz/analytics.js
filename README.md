@@ -16,8 +16,8 @@ Add the following JavaScript snippet into your website template page. You may pa
     f.src=d;g=b.getElementsByTagName(c)[0];g.parentNode.insertBefore(f,g);
   })(window,document,'script','https://analytics.skroutz.gr','sa');
   
-  sa('settings', 'setAccount', 'SA-XXXX-Y');
-  sa('site', 'sendPageView');
+  sa('settings', 'setAccount', 'SA-XXX-YY');  // Configure your Account.
+  sa('site', 'sendPageView');                 // Optional. Default action.
 </script>
 <!-- [end] Skroutz Analytics -->
 ```
@@ -31,37 +31,7 @@ Add the following JavaScript snippet into your website template page. You may pa
     Sets the tracker object to your Account ID.
 
     ```javascript
-    sa.push('settings', 'setAccount', 'SA-XXXX-Y');
-    ```
-
-  * **setCallback**
-  
-    Invokes a function after all data have been reported.
-    
-    ```javascript
-    sa.push('settings', 'setCallback', doSomethingAfter);
-    ```
-  
-  * **redirectTo**
-  
-    Redirects to a url after all data have been reported and callbacks (if any set) have been executed.
-    
-    ```javascript
-    sa.push('settings', 'redirectTo', 'http://www.example.com/');
-    ```
-
-#### Yogurt
-
-  * **productClick**
-
-    Sends a product click for the specified product and shop.
-
-    ```javascript
-    sa.push('yogurt', 'productClick', {
-      'product_id': '15400722',  // Product ID as knonwn at yogurt. Required.
-      'shop_product_id': '752',  // Shop Product ID as known at merchant. Required.
-      'shop_id': '2032'          // Shop ID. Required.
-    });
+    sa('settings', 'setAccount', 'SA-XXXX-Y');
     ```
 
 #### Site
@@ -72,7 +42,7 @@ Add the following JavaScript snippet into your website template page. You may pa
     > *This action is automatically generated if no other actions are defined.*
 
     ```javascript
-    sa.push('site', 'sendPageView');
+    sa('site', 'sendPageView');
     ```
 
 #### Ecommerce
@@ -82,7 +52,7 @@ Add the following JavaScript snippet into your website template page. You may pa
     Creates a new shopping cart object.
 
     ```javascript
-    sa.push('ecommerce', 'addOrder', {
+    sa('ecommerce', 'addOrder', {
       'order_id': '123456',  // Order ID. Required.
       'revenue': '120.99',   // Grand Total.
       'shipping': '5.45',    // Total Shipping Cost.
@@ -95,7 +65,7 @@ Add the following JavaScript snippet into your website template page. You may pa
     Adds a new item to the shopping cart object.
 
     ```javascript
-    sa.push('ecommerce', 'addItem', {
+    sa('ecommerce', 'addItem', {
       'order_id': '123456',  // Order ID. Required.
       'product_id': '987',   // Product ID. Required.
       'price': '10.50',      // Price per Unit. Required.
