@@ -121,6 +121,7 @@ module.exports = function(grunt) {
           'spec/**/*_spec.coffee',
           'spec/**/*.html',
           'spec/**/*.json',
+          '!spec/coverage/**/*',
         ],
         tasks: [
           'karma:unit:run',

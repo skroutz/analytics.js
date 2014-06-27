@@ -11,3 +11,4 @@ config/settings/development.yml
 config/settings/testing.yml
 config/settings/production.yml
 config/settings/.environment
+spec/coverage
