@@ -87,7 +87,7 @@ define [
         socket_url = Settings.url.analytics_session.create(yogurt_session)
       else
         socket_url = Settings.url.analytics_session.connect()
-      socket_url
+      URLHelper.appendData socket_url, "cookie_version=#{Settings.cookies.version}"
 
     _createSocket: (url)->
       new @easyXDM.Socket

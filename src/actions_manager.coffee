@@ -28,6 +28,7 @@ define [
 
     sendTo: (url) ->
       payload = @_prepareData(@actions)
+      url = URLHelper.appendData url, "cookie_version=#{Settings.cookies.version}"
 
       @reporter.report(url, payload).then =>
         callback() for callback in @callbacks
