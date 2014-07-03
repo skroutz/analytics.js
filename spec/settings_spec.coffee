@@ -80,7 +80,7 @@ describe 'Settings', ->
       expect(@settings)
         .to.have.deep.property('cookies.analytics.duration')
         .that.is.an('number')
-        .that.equals( (60 * 60 * 24 * 7) )
+        .that.equals( (60 * 60 * 24 * 30) )
 
   describe '.url', ->
     it 'has proper .base', ->

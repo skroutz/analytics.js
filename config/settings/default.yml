@@ -8,7 +8,7 @@ cookies:
   version: 1
   analytics:
     name: "analytics_session"
-    duration: 604800 # 1 week
+    duration: 2592000 # 1 month
 
 api:
   settings:
