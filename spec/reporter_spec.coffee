@@ -322,6 +322,13 @@ describe 'Reporter', ->
           done()
         @subject.report(@url, @single_beacon_data_array).then callback, callback
 
+      it 'appends a "no_images" param to passed data', (done)->
+        @start()
+        callback = =>
+          transport = @createElement_stub.returnValues[0]
+          expect(transport.src).to.contain('no_images=')
+          done()
+        @subject.report(@url, @single_beacon_data_array).then callback, callback
 
     context 'when images are enabled', ->
       beforeEach ->
@@ -334,5 +341,13 @@ describe 'Reporter', ->
         @start()
         callback = =>
           expect(@createElement_stub.args[0][0]).to.equal('img')
+          done()
+        @subject.report(@url, @single_beacon_data_array).then callback, callback
+
+      it 'does not append a "no_images" param to passed data', (done)->
+        @start()
+        callback = =>
+          transport = @createElement_stub.returnValues[0]
+          expect(transport.src).to.not.contain('no_images=')
           done()
         @subject.report(@url, @single_beacon_data_array).then callback, callback

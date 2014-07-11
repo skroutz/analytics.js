@@ -43,12 +43,15 @@ define [
       @_createTransport(url, promise)
 
     _createTransport: (url, promise) ->
-      cache_buster = "buster=#{+new Date()}_#{unique_id++}"
-      element = document.createElement(@transport)
+      transport_options =
+        buster: "#{+new Date()}_#{unique_id++}"
 
+      transport_options.no_images = '' if @transport is 'script'
+
+      element = document.createElement(@transport)
       element.onload = -> promise.resolve()
       element.onerror = -> promise.reject()
-      element.src = URLHelper.appendData(url, cache_buster)
+      element.src = URLHelper.appendData url, URLHelper.serialize(transport_options)
 
       sibling = document.getElementsByTagName('script')[0]
       sibling.parentNode.insertBefore(element, sibling)
