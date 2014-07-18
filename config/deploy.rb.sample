@@ -30,10 +30,8 @@ namespace :deploy do
     end
   end
 
-  after :publishing, :build
-
   desc 'Copy assets to public folder'
-  after :build, :copy_assets do
+  task :copy do
     on roles(:web) do
       within(release_path) do
         execute :cp, 'dist/*{.js,.js.gz}', 'public/'
@@ -41,4 +39,7 @@ namespace :deploy do
       end
     end
   end
+
+  after :updated, :build
+  after :build, :copy
 end
