@@ -4,78 +4,11 @@ Minimal cross-domain user tracking library to measure user interaction across Sk
 
 ## How To Use
 
-### Tracking Code Quick Installation
+[Read the Documentation](http://developer.skroutz.gr/analytics/)
 
-Add the following JavaScript snippet into your website template page. You may paste it just before closing either `<head>` or `<body>` section.
+## Development
 
-```javascript
-<!-- [start] Skroutz Analytics -->
-<script>
-  (function(a,b,c,d,e,f,g){a[e]= a[e] || function(){
-    (a[e].q = a[e].q || []).push(arguments);};f=b.createElement(c);f.async=true;
-    f.src=d;g=b.getElementsByTagName(c)[0];g.parentNode.insertBefore(f,g);
-  })(window,document,'script','https://analytics.skroutz.gr','sa');
-  
-  sa('settings', 'setAccount', 'SA-XXX-YY');  // Configure your Account.
-  sa('site', 'sendPageView');                 // Optional. Default action.
-</script>
-<!-- [end] Skroutz Analytics -->
-```
-
-### API Quick Reference
-
-#### Settings
-
-  * **setAccount**
-
-    Sets the tracker object to your Account ID.
-
-    ```javascript
-    sa('settings', 'setAccount', 'SA-XXXX-Y');
-    ```
-
-#### Site
-
-  * **sendPageView**
-
-    Sends a page view for the current page. 
-    > *This action is automatically generated if no other actions are defined.*
-
-    ```javascript
-    sa('site', 'sendPageView');
-    ```
-
-#### Ecommerce
-
-  * **addOrder**
-
-    Creates a new shopping cart object.
-
-    ```javascript
-    sa('ecommerce', 'addOrder', {
-      'order_id': '123456',  // Order ID. Required.
-      'revenue': '120.99',   // Grand Total.
-      'shipping': '5.45',    // Total Shipping Cost.
-      'tax': '10.50'         // Total Tax.
-    });
-    ```
-  
-  * **addItem**
-
-    Adds a new item to the shopping cart object.
-
-    ```javascript
-    sa('ecommerce', 'addItem', {
-      'order_id': '123456',  // Order ID. Required.
-      'product_id': '987',   // Product ID. Required.
-      'price': '10.50',      // Price per Unit. Required.
-      'quantity': '4'        // Quantity of Items. Required.
-    });
-    ```
-
----
-
-## Installation
+## Install Dependencies
 
 First, install [`Node.js`](http://nodejs.org/) and its package manager, [`npm`](https://github.com/npm/npm) (`npm` comes by default with `node` now).
 
@@ -92,7 +25,6 @@ Finally, install project dependencies:
 $ npm install && grunt bower
 ```
 
----
 ## Environments
 
 You have two options to invoke a specific environment:
@@ -122,8 +54,6 @@ The `src/settings.coffee` file gets created according to the environment setting
 $ grunt create_env_settings
 ```
 
----
-
 ## Build
 
 You can build the project with the command:
@@ -148,12 +78,10 @@ The contents of the `dist` directory should look like this:
 |- analytics.min.js
 ```
 
+## Watch and rebuild changes
 
----
-
-## Development
-
-For development, you may just run:
+In development you don't have to constantly run the build command for
+any change you perform in the sources. You may just run:
 
 ```bash
 $ grunt
@@ -165,8 +93,6 @@ This executes the *default* `grunt` task that:
 - watches for file changes and
     - runs all tests
     - recompiles assets
-
----
 
 ## Test
 
@@ -212,16 +138,12 @@ The above command is useful when in development and it will just:
  -  delete `compiled` directory
  -  delete `src/settings.coffee` file
 
----
-
 ## Authors
 
 - Bill Trikalinos (*[billtrik](https://github.com/billtrik)*)
 - Chrisovalantis Kefalidis (*[cvkef](https://github.com/cvkef)*)
 - Fotos Georgiadis (*[fotos](https://github.com/fotos)*)
 - Dimitrios Zorbas (*[Zorbash](https://github.com/Zorbash)*)
-
----
 
 ## License
 
