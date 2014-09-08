@@ -1,6 +1,4 @@
 describe 'Analytics', ->
-  @timeout(0) # Disable the spec's timeout
-
   before (done) ->
     window.__requirejs__.clearRequireState()
     require ['promise'], (Promise) =>
@@ -50,6 +48,7 @@ describe 'Analytics', ->
     beforeEach ->
       @subject = new @analytics()
       @subject.session.promise.reject()
+      return
 
     it 'has own property session', ->
       expect(@subject).to.have.ownProperty('session')

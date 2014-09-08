@@ -3,9 +3,6 @@ clear_all_cookies = ->
     document.cookie = "#{cookie.split('=')[0]}= ;expires=Wed, 28 May 2000 10:53:43 GMT"
 
 describe 'Session', ->
-  @timeout(0) # Disable the spec's timeout
-
-
   before (done) ->
     window.__requirejs__.clearRequireState()
 
@@ -242,6 +239,7 @@ describe 'Session', ->
             @setup_get_to_return null
             @setup_iframe_to_return null
             @init()
+            return
 
           it 'rejects the @promise', (done)->
             @instance.then ->

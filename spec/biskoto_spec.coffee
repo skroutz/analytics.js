@@ -1,6 +1,4 @@
 describe 'Biskoto', ->
-  @timeout(0) # Disable the spec's timeout
-
   before (done) ->
     require ['biskoto'], (Biskoto) =>
       @biskoto = Biskoto

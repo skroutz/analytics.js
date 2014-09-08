@@ -1,6 +1,4 @@
 describe 'Reporter', ->
-  @timeout(0) # Disable the spec's timeout
-
   before (done) ->
     @url = 'foo.bar'
 
