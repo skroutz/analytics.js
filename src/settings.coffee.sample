@@ -1,35 +1,85 @@
 define ->
   Settings =
+    ###
+    @param [String] url The url to redirect to
+    ###
     redirectTo: (url)-> Settings.window.location.replace(url)
+
+    ###
+    The message to send over easyXDM.Socket and request the Analytics Session
+    from the server.
+    ###
     iframe_message: '@@common.iframe_message'
+
+    ###
+    Whether to use single or multiple beacons when reporting data
+    @see Reporter._prepareData()
+    ###
     single_beacon: @@common.single_beacon
+
+    ###
+    Timeouts
+    ###
     xdomain_session_timeout: @@xdomain_session_timeout
     auto_pageview_timeout: @@auto_pageview_timeout
     send_auto_pageview: @@send_auto_pageview
+
+    ###
+    Parameter names for backend requests
+    ###
     params:
       analytics_session: '@@params.analytics_session'
       signature: '@@params.signature'
       url: '@@params.url'
       shop_code: '@@params.shop_code'
       actions: '@@params.actions'
+
+    ###
+    Cookies
+    ###
     cookies:
       first_party_enabled: @@cookies.first_party_enabled
       version: @@cookies.version
       analytics:
         name: '@@cookies.analytics.name'
         duration: @@cookies.analytics.duration
+
+    ###
+    Backend Endpoints
+    ###
     url:
       base: '@@base'
       analytics_session:
+        ###
+        Analytics Tracking Session Creation Endpoint
+        @param [String] shop_code Analytics code of the tracked shop
+        @param [String] yogurt_session Our Session ID
+        @param [String] yogurt_user_id Backend ID of the tracked user
+        @return [String] The formatted URL
+        ###
         create: (shop_code, yogurt_session, yogurt_user_id)->
           "@@base@@url.analytics_session.create"
+
+        ###
+        Analytics Tracking Session Connection Endpoint
+        @return [String] The formatted URL
+        ###
         connect: (shop_code)->
           "@@base@@url.analytics_session.connect"
+
+      ###
+      Analytics Action Endpoint
+      @param [String] analytics_session The Analytics Session ID
+      @return [String] The Formatted URL
+      ###
       beacon: (analytics_session)->
         "@@base@@url.beacon"
+
       utils:
+        # Helper endpoints to detect whether 3rd party cookies are enabled or not
         third_party_step1: -> "@@base@@url.utils.third_party_step1"
         third_party_step2: -> "@@base@@url.utils.third_party_step2"
+
     api:
       settings:
         key: '@@api.settings.key'
@@ -49,18 +99,24 @@ define ->
         add_item: '@@api.ecommerce.add_item'
         add_transaction: '@@api.ecommerce.add_transaction'
 
+  # The current window object
   try
     Settings.window = global
   catch
     Settings.window = this
 
-  # TODO MAKE IT BETTER
+  ###
+  Define window.sa and window.sa.q
+  @todo Needs refactoring and better place to live
+  ###
   Settings.window.sa = Settings.window.sa or ->
     (Settings.window.sa.q = Settings.window.sa.q || []).push(arguments)
     return
   Settings.window.sa.q = Settings.window.sa.q or []
 
   Settings.commands_queue = Settings.window.sa.q
+
+  # The current page URL
   Settings.url.current   = Settings.window.location.href
 
   return Settings
