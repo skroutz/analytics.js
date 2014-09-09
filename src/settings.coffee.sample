@@ -1,31 +1,99 @@
 define ->
+
+  ###
+    Settings module
+
+    Singleton to share common settings across all modules.
+  ###
   Settings =
+
+    ###
+      Alias to location.replace()
+
+      @example Redirect to a URL
+        Settings.redirectTo('http://foo.bar')
+
+      @param [String] url The url to redirect to
+    ###
     redirectTo: (url)-> Settings.window.location.replace(url)
+
+    # The message to send over easyXDM.Socket and request the Analytics Session
+    # from the server.
     iframe_message: '@@common.iframe_message'
+
+    ###
+      Whether to use single or multiple beacons when reporting data
+
+      @see Reporter._prepareData()
+    ###
     single_beacon: @@common.single_beacon
+
+    # Common literals for parameters
     params:
       analytics_session: '@@params.analytics_session'
       signature: '@@params.signature'
       url: '@@params.url'
       shop_code: '@@params.shop_code'
       actions: '@@params.actions'
+
+    # Common settings for cookies
     cookies:
       first_party_enabled: @@cookies.first_party_enabled
       version: @@cookies.version
       analytics:
         name: '@@cookies.analytics.name'
         duration: @@cookies.analytics.duration #In seconds: one week
+
+    # Common URIs
     url:
+
+      # The base URL
       base: '@@base'
+
       analytics_session:
+
+        ###
+          Creates Analytics Tracking Session endpoint
+
+          @example Retrieve the Create Session endpoint
+            Settings.url.analytics_session.create('yogurt-47fd-8df3-277e55b7')
+
+          @param [String] yogurt_session Our Sites' Session ID
+          @return [String] The analytics server endpoint to create the session
+        ###
         create: (yogurt_session)->
           "@@base@@url.analytics_session.create"
+
+        ###
+          Connects to Analytics Tracking Session endpoint
+
+          @example Retrieve the Connect endpoint
+            Settings.url.analytics_session.connect()
+
+          @return [String] The analytics server endpoint to restore tracking of
+            session.
+        ###
         connect: -> "@@base@@url.analytics_session.connect"
+
+      ###
+        New Analytics Action endpoint
+
+        @example Retrieve the Create Action endpoint
+          Settings.url.beacon('analytics-47fd-8df3-277e55b7')
+
+        @param [String] analytics_session The Analytics Session ID
+        @return [String] The base analytics server endpoint to create a new
+          action.
+      ###
       beacon: (analytics_session)->
         "@@base@@url.beacon"
+
+      # Helper endpoints to detect whether 3rd party cookies are enabled or not
       utils:
         third_party_step1: -> "@@base@@url.utils.third_party_step1"
         third_party_step2: -> "@@base@@url.utils.third_party_step2"
+
+    # Literals for Analytics categories and types of actions
     api:
       settings:
         key: '@@api.settings.key'
@@ -44,18 +112,27 @@ define ->
         add_item: '@@api.ecommerce.add_item'
         add_transaction: '@@api.ecommerce.add_transaction'
 
+  # The current window scope
   try
     Settings.window = global
   catch
     Settings.window = this
 
-  # TODO MAKE IT BETTER
+  ###
+    Define window.sa and window.sa.q
+
+    @todo Needs refactor and better place to live. This was implemented just to
+      enforce specs to pass.
+  ###
   Settings.window.sa = Settings.window.sa or ->
     (Settings.window.sa.q = Settings.window.sa.q || []).push(arguments)
     return
   Settings.window.sa.q = Settings.window.sa.q or []
 
+  # The collected Analytics actions
   Settings.actions_queue = Settings.window.sa.q
+
+  # The current page URL
   Settings.url.current   = Settings.window.location.href
 
   return Settings
