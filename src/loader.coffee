@@ -1,3 +1,12 @@
+###
+Analytics Payload Loader
+
+This is the `analytics.js` file that loads the actual Analytics payload. It
+utilizes the Friendly iFrames (FiF) technique in order to load the JavaScript
+library without blocking the `window.onload` event.
+
+@see http://goo.gl/VLDc3F More information on FiF technique
+###
 ((url)->
   # Section 1
   iframe = document.createElement('iframe')
@@ -10,7 +19,7 @@
   where = where[where.length - 1]
   where.parentNode.insertBefore(iframe, where)
 
-# Section 2
+  # Section 2
   try
     doc = iframe.contentWindow.document
   catch err
