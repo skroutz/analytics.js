@@ -67,10 +67,13 @@ describe 'ActionsManager', ->
         expect(@instance.actions).to.have.length 1
 
       it 'creates an action with category "site"', ->
-        expect(@instance.actions[0]).to.contain {category:@settings.api.site.key}
+        expect(@instance.actions[0]).to.contain {category: @settings.api.site.key}
 
       it 'creates an action with type "sendPageview"', ->
         expect(@instance.actions[0]).to.contain {type: @settings.api.site.send_pageview}
+
+      it 'creates an action with empty data', ->
+        expect(@instance.actions[0]).to.have.property('data').that.eql({})
 
     context "when a settings:setYogurtSession action is passed", ->
       beforeEach ->
