@@ -1,6 +1,5 @@
 define ->
   Settings =
-    window: (global or this)
     redirectTo: (url)-> Settings.window.location.replace(url)
     iframe_message: '@@common.iframe_message'
     single_beacon: @@common.single_beacon
@@ -44,6 +43,11 @@ define ->
         key: '@@api.ecommerce.key'
         add_item: '@@api.ecommerce.add_item'
         add_transaction: '@@api.ecommerce.add_transaction'
+
+  try
+    Settings.window = global
+  catch
+    Settings.window = this
 
   # TODO MAKE IT BETTER
   Settings.window.sa = Settings.window.sa or ->

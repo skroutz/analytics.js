@@ -4,8 +4,6 @@ clear_q = ->
     ;
 
 describe 'ActionsManager', ->
-  @timeout(0) # Disable the spec's timeout
-
   before (done) ->
     require [
       'promise'

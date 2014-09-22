@@ -1,6 +1,4 @@
 describe 'Promise', ->
-  @timeout(0) # Disable the spec's timeout
-
   before (done) ->
     require ['promise'], (Promise) =>
       @promise = Promise

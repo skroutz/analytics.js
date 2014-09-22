@@ -1,6 +1,4 @@
 describe 'Settings', ->
-  @timeout(0) # Disable the spec's timeout
-
   before (done) ->
     require ['settings'], (Settings) =>
       @settings = Settings

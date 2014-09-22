@@ -1,6 +1,4 @@
 describe 'URLHelper', ->
-  @timeout(0) # Disable the spec's timeout
-
   before (done) ->
     require ['helpers/url_helper', 'settings'], (UrlHelper, Settings) =>
       @settings = Settings
