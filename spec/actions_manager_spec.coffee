@@ -91,6 +91,10 @@ describe 'ActionsManager', ->
       it "registers shop_code to @shop_code_val", ->
         expect(@instance.shop_code).to.equal @shop_code
 
+      it "registers shop_code to @parsed_settings", ->
+        expect(@instance.parsed_settings).to.contain
+          shop_code: @shop_code
+
     context "when a settings:redirectTo action is passed", ->
       beforeEach ->
         @url = 'some_url'

@@ -63,6 +63,7 @@ define [
             @parsed_settings.yogurt_session = item[2]
           when api.settings.set_account
             @shop_code = item[2]
+            @parsed_settings.shop_code = item[2]
           when api.settings.set_callback
             @callbacks.push item[2]
           when api.settings.redirect_to

@@ -95,18 +95,22 @@ describe 'Settings', ->
         .that.equals(current_url)
 
     describe '.analytics_session', ->
+      beforeEach ->
+        @base = @settings.url.base
+        @session = 'foo'
+        @shop_code = 'shop_code_1'
+
       describe '.create', ->
         it 'returns the proper create endpoint', ->
-          base = @settings.url.base
-          session = 'foo'
-          endpoint = "#{base}/track/create?yogurt_session=#{session}"
-          expect(@settings.url.analytics_session.create(session))
+          endpoint = "#{@base}/track/create?yogurt_session=#{@session}&shop_code=#{@shop_code}"
+          expect(@settings.url.analytics_session.create(@session, @shop_code))
             .to.equal(endpoint)
 
       describe '.connect', ->
         it 'returns the proper connect endpoint', ->
-          expect(@settings.url.analytics_session.connect())
-            .to.equal("#{@settings.url.base}/track/connect")
+          endpoint = "#{@base}/track/connect?shop_code=#{@shop_code}"
+          expect(@settings.url.analytics_session.connect(@shop_code))
+            .to.equal(endpoint)
 
     describe '.beacon', ->
       it 'returns the proper beacon endpoint', ->
