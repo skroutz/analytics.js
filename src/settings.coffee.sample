@@ -18,7 +18,7 @@ define ->
     url:
       base: '@@base'
       analytics_session:
-        create: (yogurt_session, shop_code)->
+        create: (yogurt_session, yogurt_user_id, shop_code)->
           "@@base@@url.analytics_session.create"
         connect: (shop_code)->
           "@@base@@url.analytics_session.connect"
@@ -31,6 +31,7 @@ define ->
       settings:
         key: '@@api.settings.key'
         yogurt_session: '@@api.settings.yogurt_session'
+        yogurt_user: '@@api.settings.yogurt_user'
         set_account: '@@api.settings.set_account'
         set_callback: '@@api.settings.set_callback'
         redirect_to: '@@api.settings.redirect_to'

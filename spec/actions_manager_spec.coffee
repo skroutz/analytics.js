@@ -85,6 +85,17 @@ describe 'ActionsManager', ->
         expect(@instance.parsed_settings).to.contain
           yogurt_session: @yogurt_session
 
+    context "when a settings:setYogurtUser action is passed", ->
+      beforeEach ->
+        @yogurt_session = 'session_id'
+        @yogurt_user_id = '1234'
+        sa(@settings.api.settings.key, @settings.api.settings.yogurt_user, @yogurt_user_id)
+        @instance = new @subject()
+
+      it "registers yogurt_user_id to @parsed_settings", ->
+        expect(@instance.parsed_settings).to.contain
+          yogurt_user_id: @yogurt_user_id
+
     context "when a settings:setAccount action is passed", ->
       beforeEach ->
         @shop_code = 'shop_code_1'

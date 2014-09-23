@@ -61,6 +61,8 @@ define [
         switch item[1]
           when api.settings.yogurt_session
             @parsed_settings.yogurt_session = item[2]
+          when api.settings.yogurt_user
+            @parsed_settings.yogurt_user_id = item[2]
           when api.settings.set_account
             @shop_code = item[2]
             @parsed_settings.shop_code = item[2]

@@ -92,6 +92,7 @@ describe 'Session', ->
     beforeEach ->
       clear_all_cookies()
       @yogurt_session    = 'dummy_yogurt_session_hash'
+      @yogurt_user_id    = '1234'
       @shop_code         = 'shop_code_1'
       @analytics_session = 'dummy_analytics_session_hash'
 
@@ -121,6 +122,7 @@ describe 'Session', ->
     context 'when we are inside yogurt (implied from "yogurt_session" cookie existance)', ->
       beforeEach ->
         @parsed_settings =
+          yogurt_user_id: @yogurt_user_id
           yogurt_session: @yogurt_session
           shop_code: @shop_code
         @init = ->
@@ -138,7 +140,7 @@ describe 'Session', ->
         @init()
 
         expect(@easyxdm_socket_spy.args[0][0]).to.contain
-          remote: @settings.url.analytics_session.create(@yogurt_session, @shop_code)
+          remote: @settings.url.analytics_session.create(@yogurt_session, @yogurt_user_id, @shop_code)
 
       it 'extracts "analytics_session" from XDomain socket', (done)->
         test_analytics_session = 'another_analytics_session_hash'
