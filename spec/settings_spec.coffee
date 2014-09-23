@@ -98,12 +98,13 @@ describe 'Settings', ->
       beforeEach ->
         @base = @settings.url.base
         @session = 'foo'
+        @yogurt_user_id = '123'
         @shop_code = 'shop_code_1'
 
       describe '.create', ->
         it 'returns the proper create endpoint', ->
-          endpoint = "#{@base}/track/create?yogurt_session=#{@session}&shop_code=#{@shop_code}"
-          expect(@settings.url.analytics_session.create(@session, @shop_code))
+          endpoint = "#{@base}/track/create?yogurt_session=#{@session}&yogurt_user_id=#{@yogurt_user_id}&shop_code=#{@shop_code}"
+          expect(@settings.url.analytics_session.create(@session, @yogurt_user_id, @shop_code))
             .to.equal(endpoint)
 
       describe '.connect', ->
@@ -154,6 +155,12 @@ describe 'Settings', ->
           .to.have.property('yogurt_session')
           .that.is.a('string')
           .that.equals('setYogurtSession')
+
+      it 'has property .yogurt_user', ->
+        expect(@settings.api.settings)
+          .to.have.property('yogurt_user')
+          .that.is.a('string')
+          .that.equals('setYogurtUser')
 
       it 'has property .set_account', ->
         expect(@settings.api.settings)
