@@ -13,20 +13,22 @@ define [
       @_cleanUpCookies()
 
       @yogurt_session = parsed_settings.yogurt_session or null
+      @shop_code = parsed_settings.shop_code or null
+
       @analytics_session = @_getCookieAnalyticsSession()
 
-      @_establishSession(@yogurt_session, @analytics_session)
+      @_establishSession(@yogurt_session, @analytics_session, @shop_code)
 
     then: (success, fail)-> @promise.then(success, fail)
 
-    _establishSession: (yogurt_session, analytics_session)->
+    _establishSession: (yogurt_session, analytics_session, shop_code)->
       # Always create third party cookie on analytics domain
       # if on create phase
       if analytics_session isnt null and yogurt_session is null
         ## TODO: SHOULD BE RE-SET expires ATTRIBUTE IF COOKIE ALREADY EXISTS?
         @promise.resolve analytics_session
       else
-        @socket = @_createSocket @_socketUrl(yogurt_session)
+        @socket = @_createSocket @_socketUrl(yogurt_session, shop_code)
         @_extractAnalyticsSession()
 
     _extractAnalyticsSession: ->
@@ -82,11 +84,11 @@ define [
       return unless origin is Settings.url.base
       @socket.promise.resolve analytics_session
 
-    _socketUrl: (yogurt_session)->
+    _socketUrl: (yogurt_session, shop_code)->
       if yogurt_session
-        socket_url = Settings.url.analytics_session.create(yogurt_session)
+        socket_url = Settings.url.analytics_session.create(yogurt_session, shop_code)
       else
-        socket_url = Settings.url.analytics_session.connect()
+        socket_url = Settings.url.analytics_session.connect(shop_code)
       socket_url
 
     _createSocket: (url)->

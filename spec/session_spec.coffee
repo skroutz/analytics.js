@@ -92,6 +92,7 @@ describe 'Session', ->
     beforeEach ->
       clear_all_cookies()
       @yogurt_session    = 'dummy_yogurt_session_hash'
+      @shop_code         = 'shop_code_1'
       @analytics_session = 'dummy_analytics_session_hash'
 
       @prev_cookies_enabled = @settings.cookies.first_party_enabled
@@ -121,6 +122,7 @@ describe 'Session', ->
       beforeEach ->
         @parsed_settings =
           yogurt_session: @yogurt_session
+          shop_code: @shop_code
         @init = ->
           @instance = new @session(@parsed_settings)
 
@@ -136,7 +138,7 @@ describe 'Session', ->
         @init()
 
         expect(@easyxdm_socket_spy.args[0][0]).to.contain
-          remote: @settings.url.analytics_session.create(@yogurt_session)
+          remote: @settings.url.analytics_session.create(@yogurt_session, @shop_code)
 
       it 'extracts "analytics_session" from XDomain socket', (done)->
         test_analytics_session = 'another_analytics_session_hash'
@@ -217,7 +219,7 @@ describe 'Session', ->
     context 'when we are outside yogurt (implied from "yogurt_session" cookie absence)', ->
       beforeEach ->
         @init = ->
-          @instance = new @session({})
+          @instance = new @session({shop_code: @shop_code})
 
       it 'does not find "yogurt_session" from passed argument', ->
         @init()
@@ -231,7 +233,7 @@ describe 'Session', ->
         @init()
 
         expect(@easyxdm_socket_spy.args[0][0]).to.contain
-          remote: @settings.url.analytics_session.connect()
+          remote: @settings.url.analytics_session.connect(@shop_code)
 
       describe 'retrieval process', ->
         context 'when neither XDomain socket nor GET param provide "analytics_session"', ->

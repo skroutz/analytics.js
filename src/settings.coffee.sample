@@ -18,9 +18,10 @@ define ->
     url:
       base: '@@base'
       analytics_session:
-        create: (yogurt_session)->
+        create: (yogurt_session, shop_code)->
           "@@base@@url.analytics_session.create"
-        connect: -> "@@base@@url.analytics_session.connect"
+        connect: (shop_code)->
+          "@@base@@url.analytics_session.connect"
       beacon: (analytics_session)->
         "@@base@@url.beacon"
       utils:
