@@ -82,7 +82,7 @@ define [
 
             @actions.push action
 
-      @actions.push {category: api.site.key, type: api.site.send_pageview, data: {}} unless @actions.length
+      @actions.push {category: api.site.key, type: api.site.send_pageview, data: '{}'} unless @actions.length
 
       return
 
