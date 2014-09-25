@@ -204,7 +204,7 @@ describe 'Settings', ->
         expect(@settings.api.site)
           .to.have.property('send_pageview')
           .that.is.a('string')
-          .that.equals('sendPageview')
+          .that.equals('sendPageView')
 
     describe '.ecommerce', ->
       it 'has property .key', ->

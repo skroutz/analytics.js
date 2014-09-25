@@ -23,7 +23,7 @@ api:
     product_click: "productClick"
   site:
     key: "site"
-    send_pageview: "sendPageview"
+    send_pageview: "sendPageView"
   ecommerce:
     key: "ecommerce"
     add_item: "addItem"

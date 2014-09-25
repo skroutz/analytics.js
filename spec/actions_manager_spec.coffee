@@ -69,7 +69,7 @@ describe 'ActionsManager', ->
       it 'creates an action with category "site"', ->
         expect(@instance.actions[0]).to.contain {category: @settings.api.site.key}
 
-      it 'creates an action with type "sendPageview"', ->
+      it 'creates an action with type "sendPageView"', ->
         expect(@instance.actions[0]).to.contain {type: @settings.api.site.send_pageview}
 
       it 'creates an action with empty data', ->
