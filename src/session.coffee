@@ -17,33 +17,14 @@ define [
 
       @analytics_session = @_getCookieAnalyticsSession()
 
-      @_establishSession(@yogurt_session, @analytics_session, @yogurt_user_id, @shop_code)
+      # If yogurt_session exists we are in yogurt space.
+      # Always create third party cookie while in yogurt space.
+      if @yogurt_session is null and @analytics_session isnt null
+        @promise.resolve @analytics_session
+      else
+        @_extractAnalyticsSession(@yogurt_session, @yogurt_user_id, @shop_code)
 
     then: (success, fail)-> @promise.then(success, fail)
-
-    _establishSession: (yogurt_session, analytics_session, yogurt_user_id, shop_code)->
-      # Always create third party cookie on analytics domain
-      # if on create phase
-      if analytics_session isnt null and yogurt_session is null
-        ## TODO: SHOULD BE RE-SET expires ATTRIBUTE IF COOKIE ALREADY EXISTS?
-        @promise.resolve analytics_session
-      else
-        @_extractAnalyticsSession(yogurt_session, yogurt_user_id, shop_code)
-
-    _extractAnalyticsSession: (yogurt_session, yogurt_user_id, shop_code)->
-      Promise.all([
-        (new XDomainEngine(yogurt_session, yogurt_user_id, shop_code))
-        (new GetParamEngine())
-      ]).then ((results)=>
-        analytics_session = results[0] or results[1]
-
-        if analytics_session
-          @_createFirstPartyCookie(analytics_session)
-          @_registerAnalyticsSession(analytics_session)
-        else
-          @promise.reject()
-      ), =>
-         @promise.reject()
 
     _cleanUpCookies: ->
       cookie_settings = Settings.cookies
@@ -58,6 +39,22 @@ define [
       data = Biskoto.get(Settings.cookies.analytics.name)
       if data then data.analytics_session else null
 
+    _extractAnalyticsSession: (yogurt_session, yogurt_user_id, shop_code)->
+      Promise.all([
+        (new XDomainEngine(yogurt_session, yogurt_user_id, shop_code))
+        (new GetParamEngine())
+      ]).then @_onSessionSuccess, @_onSessionError
+
+    _onSessionError: => @promise.reject()
+
+    _onSessionSuccess: (results) =>
+      if analytics_session = results[0] or results[1]
+        @_createFirstPartyCookie(analytics_session)
+        @analytics_session = analytics_session
+        @promise.resolve analytics_session
+      else
+        @promise.reject()
+
     _createFirstPartyCookie: (analytics_session)->
       return unless Settings.cookies.first_party_enabled
 
@@ -67,9 +64,5 @@ define [
 
       Biskoto.set Settings.cookies.analytics.name, cookie_data,
         expires: Settings.cookies.analytics.duration
-
-    _registerAnalyticsSession: (analytics_session)->
-      @analytics_session = analytics_session
-      @promise.resolve analytics_session
 
   return Session
