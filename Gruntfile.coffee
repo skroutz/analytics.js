@@ -59,7 +59,9 @@ module.exports = (grunt) ->
               match: 'payload_hash'
               replacement: ->
                 filename = grunt.file.readJSON('compiled/assets.json')['js/payload.js']
-                filename.replace '.js', '.min.js'
+                if grunt.config('env') isnt 'development'
+                  filename = filename.replace('.js', '.min.js')
+                filename
             }
             {
               match: 'base'
@@ -106,6 +108,8 @@ module.exports = (grunt) ->
         tasks: ['karma:unit:run']
 
       payload:
+        options:
+          livereload: true
         files: [
           'config/settings/*.yml'
           'src/**/*.coffee'
