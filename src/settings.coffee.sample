@@ -4,6 +4,8 @@ define ->
     iframe_message: '@@common.iframe_message'
     single_beacon: @@common.single_beacon
     xdomain_session_timeout: @@xdomain_session_timeout
+    auto_pageview_timeout: @@auto_pageview_timeout
+    send_auto_pageview: @@send_auto_pageview
     params:
       analytics_session: '@@params.analytics_session'
       signature: '@@params.signature'

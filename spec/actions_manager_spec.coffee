@@ -172,6 +172,108 @@ describe 'ActionsManager', ->
       @init()
       expect(@settings.window.sa).to.equal @instance.run
 
+  describe 'Automatic PageViews', ->
+    beforeEach ->
+      @timeout_spy = sinon.spy @settings.window, 'setTimeout'
+      @cleartimeout_spy = sinon.spy @settings.window, 'clearTimeout'
+      @old_setting = @settings.send_auto_pageview
+      @init = =>
+        @instance = new @subject()
+        @init_session()
+
+    afterEach ->
+      @settings.send_auto_pageview = @old_setting
+      @timeout_spy.restore()
+      @cleartimeout_spy.restore()
+
+    context 'when Settings.send_auto_pageview is false', ->
+      beforeEach ->
+        @settings.send_auto_pageview = false
+
+      it 'does not set a timeout', ->
+        @init()
+        expect(@timeout_spy).to.not.be.called
+
+      it 'does not send a pageview', ->
+        @init()
+        @clock.tick @settings.auto_pageview_timeout + 100
+
+        expect(@sendbeacon_spy).to.not.be.called
+
+    context 'when Settings.send_auto_pageview is true', ->
+      beforeEach ->
+        @settings.send_auto_pageview = true
+
+      it 'sets a timeout', ->
+        @init()
+        expect(@timeout_spy).to.be.calledOnce
+
+      context 'when no other actions are declared', ->
+        context 'before timeout expires', ->
+          beforeEach ->
+            @init()
+
+          it 'does not send a pageview', ->
+            expect(@sendbeacon_spy).to.not.be.called
+
+        context 'after timeout expires', ->
+          beforeEach ->
+            @init()
+            @clock.tick @settings.auto_pageview_timeout + 100
+
+          it 'sends an action', ->
+            expect(@sendbeacon_spy).to.be.calledOnce
+
+          it 'sends a PageView action', ->
+            beacon_data = @sendbeacon_spy.args[0][1].actions[0]
+
+            expect(beacon_data).to.contain
+              category: "site"
+              type: "sendPageView"
+
+          it 'sends a PageView action with empty data', ->
+            beacon_data = @sendbeacon_spy.args[0][1].actions[0]
+
+            expect(beacon_data).to.contain
+              data: '{}'
+
+      context 'when another action is created', ->
+        context 'before timeout expires', ->
+          beforeEach ->
+            @init()
+            sa('ecommerce', 'addOrder', 'data1')
+
+          it 'clears the AutoPageView timeout', ->
+            expect(@cleartimeout_spy).to.be.calledWith @instance.pageview_timeout
+
+          it 'only sends one action', ->
+            expect(@sendbeacon_spy).to.be.calledOnce
+
+          it 'sends the newly created action', ->
+            action_data = @sendbeacon_spy.args[0][1].actions[0]
+            expect(action_data).to.contain
+              category: 'ecommerce'
+              type: 'addOrder'
+              data: 'data1'
+
+          it 'does not send a PageView action', ->
+            action_data = @sendbeacon_spy.args[0][1].actions[0]
+            expect(action_data).to.not.contain
+              category: "site"
+              type: "sendPageView"
+
+        context 'after timeout expires', ->
+          beforeEach ->
+            @init()
+            @clock.tick @settings.auto_pageview_timeout + 100
+            sa('ecommerce', 'addOrder', 'data1');
+
+          it 'clears the AutoPageView timeout', ->
+            expect(@cleartimeout_spy).to.be.calledWith @instance.pageview_timeout
+
+          it 'sends both actions', ->
+            expect(@sendbeacon_spy).to.be.calledTwice
+
   describe 'Replacement of public endpoint on library load', ->
     beforeEach ->
       @init = => @instance = new @subject()

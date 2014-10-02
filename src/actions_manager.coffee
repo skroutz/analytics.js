@@ -12,6 +12,9 @@ define [
       @promise = new Promise()
 
       @session = null
+      @pageview_timeout = null
+
+      @_autoPageView() if Settings.send_auto_pageview
 
       @run.apply(@, item) while item = Settings.window.sa.q.shift()
       Settings.window.sa = @run
@@ -24,6 +27,11 @@ define [
         ## TODO Create custom error class
         throw new Error('Invalid API call')
 
+    _autoPageView: ->
+      @pageview_timeout = setTimeout (=>
+        @run('site', 'sendPageView')
+      ), Settings.auto_pageview_timeout
+
     _actions:
       session:
         create: (shop_code, yogurt_session, yogurt_user_id)-> @_sessionAction 'create',
@@ -33,12 +41,15 @@ define [
         connect: (shop_code)-> @_sessionAction 'connect',{shop_code: shop_code}
       yogurt:
         productClick: (data, redirect_url, redirect = true)->
+          clearTimeout @pageview_timeout
           @_reportAction 'yogurt', 'productClick', data, (analytics_session)=>
             @_redirect(redirect_url, analytics_session) if redirect_url and redirect
       ecommerce:
         addOrder: (data, callback)->
+          clearTimeout @pageview_timeout
           @_reportAction 'ecommerce', 'addOrder', data, -> callback() if callback
         addItem: (data, callback)->
+          clearTimeout @pageview_timeout
           @_reportAction 'ecommerce', 'addItem', data, -> callback() if callback
       site:
         sendPageView: ->
