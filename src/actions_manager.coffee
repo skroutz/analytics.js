@@ -14,6 +14,13 @@ define [
       @session = null
       @pageview_timeout = null
 
+      # Temp stuff
+      @temp_redirect_url = null
+      @temp_session_data =
+        account: null
+        session: null
+        user: null
+
       @_autoPageView() if Settings.send_auto_pageview
 
       @run.apply(@, item) while item = Settings.window.sa.q.shift()
@@ -32,7 +39,29 @@ define [
         @run('site', 'sendPageView')
       ), Settings.auto_pageview_timeout
 
+    _tempHandleSession: (type, data)=>
+      s = @temp_session_data
+      return unless s.account
+
+      if s.session
+        @_sessionAction 'create',
+          shop_code: s.account
+          yogurt_session: s.session
+          yogurt_user_id: s.user_id
+      else
+        @_sessionAction 'connect', {shop_code: s.account}
+
+
     _actions:
+      settings:
+        redirectTo: (url)-> @temp_redirect_url = url
+        setYogurtSession: (data)->
+          @temp_session_data.session = data
+        setYogurtUser: (data)->
+          @temp_session_data.user = data
+        setAccount: (data)->
+          @temp_session_data.account = data
+          setTimeout @_tempHandleSession, 500
       session:
         create: (shop_code, yogurt_session, yogurt_user_id)-> @_sessionAction 'create',
           shop_code: shop_code
@@ -43,7 +72,8 @@ define [
         productClick: (data, redirect_url, redirect = true)->
           clearTimeout @pageview_timeout
           @_reportAction 'yogurt', 'productClick', data, (analytics_session)=>
-            @_redirect(redirect_url, analytics_session) if redirect_url and redirect
+            url = redirect_url or @temp_redirect_url
+            @_redirect(url, analytics_session) if url and redirect
       ecommerce:
         addOrder: (data, callback)->
           clearTimeout @pageview_timeout
