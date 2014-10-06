@@ -7,13 +7,17 @@ define [
     constructor: (yogurt_session = '', yogurt_user_id = '', shop_code = '')->
       @promise = new Promise()
       @socket = @_createSocket @_socketUrl(yogurt_session, yogurt_user_id, shop_code)
+      @timeout = @_checkForSocketTimeout()
 
     then: (success, fail)-> @promise.then(success, fail)
+
+    _checkForSocketTimeout: -> setTimeout (=> @promise.reject('timeout')), Settings.xdomain_session_timeout
 
     _onSocketReady: => @socket.postMessage(Settings.iframe_message)
 
     _onSocketMessage: (analytics_session, origin)=>
       return unless origin is Settings.url.base
+      @timeout and clearTimeout(@timeout)
       @promise.resolve analytics_session
 
     _socketUrl: (yogurt_session, yogurt_user_id, shop_code)->

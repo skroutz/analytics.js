@@ -55,6 +55,9 @@ describe 'XDomain Session Retrieval Engine', ->
     it 'creates a socket', ->
       expect(@instance.socket).to.exist
 
+    it 'registers a timeout', ->
+      expect(@instance.timeout).to.not.be.undefined
+
   describe '#then', ->
     beforeEach ->
       @instance = new @xdomain_engine()
@@ -140,6 +143,9 @@ describe 'XDomain Session Retrieval Engine', ->
       beforeEach ->
         @instance._onSocketMessage(@analytics_session, @settings.url.base)
 
+      it 'clears @timeout', ->
+        expect(@timeout_spy).to.be.calledOnce
+
       it 'resolves @promise with the given value', ->
         expect(@resolve_spy).to.be.calledWith @analytics_session
 
@@ -147,5 +153,22 @@ describe 'XDomain Session Retrieval Engine', ->
       beforeEach ->
         @instance._onSocketMessage('', @settings.url.base)
 
+      it 'clears @timeout', ->
+        expect(@timeout_spy).to.be.calledOnce
+
       it 'resolves @promise with \'\'', ->
         expect(@resolve_spy).to.be.calledWith ''
+
+    context 'when backend does not respond', ->
+      it 'does not clear the timeout', ->
+        expect(@timeout_spy).to.not.be.called
+
+      context 'after "Settings.xdomain_session_timeout" time', ->
+        beforeEach ->
+          @clock.tick @settings.xdomain_session_timeout + 100
+
+        it 'rejects @promise after "Settings.xdomain_session_timeout" time', ->
+          expect(@reject_spy).to.be.calledOnce
+
+        it 'rejects @promise with "timeout" value', ->
+          expect(@reject_spy).to.be.calledWith 'timeout'

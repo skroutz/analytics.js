@@ -31,6 +31,11 @@ describe 'Settings', ->
         .to.have.property('single_beacon')
         .that.is.a('boolean')
 
+    it 'has property .xdomain_session_timeout', ->
+      expect(@settings)
+        .to.have.property('xdomain_session_timeout')
+        .that.is.a('number')
+
     it 'has property .cookies', ->
       expect(@settings)
         .to.have.property('cookies')

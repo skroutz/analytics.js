@@ -3,6 +3,7 @@ define ->
     redirectTo: (url)-> Settings.window.location.replace(url)
     iframe_message: '@@common.iframe_message'
     single_beacon: @@common.single_beacon
+    xdomain_session_timeout: @@xdomain_session_timeout
     params:
       analytics_session: '@@params.analytics_session'
       signature: '@@params.signature'
