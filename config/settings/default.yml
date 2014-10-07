@@ -2,7 +2,7 @@ common:
   iframe_message: "get_analytics_session"
   get_param_name: "analytics_session"
   single_beacon: false
-
+xdomain_session_timeout: 1000
 cookies:
   first_party_enabled: true
   version: 1

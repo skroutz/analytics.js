@@ -2,57 +2,303 @@ clear_all_cookies = ->
   document.cookie.split(/;\s/g).forEach (cookie)->
     document.cookie = "#{cookie.split('=')[0]}= ;expires=Wed, 28 May 2000 10:53:43 GMT"
 
+session_creation_tests = (cookies_enabled = false, cookie_exists = false)->
+  if cookies_enabled
+    if cookie_exists
+      it 'replaces first-party cookie data with retrieved data', (done)->
+        @init2()
+        @instance.then =>
+          expect(@biskoto.get(@cookie_name).analytics_session).to.equal @analytics_session
+          done()
+    else
+      it 'creates a first-party cookie with that value', (done)->
+        @init2()
+        @instance.then =>
+          expect(@biskoto.get(@cookie_name).analytics_session).to.equal @analytics_session
+          done()
+
+      it 'creates first-party cookie with proper version', (done)->
+        @init2()
+        @instance.then =>
+          expect(@biskoto.get(@cookie_name).version).to.equal @settings.cookies.version
+          done()
+  else
+    it 'does not create a cookie', ->
+      prev_length = document.cookie.split(/;\s/g).length
+      @init2()
+
+      expect(document.cookie.split(/;\s/g).length).to.equal prev_length
+
+  it 'it registers that value to @analytics_session', ->
+    @init2()
+    expect(@instance.analytics_session).to.equal @analytics_session
+
+  it 'it resolves promise with that value', (done)->
+    @init2()
+    @instance.then (sess_id)=>
+      expect(sess_id).to.equal @analytics_session
+      done()
+
+session_retrieval_tests = (cookies_enabled = false, cookie_exists = false)->
+  it 'tries to extract analytics_session from Xdomain engine', ->
+    @init()
+    expect(@xdomain_spy).to.be.calledOnce
+
+  it 'passes yogurt_session to Xdomain engine', ->
+    @init()
+    expect(@xdomain_spy.args[0][0]).to.equal @yogurt_session
+
+  it 'passes yogurt_user_id to Xdomain engine', ->
+    @init()
+    expect(@xdomain_spy.args[0][1]).to.equal @yogurt_user_id
+
+  it 'passes shop_code to Xdomain engine', ->
+    @init()
+    expect(@xdomain_spy.args[0][2]).to.equal @shop_code
+
+  it 'tries to extract analytics_session from GetParam engine', ->
+    @init()
+    expect(@get_param_spy).to.be.calledOnce
+
+  context 'when only the XDomain engine returns a value', ->
+    beforeEach ->
+      @init2 = =>
+        @init()
+        @xdomain_promise.resolve(@analytics_session)
+        @get_param_promise.resolve('')
+        return
+
+    session_creation_tests(cookies_enabled, cookie_exists)
+
+  context 'when only the GetParam engine returns a value', ->
+    beforeEach ->
+      @init2 = =>
+        @init()
+        @xdomain_promise.resolve('')
+        @get_param_promise.resolve(@analytics_session)
+        return
+
+    session_creation_tests(cookies_enabled, cookie_exists)
+
+  context 'when both XDomain and GetParam engines return values', ->
+    it 'it uses the value from the XDomain engine', (done)->
+      @init()
+      @xdomain_promise.resolve('asd')
+      @get_param_promise.resolve('dsa')
+      @instance.then (sess_id)=>
+        expect(sess_id).to.equal 'asd'
+        done()
+
+  context 'when both engines return \'\' as value', ->
+    it 'it rejects the @promise', (done)->
+      @init()
+      @xdomain_promise.resolve('')
+      @get_param_promise.resolve('')
+
+      resolve = ->
+        expect(false).to.equal(true)
+        done()
+      reject = ->
+        expect(true).to.equal(true)
+        done()
+
+      @instance.then(resolve, reject)
+
+    if cookies_enabled
+      it 'does not create a first-party cookie', ->
+        prev_length = document.cookie.split(/;\s/g).length
+        @init()
+
+        expect(document.cookie.split(/;\s/g).length).to.equal prev_length
+
+  context 'when either engine rejects', ->
+    beforeEach ->
+      @init()
+      @xdomain_promise.reject()
+      @get_param_promise.resolve(@analytics_session)
+      return
+
+    it 'it rejects the @promise', (done)->
+      resolve = ->
+        expect(false).to.equal(true)
+        done()
+      reject = ->
+        expect(true).to.equal(true)
+        done()
+
+      @instance.then(resolve, reject)
+
+    if cookies_enabled
+      it 'does not create a first-party cookie', ->
+        prev_length = document.cookie.split(/;\s/g).length
+        @init()
+
+        expect(document.cookie.split(/;\s/g).length).to.equal prev_length
+
+inside_yogurt_tests = (cookies_enabled = false)->
+  if cookies_enabled
+    context 'when a first-party cookie exists', ->
+      beforeEach ->
+        @biskoto.set @cookie_name, {version:1, analytics_session: 'asd'}, @cookie_options
+
+      it 'intializes @analytics_session to the first-party cookie\'s value', ->
+        @init()
+        expect(@instance.analytics_session).to.equal 'asd'
+
+
+      context 'when cookie version has changed', ->
+        beforeEach ->
+          @settings.cookies.version = @prev_cookies_version + 1
+
+        it 'deletes first-party cookie', ->
+          @init()
+          expect(@biskoto.get(@cookie_name)).to.be.null
+
+      session_retrieval_tests(cookies_enabled, true)
+
+    context 'when a first-party cookie does not exist', ->
+      it 'intializes @analytics_session to null', ->
+        @init()
+        expect(@instance.analytics_session).to.be.null
+
+      session_retrieval_tests(cookies_enabled, false)
+  else
+    context 'when a first-party cookie exists', ->
+      beforeEach ->
+        @biskoto.set @cookie_name, @cookie_data, @cookie_options
+
+      it 'deletes first-party cookie', ->
+        @init()
+        expect(@biskoto.get(@cookie_name)).to.be.null
+
+    session_retrieval_tests(cookies_enabled, false)
+
+outside_yogurt_tests = (cookies_enabled = false)->
+  if cookies_enabled
+    context 'when a first-party cookie exists', ->
+      beforeEach ->
+        @biskoto.set @cookie_name, {version:1, analytics_session: 'asd'}, @cookie_options
+
+      it 'resolves the @promise with the "analytics_session" found in the cookie', (done)->
+        @init()
+        @instance.then (sess_id)->
+          expect(sess_id).to.equal 'asd'
+          done()
+
+      it 'does not use the XDomain engine to retrieve the "analytics_session"', ->
+        @init()
+        expect(@xdomain_spy).to.not.be.called
+
+      it 'does not use the GetParam engine to retrieve the "analytics_session"', ->
+        @init()
+        expect(@get_param_spy).to.not.be.called
+
+    context 'when a first-party cookie does not exist', ->
+      session_retrieval_tests(cookies_enabled, false)
+  else
+    context 'when a first-party cookie exists', ->
+      beforeEach ->
+        @biskoto.set @cookie_name, @cookie_data, @cookie_options
+
+      it 'deletes first-party cookie ', ->
+        @init()
+        expect(@biskoto.get(@cookie_name)).to.be.null
+
+    session_retrieval_tests(cookies_enabled)
+
 describe 'Session', ->
   before (done) ->
-    window.__requirejs__.clearRequireState()
-
-    requirejs.undef 'easyxdm'
-
-    @postMessage_spy = sinon.spy()
-    @easyxdm_mock =
-      Socket: =>
-        return {
-          postMessage: @postMessage_spy
-        }
-    @easyxdm_socket_spy = sinon.spy(@easyxdm_mock, 'Socket')
-
-    define 'easyxdm', [], => @easyxdm_mock
+    @yogurt_session    = 'dummy_yogurt_session_hash'
+    @yogurt_user_id    = '1234'
+    @shop_code         = 'shop_code_1'
+    @analytics_session = 'dummy_analytics_session_hash'
 
     require [
-      'session'
       'promise'
-      'biskoto'
-      'settings'
-      'helpers/url_helper'
-    ], (Session, Promise, Biskoto, Settings, URLHelper) =>
-      @URLHelper = URLHelper
-      @settings = Settings
-      @biskoto  = Biskoto
+    ], (Promise)=>
       @promise  = Promise
-      @session  = Session
-      done()
-    return
+
+      window.__requirejs__.clearRequireState()
+      requirejs.undef 'session_engines/get_param_engine'
+      @get_param_promise = new @promise()
+      @get_param_mock = => return @get_param_promise
+      @get_param_spy = sinon.spy @, 'get_param_mock'
+      define 'session_engines/get_param_engine', [], => @get_param_mock
+
+      requirejs.undef 'session_engines/xdomain_engine'
+      @xdomain_promise = new @promise()
+      @xdomain_mock = => return @xdomain_promise
+      @xdomain_spy = sinon.spy @, 'xdomain_mock'
+      define 'session_engines/xdomain_engine', [], => @xdomain_mock
+
+      require [
+        'session'
+        'promise'
+        'biskoto'
+        'settings'
+      ], (Session, Promise, Biskoto, Settings)=>
+        @promise  = Promise
+        @biskoto  = Biskoto
+        @settings = Settings
+        @session = Session
+        done()
 
   after ->
-    requirejs.undef 'easyxdm'
+    requirejs.undef 'session_engines/get_param_engine'
+    requirejs.undef 'session_engines/xdomain_engine'
     window.__requirejs__.clearRequireState()
 
   afterEach ->
-    @easyxdm_socket_spy.reset()
-    @postMessage_spy.reset()
+    @get_param_promise = new @promise()
+    @get_param_spy.reset()
+    @xdomain_promise = new @promise()
+    @xdomain_spy.reset()
 
   describe '.contructor', ->
     it 'returns its own instance', ->
       @instance = new @session()
       expect(@instance).to.be.an.instanceof @session
 
-    it 'registers @easyXDM', ->
-      @instance = new @session()
-      expect(@instance.easyXDM).to.not.equal(undefined)
-
     it 'creates a promise to notify when session is ready', ->
       @instance = new @session()
       expect(@instance.promise).to.be.an.instanceof @promise
+
+    describe 'initialization parameter', ->
+      beforeEach ->
+        @params = {}
+
+      context 'when yogurt_session is passed', ->
+        it 'assigns the value to @yogurt_session', ->
+          @params.yogurt_session = @yogurt_session
+          @instance = new @session(@params)
+          expect(@instance.yogurt_session).to.equal @yogurt_session
+
+      context 'when yogurt_session is not passed', ->
+        it 'assigns null to @yogurt_session', ->
+          @instance = new @session(@params)
+          expect(@instance.yogurt_session).to.equal null
+
+      context 'when yogurt_user_id is passed', ->
+        it 'assigns the value to @yogurt_user_id', ->
+          @params.yogurt_user_id = @yogurt_user_id
+          @instance = new @session(@params)
+          expect(@instance.yogurt_user_id).to.equal @yogurt_user_id
+
+      context 'when yogurt_user_id is not passed', ->
+        it 'assigns "" to @yogurt_user_id', ->
+          @instance = new @session(@params)
+          expect(@instance.yogurt_user_id).to.equal ''
+
+      context 'when shop_code is passed', ->
+        it 'assigns the value to @shop_code', ->
+          @params.shop_code = @shop_code
+          @instance = new @session(@params)
+          expect(@instance.shop_code).to.equal @shop_code
+
+      context 'when shop_code is not passed', ->
+        it 'assigns null to @shop_code', ->
+          @instance = new @session(@params)
+          expect(@instance.shop_code).to.equal null
 
   describe '#then', ->
     beforeEach ->
@@ -91,10 +337,6 @@ describe 'Session', ->
   describe 'Business logic', ->
     beforeEach ->
       clear_all_cookies()
-      @yogurt_session    = 'dummy_yogurt_session_hash'
-      @yogurt_user_id    = '1234'
-      @shop_code         = 'shop_code_1'
-      @analytics_session = 'dummy_analytics_session_hash'
 
       @prev_cookies_enabled = @settings.cookies.first_party_enabled
       @prev_cookies_version = @settings.cookies.version
@@ -106,276 +348,48 @@ describe 'Session', ->
       @cookie_options =
         expires: @settings.cookies.analytics.duration
 
-      @setup_get_to_return = (ret)=>
-        @extractGetParam_stub = sinon.stub(@URLHelper, 'extractGetParam').returns(ret)
-
-      @setup_iframe_to_return = (ret)=>
-        @extractFromIframe_stub = sinon.stub(@session.prototype, '_extractFromIframe').returns( new @promise().resolve(ret) )
-
     afterEach ->
-      @extractFromIframe_stub?.restore()
-      @extractGetParam_stub?.restore()
-
-      @settings.cookies.version = @prev_cookies_version
       @settings.cookies.first_party_enabled = @prev_cookies_enabled
+      @settings.cookies.version = @prev_cookies_version
 
-    context 'when we are inside yogurt (implied from "yogurt_session" cookie existance)', ->
+    context 'when we are inside yogurt (@yogurt_session !== null)', ->
       beforeEach ->
         @parsed_settings =
           yogurt_user_id: @yogurt_user_id
           yogurt_session: @yogurt_session
           shop_code: @shop_code
-        @init = ->
-          @instance = new @session(@parsed_settings)
+        @init = => @instance = new @session(@parsed_settings)
 
-      it 'sets up "@yogurt_session" from contructor\'s passed argument', ->
-        @init()
-        expect(@instance.yogurt_session).to.equal @yogurt_session
+      context 'when first-party cookies are enabled', ->
+        beforeEach ->
+          @settings.cookies.first_party_enabled = true
 
-      it 'initializes XDomain socket', ->
-        @init()
-        expect(@easyxdm_socket_spy).to.be.calledOnce
+        inside_yogurt_tests(true)
 
-      it 'opens XDomain socket with "create" url', ->
-        @init()
+      context 'when first-party cookies are disabled', ->
+        beforeEach ->
+          @settings.cookies.first_party_enabled = false
 
-        expect(@easyxdm_socket_spy.args[0][0]).to.contain
-          remote: @settings.url.analytics_session.create(@yogurt_session, @yogurt_user_id, @shop_code)
+        inside_yogurt_tests(false)
 
-      it 'extracts "analytics_session" from XDomain socket', (done)->
-        test_analytics_session = 'another_analytics_session_hash'
-
-        @init()
-        @.easyxdm_socket_spy.args[0][0].onMessage test_analytics_session, @settings.url.base
-
-        @instance.then (analytics_session)->
-          expect(analytics_session).to.equal(test_analytics_session)
-          done()
-
-      it 'fullfils @promise with analytics_session', (done)->
-        test_analytics_session = 'another_analytics_session_hash'
-
-        @init()
-        @.easyxdm_socket_spy.args[0][0].onMessage test_analytics_session, @settings.url.base
-
-        @instance.promise.then (analytics_session)->
-          expect(analytics_session).to.equal(test_analytics_session)
-          done()
-
-      describe 'first party cookie settings', ->
-        context 'when first party cookies are enabled', ->
-          beforeEach ->
-            @settings.cookies.first_party_enabled = true
-
-          it 'checks if first party cookie exists', ->
-            @init()
-            expect(@instance.analytics_session).to.not.be.undefined
-
-          context 'when first party cookie exists', ->
-            beforeEach ->
-              @biskoto.set @cookie_name, @cookie_data, @cookie_options
-
-            it 'deletes cookie if cookie.version has changed', ->
-              @settings.cookies.version = @prev_cookies_version + 1
-              @init()
-
-              expect(@biskoto.get(@cookie_name)).to.be.null
-
-            it 'replaces cookie data with results from XDomain socket', (done)->
-              test_analytics_session = 'another_analytics_session_hash'
-
-              @init()
-              @.easyxdm_socket_spy.args[0][0].onMessage test_analytics_session, @settings.url.base
-
-              @instance.then =>
-                expect(@biskoto.get(@cookie_name).analytics_session).to.equal test_analytics_session
-                done()
-
-          context 'when first party cookie does not exist', ->
-            it 'creates first party cookie with "analytics_session"', (done)->
-              test_analytics_session = 'another_analytics_session_hash'
-
-              @init()
-              @.easyxdm_socket_spy.args[0][0].onMessage test_analytics_session, @settings.url.base
-
-              @instance.then =>
-                expect(@biskoto.get(@cookie_name).analytics_session).to.equal test_analytics_session
-                done()
-
-        context 'when first party cookies are disabled', ->
-          beforeEach ->
-            @settings.cookies.first_party_enabled = false
-
-          it 'deletes cookie if one exists', ->
-            @biskoto.set @cookie_name, @cookie_data, @cookie_options
-            @init()
-
-            expect(@biskoto.get(@cookie_name)).to.be.null
-
-          it 'does not set up a new cookie', ->
-            prev_length = document.cookie.split(/;\s/g).length
-            @init()
-
-            expect(document.cookie.split(/;\s/g).length).to.equal prev_length
-
-    context 'when we are outside yogurt (implied from "yogurt_session" cookie absence)', ->
+    context 'when we are outside yogurt (@yogurt_session === null)', ->
       beforeEach ->
-        @init = ->
-          @instance = new @session({shop_code: @shop_code})
+        @yogurt_session = null
+        @yogurt_user_id = ''
+        @parsed_settings =
+          yogurt_user_id: @yogurt_user_id
+          yogurt_session: @yogurt_session
+          shop_code: @shop_code
+        @init = => @instance = new @session(@parsed_settings)
 
-      it 'does not find "yogurt_session" from passed argument', ->
-        @init()
-        expect(@instance.yogurt_session).to.equal null
+      context 'when first-party cookies are enabled', ->
+        beforeEach ->
+          @settings.cookies.first_party_enabled = true
 
-      it 'initializes XDomain socket', ->
-        @init()
-        expect(@easyxdm_socket_spy).to.be.calledOnce
+        outside_yogurt_tests(true)
 
-      it 'opens XDomain socket with "connect" url', ->
-        @init()
+      context 'when first-party cookies are disabled', ->
+        beforeEach ->
+          @settings.cookies.first_party_enabled = false
 
-        expect(@easyxdm_socket_spy.args[0][0]).to.contain
-          remote: @settings.url.analytics_session.connect(@shop_code)
-
-      describe 'retrieval process', ->
-        context 'when neither XDomain socket nor GET param provide "analytics_session"', ->
-          beforeEach ->
-            @setup_get_to_return null
-            @setup_iframe_to_return null
-            @init()
-            return
-
-          it 'rejects the @promise', (done)->
-            @instance.then ->
-              expect(false).to.equal(true)
-              done()
-            , ->
-              expect(true).to.equal(true)
-              done()
-
-          it 'does not create first party cookie with "analytics_session"', (done)->
-            onEnd = =>
-              expect(@biskoto.get(@cookie_name)).to.equal null
-              done()
-
-            @instance.then onEnd, onEnd
-
-        context 'when only XDomain socket provides "analytics_session"', ->
-          beforeEach ->
-            @setup_iframe_to_return @analytics_session
-            @setup_get_to_return null
-            @init()
-
-          it 'fullfils @promise with "analytics_session" from XDomain socket', (done)->
-            @instance.then (analytics_session)=>
-              expect(analytics_session).to.equal(@analytics_session)
-              done()
-            , ->
-              expect(false).to.equal(true)
-              done()
-
-        context 'when only GET param provides "analytics_session"', ->
-          beforeEach ->
-            @setup_iframe_to_return null
-            @setup_get_to_return @analytics_session
-            @init()
-
-          it 'fullfils @promise with "analytics_session" from GET param', (done)->
-            @instance.then (analytics_session)=>
-              expect(analytics_session).to.equal(@analytics_session)
-              done()
-            , ->
-              expect(false).to.equal(true)
-              done()
-
-        context 'when both GET param and XDomain Socket provide "analytics_session"', ->
-          beforeEach ->
-            @setup_get_to_return @analytics_session + '1'
-            @setup_iframe_to_return @analytics_session + '2'
-            @init()
-
-          it 'fullfils @promise with XDomain socket value', (done)->
-            @instance.then (analytics_session)=>
-              expect(analytics_session).to.equal @analytics_session + '2'
-              done()
-            , ->
-              expect(false).to.equal(true)
-              done()
-
-      describe 'first party cookie settings', ->
-        context 'when first party cookies are enabled', ->
-          beforeEach ->
-            @settings.cookies.first_party_enabled = true
-
-          it 'deletes cookie if cookie.version has changed', ->
-            @settings.cookies.version = @prev_cookies_version + 1
-            @init()
-
-            expect(@biskoto.get(@cookie_name)).to.be.null
-
-          it 'checks if first party cookie exists', ->
-            @init()
-            expect(@instance.analytics_session).to.not.be.undefined
-
-          context 'when first party cookie exists', ->
-            beforeEach ->
-              @biskoto.set @cookie_name, @cookie_data, @cookie_options
-
-            it 'does not initialize XDomain socket', ->
-              @init()
-              expect(@easyxdm_socket_spy).to.not.be.called
-
-            it 'extracts "analytics_session" from first party cookie', (done)->
-              test_analytics_session = 'another_analytics_session_hash'
-              cookie_data =
-                version: 1
-                analytics_session: test_analytics_session
-
-              @biskoto.set @cookie_name, cookie_data, @cookie_options
-
-              @init()
-
-              @instance.then (analytics_session)->
-                expect(analytics_session).to.equal(test_analytics_session)
-                done()
-
-            it 'fullfils @promise with "analytics_session"', (done)->
-              test_analytics_session = 'another_analytics_session_hash'
-              cookie_data =
-                version: 1
-                analytics_session: test_analytics_session
-
-              @biskoto.set @cookie_name, cookie_data, @cookie_options
-
-              @init()
-
-              @instance.promise.then (analytics_session)->
-                expect(analytics_session).to.equal(test_analytics_session)
-                done()
-
-          context 'when first party cookie does not exist', ->
-            it 'creates first party cookie with "analytics_session"', (done)->
-              test_analytics_session = 'another_analytics_session_hash'
-              @setup_iframe_to_return test_analytics_session
-
-              @init()
-
-              @instance.then =>
-                expect(@biskoto.get(@cookie_name).analytics_session).to.equal test_analytics_session
-                done()
-
-        context 'when first party cookies are disabled', ->
-          beforeEach ->
-            @settings.cookies.first_party_enabled = false
-
-          it 'deletes cookie if one exists', ->
-            @biskoto.set @cookie_name, @cookie_data, @cookie_options
-            @init()
-
-            expect(@biskoto.get(@cookie_name)).to.be.null
-
-          it 'does not set up a new cookie', ->
-            prev_length = document.cookie.split(/;\s/g).length
-            @init()
-
-            expect(document.cookie.split(/;\s/g).length).to.equal prev_length
+        outside_yogurt_tests(false)
