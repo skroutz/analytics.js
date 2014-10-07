@@ -8,9 +8,11 @@ define [
       @promise = new Promise()
 
       value = URLHelper.extractGetParam(Settings.params.analytics_session) or null
-
-      @promise.resolve(value)
+      if value then @promise.resolve(value) else @promise.reject(@_nonexistant_message)
+      return
 
     then: (success, fail)-> @promise.then(success, fail)
+
+    _nonexistant_message: 'Analytics_session does not exist'
 
   return GetParamEngine
