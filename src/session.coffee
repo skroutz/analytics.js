@@ -40,7 +40,7 @@ define [
       if data then data.analytics_session else null
 
     _extractAnalyticsSession: (yogurt_session, yogurt_user_id, shop_code)->
-      Promise.all([
+      Promise.any([
         (new XDomainEngine(yogurt_session, yogurt_user_id, shop_code))
         (new GetParamEngine())
       ]).then @_onSessionSuccess, @_onSessionError

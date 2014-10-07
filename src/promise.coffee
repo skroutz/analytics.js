@@ -2,42 +2,58 @@ define ->
   UID = 1
 
   class Promise
-    @all: (promises) ->
+    @_all: (promises, fail_fast) ->
       promise_all = new Promise()
       rejected = false
 
-      results = {}
+      results = []
+      reject_results = []
       done_count = promises.length
+      fail_count = 0
+
       if done_count is 0
         promise_all.resolve(true)
         return promise_all
 
-      create_ordered_array = (results)->
-        arr = []
-        for promise_id, data of results
-          arr[data.order] = data.result
-        return arr
-
-      success = (result)->
-        results[this._id].result = result
+      success = (index, result)->
+        results[index] = result
         if --done_count is 0
-          promise_all.resolve(create_ordered_array(results))
-      fail = ->
-        unless rejected
-          promise_all.reject(false)
+          promise_all.resolve(results)
+
+      fail = (index, result)->
+        return if rejected
+        reject_results[index] = result
+
+        if fail_fast
+          promise_all.reject(result)
           rejected = true
+          return
 
-      i = 0
-      for promise in promises
-        results[promise._id] = {order: i++}
+        if ++fail_count is promises.length
+          promise_all.reject(reject_results)
+        else
+          success(index, undefined)
 
-        bound_success = ((success, promise)->
-          return -> success.apply promise, arguments
-        )(success, promise)
+      for promise, index in promises
+        bound_success = ((index)->
+          return (args...)->
+            args.unshift index
+            success.apply null, args
+        )(index)
 
-        promise.then(bound_success, fail)
+        bound_fail = ((index)->
+          return (args...)->
+            args.unshift index
+            fail.apply null, args
+        )(index)
+
+        promise.then(bound_success, bound_fail)
 
       promise_all
+
+    @all: (promises)-> Promise._all(promises, true)
+
+    @any: (promises)-> Promise._all(promises, false)
 
     constructor: ->
       @_id = UID++
@@ -60,12 +76,13 @@ define ->
 
     _complete: (which, arg) ->
       resolver = (res, rej) =>
-        res(arg)
+        res and res(arg)
         @
 
       rejecter = (res, rej) =>
-        rej(arg)
+        rej and rej(arg)
         @
+
       if which is 'resolve'
         @state = 'fulfilled'
         @then = resolver

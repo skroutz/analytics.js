@@ -60,27 +60,27 @@ session_retrieval_tests = (cookies_enabled = false, cookie_exists = false)->
     @init()
     expect(@get_param_spy).to.be.calledOnce
 
-  context 'when only the XDomain engine returns a value', ->
+  context 'when only the XDomain engine resolves', ->
     beforeEach ->
       @init2 = =>
         @init()
         @xdomain_promise.resolve(@analytics_session)
-        @get_param_promise.resolve('')
+        @get_param_promise.reject()
         return
 
     session_creation_tests(cookies_enabled, cookie_exists)
 
-  context 'when only the GetParam engine returns a value', ->
+  context 'when only the GetParam engine resolves', ->
     beforeEach ->
       @init2 = =>
         @init()
-        @xdomain_promise.resolve('')
+        @xdomain_promise.reject()
         @get_param_promise.resolve(@analytics_session)
         return
 
     session_creation_tests(cookies_enabled, cookie_exists)
 
-  context 'when both XDomain and GetParam engines return values', ->
+  context 'when both XDomain and GetParam resolve', ->
     it 'it uses the value from the XDomain engine', (done)->
       @init()
       @xdomain_promise.resolve('asd')
@@ -89,33 +89,11 @@ session_retrieval_tests = (cookies_enabled = false, cookie_exists = false)->
         expect(sess_id).to.equal 'asd'
         done()
 
-  context 'when both engines return \'\' as value', ->
-    it 'it rejects the @promise', (done)->
-      @init()
-      @xdomain_promise.resolve('')
-      @get_param_promise.resolve('')
-
-      resolve = ->
-        expect(false).to.equal(true)
-        done()
-      reject = ->
-        expect(true).to.equal(true)
-        done()
-
-      @instance.then(resolve, reject)
-
-    if cookies_enabled
-      it 'does not create a first-party cookie', ->
-        prev_length = document.cookie.split(/;\s/g).length
-        @init()
-
-        expect(document.cookie.split(/;\s/g).length).to.equal prev_length
-
-  context 'when either engine rejects', ->
+  context 'when both engines reject', ->
     beforeEach ->
       @init()
       @xdomain_promise.reject()
-      @get_param_promise.resolve(@analytics_session)
+      @get_param_promise.reject()
       return
 
     it 'it rejects the @promise', (done)->
@@ -304,35 +282,29 @@ describe 'Session', ->
     beforeEach ->
       @instance = new @session()
       @stub = sinon.stub @instance, '_extractAnalyticsSession'
+      @resolve_spy = sinon.spy()
+      @reject_spy = sinon.spy()
 
     afterEach ->
+      @resolve_spy.reset()
+      @reject_spy.reset()
       @stub.restore()
 
     it 'returns the @promise', ->
-      ret = @instance.then(@success, @fail)
+      ret = @instance.then(@resolve_spy, @reject_spy)
       expect(ret).to.equal @instance.promise
 
-    it 'triggers success callback argument on @promise.resolve()', (done)->
-      success = ->
-        expect(true).to.equal(true)
-        done()
-      fail = ->
-        expect(false).to.equal(true)
-        done()
-
-      @instance.then(success, fail)
+    it 'triggers success callback argument on @promise.resolve()', ->
+      @instance.then(@resolve_spy, @reject_spy)
       @instance.promise.resolve()
 
-    it 'triggers fail callback argument on @promise.reject()', (done)->
-      success = ->
-        expect(false).to.equal(true)
-        done()
-      fail = ->
-        expect(true).to.equal(true)
-        done()
+      expect(@resolve_spy).to.be.calledOnce
 
-      @instance.then(success, fail)
+    it 'triggers fail callback argument on @promise.reject()', ->
+      @instance.then(@resolve_spy, @reject_spy)
       @instance.promise.reject()
+
+      expect(@reject_spy).to.be.calledOnce
 
   describe 'Business logic', ->
     beforeEach ->
@@ -393,3 +365,4 @@ describe 'Session', ->
           @settings.cookies.first_party_enabled = false
 
         outside_yogurt_tests(false)
+
