@@ -1,10 +1,12 @@
 describe 'Promise', ->
   before (done) ->
+    @param = 'asdasd'
+
     require ['promise'], (Promise) =>
       @promise = Promise
 
-      @fooSuccess = (val) -> val
-      @fooFailure = (val) -> val
+      @fooSuccess = sinon.spy()
+      @fooFailure = sinon.spy()
 
       done()
 
@@ -12,6 +14,10 @@ describe 'Promise', ->
     @subject = new @promise()
     @pr = @subject.then @fooSuccess, @fooFailure
     done()
+
+  afterEach ->
+    @fooSuccess.reset()
+    @fooFailure.reset()
 
   describe 'API', ->
     it 'has own property #state', ->
@@ -45,21 +51,116 @@ describe 'Promise', ->
         expect(@pr.state).to.equal 'rejected'
 
   describe '#then', (done) ->
-    it 'pushes the correct success callback function', ->
-      expect(@pr._thens[0].resolve)
-        .to.equal @fooSuccess
-
-    it 'pushes the correct failure callback function', ->
-      expect(@pr._thens[0].reject)
-        .to.equal @fooFailure
-
     it 'sets the initial promise state to pending', ->
       expect(@pr.state).to.equal 'pending'
 
-    it 'returns a promise', (done) ->
-      expect(@pr)
-        .to.be.an.instanceof @promise
+    it 'returns the same promise', (done) ->
+      expect(@pr).to.equal @subject
       done()
+
+    context 'when promise is not yet fulfilled', ->
+      it 'pushes the correct success callback function', ->
+        expect(@pr._thens[0].resolve)
+          .to.equal @fooSuccess
+
+      it 'pushes the correct failure callback function', ->
+        expect(@pr._thens[0].reject)
+          .to.equal @fooFailure
+
+      context 'when the promise gets resolved', ->
+        beforeEach ->
+          @subject.resolve(@param)
+          return
+
+        it 'executes resolve callbacks', ->
+          expect(@fooSuccess).to.be.calledOnce
+
+        it 'does not execute reject callbacks', ->
+          expect(@fooFailure).to.not.be.called
+
+        it 'passed resolve argument to resolve callbacks', ->
+          expect(@fooSuccess).to.be.calledWith @param
+
+      context 'when the promise gets rejected', ->
+        beforeEach ->
+          @subject.reject(@param)
+          return
+
+        it 'executes reject callbacks', ->
+          expect(@fooFailure).to.be.calledOnce
+
+        it 'does not execute resolve callbacks', ->
+          expect(@fooSuccess).to.not.be.called
+
+        it 'passed reject argument to reject callbacks', ->
+          expect(@fooFailure).to.be.calledWith @param
+
+    context 'when promise is already resolved', ->
+      beforeEach ->
+        @subject = new @promise().resolve(@param)
+        return
+
+      context 'when a resolve callback is passed', ->
+        beforeEach ->
+          @pr = @subject.then @fooSuccess, @fooFailure
+          return
+
+        it 'executes the resolve callback', ->
+          expect(@fooSuccess).to.be.calledOnce
+
+        it 'passed resolve argument to callback', ->
+          expect(@fooSuccess).to.be.calledWith @param
+
+      context 'when a resolve callback is not passed', ->
+        it 'does not throw error', ->
+          expect(=> @subject.then(undefined, @fooFailure)).to.not.throw(/.*/)
+
+      context 'when a reject callback is passed', ->
+        beforeEach ->
+          @pr = @subject.then @fooSuccess, @fooFailure
+          return
+
+        it 'does not execute the reject callback', ->
+          expect(@fooFailure).to.not.be.called
+
+      context 'when a reject callback is not passed', ->
+        it 'does not throw error', ->
+          expect(=> @subject.then(@fooSuccess)).to.not.throw(/.*/)
+
+    context 'when promise is already rejected', ->
+      beforeEach ->
+        @subject = new @promise().reject(@param)
+        return
+
+      context 'when a resolve callback is passed', ->
+        beforeEach ->
+          @pr = @subject.then @fooSuccess, @fooFailure
+          return
+
+        it 'does not execute the resolve callback', ->
+          expect(@fooSuccess).to.not.be.called
+
+      context 'when a resolve callback is not passed', ->
+        it 'does not throw error', ->
+          expect(=> @subject.then(undefined, @fooFailure)).to.not.throw(/.*/)
+
+      context 'when a reject callback is passed', ->
+        beforeEach ->
+          @pr = @subject.then @fooSuccess, @fooFailure
+          return
+
+        it 'does not execute the resolve callback', ->
+          expect(@fooSuccess).to.not.be.called
+
+        it 'executes the reject callback', ->
+          expect(@fooFailure).to.be.calledOnce
+
+        it 'passed reject argument to callback', ->
+          expect(@fooFailure).to.be.calledWith @param
+
+      context 'when a reject callback is not passed', ->
+        it 'does not throw error', ->
+          expect(=> @subject.then(@fooSuccess)).to.not.throw(/.*/)
 
   describe '#resolve', ->
     it 'returns its own promise instance', ->
@@ -67,15 +168,9 @@ describe 'Promise', ->
         .to.be.equal @subject
 
     it 'calls the success callback with correct params', ->
-      spy = sinon.spy(@, 'fooSuccess')
+      @subject.resolve(@param)
 
-      @subject.then @fooSuccess, @fooFailure
-      @subject.resolve('foo')
-
-      expect(spy.withArgs('foo').calledOnce)
-        .to.be.true
-
-      spy.restore()
+      expect(@fooSuccess).to.be.calledOnce
 
     it 'changes the promise state to fulfilled', (done) ->
       @subject.resolve true
@@ -89,15 +184,9 @@ describe 'Promise', ->
         .to.be.equal @subject
 
     it 'calls the failure callback with correct params', ->
-      spy = sinon.spy(@, 'fooFailure')
+      @subject.reject(@param)
 
-      @subject.then @fooSuccess, @fooFailure
-      @subject.reject('foo')
-
-      expect(spy.withArgs('foo').calledOnce)
-        .to.be.true
-
-      spy.restore()
+      expect(@fooFailure).to.be.calledOnce
 
     it 'changes the promise state to rejected', ->
       @subject.reject false
@@ -149,11 +238,6 @@ describe 'Promise', ->
         expect(@pr.state).to.equal 'rejected'
 
       it 'calls fail', ->
-        spy = sinon.spy(@, 'fooFailure')
-
         @pr.then @fooSuccess, @fooFailure
 
-        expect(spy.calledOnce)
-          .to.be.true
-
-        spy.restore()
+        expect(@fooFailure).to.be.calledOnce

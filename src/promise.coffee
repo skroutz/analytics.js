@@ -60,12 +60,13 @@ define ->
 
     _complete: (which, arg) ->
       resolver = (res, rej) =>
-        res(arg)
+        res and res(arg)
         @
 
       rejecter = (res, rej) =>
-        rej(arg)
+        rej and rej(arg)
         @
+
       if which is 'resolve'
         @state = 'fulfilled'
         @then = resolver
