@@ -6,34 +6,28 @@ define ->
       promise_all = new Promise()
       rejected = false
 
-      results = {}
+      results = []
       done_count = promises.length
       if done_count is 0
         promise_all.resolve(true)
         return promise_all
 
-      create_ordered_array = (results)->
-        arr = []
-        for promise_id, data of results
-          arr[data.order] = data.result
-        return arr
-
-      success = (result)->
-        results[this._id].result = result
+      success = (index, result)->
+        results[index] = result
         if --done_count is 0
-          promise_all.resolve(create_ordered_array(results))
+          promise_all.resolve(results)
+
       fail = ->
         unless rejected
           promise_all.reject(false)
           rejected = true
 
-      i = 0
-      for promise in promises
-        results[promise._id] = {order: i++}
-
-        bound_success = ((success, promise)->
-          return -> success.apply promise, arguments
-        )(success, promise)
+      for promise, index in promises
+        bound_success = ((index)->
+          return (args...)->
+            args.unshift index
+            success.apply null, args
+        )(index)
 
         promise.then(bound_success, fail)
 
