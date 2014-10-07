@@ -304,35 +304,29 @@ describe 'Session', ->
     beforeEach ->
       @instance = new @session()
       @stub = sinon.stub @instance, '_extractAnalyticsSession'
+      @resolve_spy = sinon.spy()
+      @reject_spy = sinon.spy()
 
     afterEach ->
+      @resolve_spy.reset()
+      @reject_spy.reset()
       @stub.restore()
 
     it 'returns the @promise', ->
-      ret = @instance.then(@success, @fail)
+      ret = @instance.then(@resolve_spy, @reject_spy)
       expect(ret).to.equal @instance.promise
 
-    it 'triggers success callback argument on @promise.resolve()', (done)->
-      success = ->
-        expect(true).to.equal(true)
-        done()
-      fail = ->
-        expect(false).to.equal(true)
-        done()
-
-      @instance.then(success, fail)
+    it 'triggers success callback argument on @promise.resolve()', ->
+      @instance.then(@resolve_spy, @reject_spy)
       @instance.promise.resolve()
 
-    it 'triggers fail callback argument on @promise.reject()', (done)->
-      success = ->
-        expect(false).to.equal(true)
-        done()
-      fail = ->
-        expect(true).to.equal(true)
-        done()
+      expect(@resolve_spy).to.be.calledOnce
 
-      @instance.then(success, fail)
+    it 'triggers fail callback argument on @promise.reject()', ->
+      @instance.then(@resolve_spy, @reject_spy)
       @instance.promise.reject()
+
+      expect(@reject_spy).to.be.calledOnce
 
   describe 'Business logic', ->
     beforeEach ->
@@ -393,3 +387,4 @@ describe 'Session', ->
           @settings.cookies.first_party_enabled = false
 
         outside_yogurt_tests(false)
+
