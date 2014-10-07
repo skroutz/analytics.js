@@ -4,9 +4,11 @@ define [
   'easyxdm'
 ], (Settings, Promise, easyXDM)->
   class XDomainEngine
-    constructor: (yogurt_session = '', yogurt_user_id = '', shop_code = '')->
+    constructor: (type, shop_code = '', yogurt_session = '', yogurt_user_id = '')->
       @promise = new Promise()
-      @socket = @_createSocket @_socketUrl(yogurt_session, yogurt_user_id, shop_code)
+      @url = Settings.url.analytics_session[type](shop_code, yogurt_session, yogurt_user_id)
+
+      @socket = @_createSocket @url
       @timeout = @_checkForSocketTimeout()
     then: (success, fail)-> @promise.then(success, fail)
 
@@ -25,13 +27,6 @@ define [
         @promise.reject(@_nonexistant_message)
       else
         @promise.resolve(analytics_session)
-
-    _socketUrl: (yogurt_session, yogurt_user_id, shop_code)->
-      url = Settings.url.analytics_session
-      if yogurt_session
-        url.create(yogurt_session, yogurt_user_id, shop_code)
-      else
-        url.connect(shop_code)
 
     _createSocket: (url)-> new easyXDM.Socket
       remote: url

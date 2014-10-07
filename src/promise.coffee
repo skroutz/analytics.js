@@ -64,11 +64,11 @@ define ->
       @_thens.push resolve: on_resolve, reject: on_reject
       @
 
-    resolve: (val) ->
+    resolve: (val) =>
       @_complete 'resolve', val
       @
 
-    reject: (val) ->
+    reject: (val) =>
       @_complete 'reject', val
       @
 

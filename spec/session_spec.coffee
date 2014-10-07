@@ -44,17 +44,21 @@ session_retrieval_tests = (cookies_enabled = false, cookie_exists = false)->
     @init()
     expect(@xdomain_spy).to.be.calledOnce
 
-  it 'passes yogurt_session to Xdomain engine', ->
+  it 'passes type to Xdomain engine', ->
     @init()
-    expect(@xdomain_spy.args[0][0]).to.equal @yogurt_session
-
-  it 'passes yogurt_user_id to Xdomain engine', ->
-    @init()
-    expect(@xdomain_spy.args[0][1]).to.equal @yogurt_user_id
+    expect(@xdomain_spy.args[0][0]).to.equal @type
 
   it 'passes shop_code to Xdomain engine', ->
     @init()
-    expect(@xdomain_spy.args[0][2]).to.equal @shop_code
+    expect(@xdomain_spy.args[0][1]).to.equal @shop_code
+
+  it 'passes yogurt_session to Xdomain engine', ->
+    @init()
+    expect(@xdomain_spy.args[0][2]).to.equal @yogurt_session
+
+  it 'passes yogurt_user_id to Xdomain engine', ->
+    @init()
+    expect(@xdomain_spy.args[0][3]).to.equal @yogurt_user_id
 
   it 'tries to extract analytics_session from GetParam engine', ->
     @init()
@@ -186,6 +190,8 @@ outside_yogurt_tests = (cookies_enabled = false)->
 
 describe 'Session', ->
   before (done) ->
+    @type_create       = 'create'
+    @type_connect      = 'connect'
     @yogurt_session    = 'dummy_yogurt_session_hash'
     @yogurt_user_id    = '1234'
     @shop_code         = 'shop_code_1'
@@ -241,41 +247,41 @@ describe 'Session', ->
       @instance = new @session()
       expect(@instance.promise).to.be.an.instanceof @promise
 
-    describe 'initialization parameter', ->
+    describe 'initialization parameters', ->
       beforeEach ->
         @params = {}
 
       context 'when yogurt_session is passed', ->
         it 'assigns the value to @yogurt_session', ->
           @params.yogurt_session = @yogurt_session
-          @instance = new @session(@params)
+          @instance = new @session(@type_create, @params)
           expect(@instance.yogurt_session).to.equal @yogurt_session
 
       context 'when yogurt_session is not passed', ->
         it 'assigns null to @yogurt_session', ->
-          @instance = new @session(@params)
+          @instance = new @session(@type_create, @params)
           expect(@instance.yogurt_session).to.equal null
 
       context 'when yogurt_user_id is passed', ->
         it 'assigns the value to @yogurt_user_id', ->
           @params.yogurt_user_id = @yogurt_user_id
-          @instance = new @session(@params)
+          @instance = new @session(@type_create, @params)
           expect(@instance.yogurt_user_id).to.equal @yogurt_user_id
 
       context 'when yogurt_user_id is not passed', ->
         it 'assigns "" to @yogurt_user_id', ->
-          @instance = new @session(@params)
-          expect(@instance.yogurt_user_id).to.equal ''
+          @instance = new @session(@type_create, @params)
+          expect(@instance.yogurt_user_id).to.equal null
 
       context 'when shop_code is passed', ->
         it 'assigns the value to @shop_code', ->
           @params.shop_code = @shop_code
-          @instance = new @session(@params)
+          @instance = new @session(@type_create, @params)
           expect(@instance.shop_code).to.equal @shop_code
 
       context 'when shop_code is not passed', ->
         it 'assigns null to @shop_code', ->
-          @instance = new @session(@params)
+          @instance = new @session(@type_create, @params)
           expect(@instance.shop_code).to.equal null
 
   describe '#then', ->
@@ -324,13 +330,14 @@ describe 'Session', ->
       @settings.cookies.first_party_enabled = @prev_cookies_enabled
       @settings.cookies.version = @prev_cookies_version
 
-    context 'when we are inside yogurt (@yogurt_session !== null)', ->
+    context 'when we are inside yogurt (type === "create")', ->
       beforeEach ->
         @parsed_settings =
           yogurt_user_id: @yogurt_user_id
           yogurt_session: @yogurt_session
           shop_code: @shop_code
-        @init = => @instance = new @session(@parsed_settings)
+        @type = @type_create
+        @init = => @instance = new @session(@type , @parsed_settings)
 
       context 'when first-party cookies are enabled', ->
         beforeEach ->
@@ -344,15 +351,16 @@ describe 'Session', ->
 
         inside_yogurt_tests(false)
 
-    context 'when we are outside yogurt (@yogurt_session === null)', ->
+    context 'when we are outside yogurt (type === "connect")', ->
       beforeEach ->
         @yogurt_session = null
-        @yogurt_user_id = ''
+        @yogurt_user_id = null
         @parsed_settings =
           yogurt_user_id: @yogurt_user_id
           yogurt_session: @yogurt_session
           shop_code: @shop_code
-        @init = => @instance = new @session(@parsed_settings)
+        @type = @type_connect
+        @init = => @instance = new @session(@type, @parsed_settings)
 
       context 'when first-party cookies are enabled', ->
         beforeEach ->

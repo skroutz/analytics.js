@@ -19,7 +19,7 @@ define ->
     url:
       base: '@@base'
       analytics_session:
-        create: (yogurt_session, yogurt_user_id, shop_code)->
+        create: (shop_code, yogurt_session, yogurt_user_id)->
           "@@base@@url.analytics_session.create"
         connect: (shop_code)->
           "@@base@@url.analytics_session.connect"
