@@ -1,5 +1,8 @@
 describe 'XDomain Session Retrieval Engine', ->
   before (done) ->
+    @type_create       = 'create'
+    @type_connect      = 'connect'
+
     window.__requirejs__.clearRequireState()
     requirejs.undef 'easyxdm'
 
@@ -43,7 +46,7 @@ describe 'XDomain Session Retrieval Engine', ->
 
   describe '.contructor', ->
     beforeEach ->
-      @instance = new @xdomain_engine()
+      @instance = new @xdomain_engine(@type_create)
       return
 
     it 'returns its own instance', ->
@@ -60,7 +63,7 @@ describe 'XDomain Session Retrieval Engine', ->
 
   describe '#then', ->
     beforeEach ->
-      @instance = new @xdomain_engine()
+      @instance = new @xdomain_engine(@type_create)
       return
 
     it 'returns the @promise', ->
@@ -91,12 +94,12 @@ describe 'XDomain Session Retrieval Engine', ->
 
   describe 'Socket creation', ->
     it 'creates new easyXDM instance', ->
-      @instance = new @xdomain_engine()
+      @instance = new @xdomain_engine(@type_create)
       expect(@easyxdm_socket_spy).to.be.calledWithNew
 
-    context 'when yogurt_session is passed', ->
+    context 'when called with type "create"', ->
       beforeEach ->
-        @instance = new @xdomain_engine(@yogurt_session, @yogurt_user_id, @shop_code)
+        @instance = new @xdomain_engine(@type_create, @shop_code, @yogurt_session, @yogurt_user_id)
         return
 
       it 'opens "track/create" url', ->
@@ -114,9 +117,9 @@ describe 'XDomain Session Retrieval Engine', ->
         url = "shop_code=#{@shop_code}"
         expect(@easyxdm_socket_spy.args[0][0].remote).to.contain url
 
-    context 'when yogurt_session is not passed', ->
+    context 'when called with type "connect"', ->
       beforeEach ->
-        @instance = new @xdomain_engine(null, @yogurt_user_id, @shop_code)
+        @instance = new @xdomain_engine(@type_connect, @shop_code)
         return
 
       it 'opens "track/connect" url', ->
@@ -128,7 +131,7 @@ describe 'XDomain Session Retrieval Engine', ->
 
   describe 'Socket behaviour', ->
     beforeEach ->
-      @instance = new @xdomain_engine()
+      @instance = new @xdomain_engine(@type_create)
       @timeout_spy = sinon.spy(window, 'clearTimeout')
       @resolve_spy = sinon.spy(@instance.promise, 'resolve')
       @reject_spy = sinon.spy(@instance.promise, 'reject')

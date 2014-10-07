@@ -6,23 +6,21 @@ define [
   'session_engines/xdomain_engine'
 ], (Settings, Promise, Biskoto, GetParamEngine, XDomainEngine)->
   class Session
-    constructor: (parsed_settings = {})->
+    constructor: (type, data = {})->
       @promise = new Promise()
 
       @_cleanUpCookies()
-
-      @yogurt_session = parsed_settings.yogurt_session or null
-      @shop_code = parsed_settings.shop_code or null
-      @yogurt_user_id = parsed_settings.yogurt_user_id or ''
-
       @analytics_session = @_getCookieAnalyticsSession()
 
-      # If yogurt_session exists we are in yogurt space.
-      # Always create third party cookie while in yogurt space.
-      if @yogurt_session is null and @analytics_session isnt null
+      @shop_code = data.shop_code or null
+      @yogurt_session = data.yogurt_session or null
+      @yogurt_user_id = data.yogurt_user_id or null
+
+      if type is 'connect' and @analytics_session
         @promise.resolve @analytics_session
       else
-        @_extractAnalyticsSession(@yogurt_session, @yogurt_user_id, @shop_code)
+        # Always try to create third party cookie in 'create'
+        @_extractAnalyticsSession(type, @shop_code, @yogurt_session, @yogurt_user_id)
 
     then: (success, fail)-> @promise.then(success, fail)
 
@@ -39,9 +37,9 @@ define [
       data = Biskoto.get(Settings.cookies.analytics.name)
       if data then data.analytics_session else null
 
-    _extractAnalyticsSession: (yogurt_session, yogurt_user_id, shop_code)->
+    _extractAnalyticsSession: (type, shop_code, yogurt_session, yogurt_user_id)->
       Promise.any([
-        (new XDomainEngine(yogurt_session, yogurt_user_id, shop_code))
+        (new XDomainEngine(type, shop_code, yogurt_session, yogurt_user_id))
         (new GetParamEngine())
       ]).then @_onSessionSuccess, @_onSessionError
 

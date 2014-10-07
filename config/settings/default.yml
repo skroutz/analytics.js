@@ -3,6 +3,8 @@ common:
   get_param_name: "analytics_session"
   single_beacon: false
 xdomain_session_timeout: 1000
+auto_pageview_timeout: 1000
+send_auto_pageview: true
 cookies:
   first_party_enabled: true
   version: 1

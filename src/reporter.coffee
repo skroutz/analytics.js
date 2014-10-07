@@ -1,32 +1,21 @@
 define [
-  'settings'
   'promise'
   'helpers/browser_helper'
   'helpers/url_helper'
-], (Settings, Promise, BrowserHelper, URLHelper)->
+], (Promise, BrowserHelper, URLHelper)->
   unique_id = 0
 
   class Reporter
-    constructor: (options)->
+    constructor: ->
       @transport = 'img'
       @transport_ready = @_determineTransport()
 
     then: (success, fail) -> @transport_ready.then(success, fail)
 
-    report: (url, data_array) ->
-      promises = []
-
-      for data in data_array
-        promise = new Promise()
-
-        ((url, data, promise)=>
-          @transport_ready.then =>
-            @_handleJob url, data, promise
-        )(url, data, promise)
-
-        promises.push promise
-
-      Promise.all(promises)
+    sendBeacon: (url, data) ->
+      promise = new Promise()
+      @transport_ready.then => @_handleJob url, data, promise
+      promise
 
     _determineTransport: ->
       BrowserHelper.checkImages().then (images_enabled) =>
