@@ -71,9 +71,7 @@ define [
         @reporter.sendBeacon(url, payload).then => cb and cb(analytics_session)
 
     _redirect: (url, analytics_session) ->
-      data = {}
-      data[Settings.params.analytics_session] = analytics_session
-      Settings.redirectTo URLHelper.appendData(url, URLHelper.serialize(data))
+      Settings.redirectTo url
 
     # TODO: implement multiple actions per beacon maybe??
     _buildBeaconPayload: (category, type, data = '{}')->

@@ -393,9 +393,6 @@ describe 'ActionsManager', ->
           it 'redirects to redirect_url', ->
             expect(@settings.redirectTo.args[0][0]).to.contain @redirect_url
 
-          it 'appends analytics_session to redirect_url', ->
-            expect(@settings.redirectTo.args[0][0]).to.contain "?analytics_session=#{@analytics_session}"
-
         context 'when action fails to report', ->
           beforeEach ->
             @init2()
