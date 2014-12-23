@@ -16,7 +16,7 @@ describe 'Biskoto', ->
 
   describe '#get', ->
     afterEach ->
-      document.cookie = 'foo=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      document.cookie = 'foo=; expires=Thu, 01 Jan 1970 00:00:01 GMT;'
 
     context 'when cookie exist', ->
       it 'returns the proper cookie value', ->
@@ -29,7 +29,7 @@ describe 'Biskoto', ->
 
   describe '#set', ->
     afterEach ->
-      document.cookie = 'foo2=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      document.cookie = 'foo2=; expires=Thu, 01 Jan 1970 00:00:01 GMT;'
 
     it 'sets the proper cookie', ->
       options = {

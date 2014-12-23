@@ -16,9 +16,9 @@ define ['settings', 'promise'], (Settings, Promise)->
       sibling.parentNode.insertBefore(element, sibling)
 
     @_firstPartyCookiesEnabled: ->
-      document.cookie = "TemporaryTestCookie=yes;";
+      document.cookie = "TemporaryTestCookie=yes;"
       cookies_enabled = document.cookie.indexOf("TemporaryTestCookie=") isnt -1
-      document.cookie = "TemporaryTestCookie=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie = "TemporaryTestCookie=; expires=Thu, 01 Jan 1970 00:00:00 GMT"
       return cookies_enabled
 
     @_thirdPartyCookiesEnabled: ->

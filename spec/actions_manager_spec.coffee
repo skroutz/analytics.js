@@ -47,7 +47,7 @@ action_reporting_tests = ->
       expect(@payload.shop_code).to.equal @shop_code
 
     it 'has an array as value to the actions key', ->
-      expect(@payload.actions).to.be.an('array');
+      expect(@payload.actions).to.be.an('array')
 
     it 'places a single item to the actions array', ->
       expect(@payload.actions).to.have.length 1
@@ -266,7 +266,7 @@ describe 'ActionsManager', ->
           beforeEach ->
             @init()
             @clock.tick @settings.auto_pageview_timeout + 100
-            sa('ecommerce', 'addOrder', 'data1');
+            sa('ecommerce', 'addOrder', 'data1')
 
           it 'clears the AutoPageView timeout', ->
             expect(@cleartimeout_spy).to.be.calledWith @instance.pageview_timeout
