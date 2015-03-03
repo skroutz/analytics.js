@@ -345,6 +345,13 @@ describe 'ActionsManager', ->
             yogurt_session: @yogurt_session
             yogurt_user_id: @yogurt_user_id
 
+        it 'creates only one session', ->
+          @init2 = ->
+            sa(@category, @type, @shop_code, @yogurt_session, @yogurt_user_id)
+            sa(@category, @type, @shop_code, @yogurt_session, @yogurt_user_id)
+            @init()
+            expect(@session_mock).to.be.calledOnce
+
         api_session_promise_tests()
 
       describe 'connect', ->
@@ -358,6 +365,13 @@ describe 'ActionsManager', ->
         it 'creates a session with type and passes shop_code', ->
           expect(@session_mock).to.be.calledWith @type,
             shop_code: @shop_code
+
+        it 'creates only one session', ->
+          @init2 = ->
+            sa(@category, @type, @shop_code, @yogurt_session, @yogurt_user_id)
+            sa(@category, @type, @shop_code, @yogurt_session, @yogurt_user_id)
+            @init()
+          expect(@session_mock).to.be.calledOnce
 
         api_session_promise_tests()
 
