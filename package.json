@@ -38,7 +38,7 @@
     "grunt-bump": "0.3.0",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-watch": "^0.6.1",
-    "grunt-karma": "^0.8.3",
+    "grunt-karma": "^0.10.1",
     "karma": "^0.12.16",
     "karma-cli": "0.0.4",
     "karma-coffee-preprocessor": "^0.2.1",
