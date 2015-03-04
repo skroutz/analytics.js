@@ -52,7 +52,7 @@
     "karma-coverage": "^0.2.7",
     "ibrik": "Constellation/ibrik",
     "istanbul": "^0.3.7",
-    "mocha": "^1.20.1",
+    "mocha": "^2.1.0",
     "supertest": "^0.11.0"
   }
 }
