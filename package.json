@@ -45,7 +45,7 @@
     "karma-fixture": "^0.2.2",
     "karma-html2js-preprocessor": "^0.1.0",
     "karma-mocha": "^0.1.10",
-    "karma-mocha-reporter": "^0.2.5",
+    "karma-mocha-reporter": "^1.0.0",
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-requirejs": "^0.2.1",
     "karma-sinon-chai": "^0.1.5",
