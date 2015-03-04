@@ -53,6 +53,6 @@
     "ibrik": "Constellation/ibrik",
     "istanbul": "^0.3.7",
     "mocha": "^2.1.0",
-    "supertest": "^0.11.0"
+    "supertest": "^0.15.0"
   }
 }
