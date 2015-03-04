@@ -48,7 +48,7 @@
     "karma-mocha-reporter": "^1.0.0",
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-requirejs": "^0.2.2",
-    "karma-sinon-chai": "^0.1.5",
+    "karma-sinon-chai": "^0.3.0",
     "karma-coverage": "^0.2.4",
     "ibrik": "Constellation/ibrik",
     "istanbul": "^0.2.13",
