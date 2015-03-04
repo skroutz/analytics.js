@@ -35,7 +35,7 @@
     "requirejs": "^2.1.16"
   },
   "devDependencies": {
-    "grunt-bump": "0.0.14",
+    "grunt-bump": "0.3.0",
     "grunt-contrib-clean": "^0.5.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-karma": "^0.8.3",
