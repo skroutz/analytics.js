@@ -18,7 +18,9 @@ define ->
       return null
 
     @set: (name, value, options = {}) ->
-      document.cookie = "#{name}=#{encode( JSON.stringify(value) )}#{@_cookieOptions(options)}"
+      cookie_data =
+      document.cookie = "#{name}=#{encode(JSON.stringify(value))}" +
+        "#{@_cookieOptions(options)}"
 
     @expire: (name, options = {}) ->
       options.expires = -1
