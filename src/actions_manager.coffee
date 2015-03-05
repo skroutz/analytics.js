@@ -34,20 +34,23 @@ define [
 
     _actions:
       session:
-        create: (shop_code, yogurt_session, yogurt_user_id)-> @_sessionAction 'create',
-          shop_code: shop_code
-          yogurt_session: yogurt_session
-          yogurt_user_id: yogurt_user_id
-        connect: (shop_code)-> @_sessionAction 'connect',{shop_code: shop_code}
+        create: (shop_code, yogurt_session, yogurt_user_id)->
+          @_sessionAction 'create',
+            shop_code: shop_code
+            yogurt_session: yogurt_session
+            yogurt_user_id: yogurt_user_id
+        connect: (shop_code)-> @_sessionAction 'connect', {shop_code: shop_code}
       yogurt:
         productClick: (data, redirect_url, redirect = true)->
           clearTimeout @pageview_timeout
           @_reportAction 'yogurt', 'productClick', data, (analytics_session)=>
-            @_redirect(redirect_url, analytics_session) if redirect_url and redirect
+            if redirect_url and redirect
+              @_redirect(redirect_url, analytics_session)
       ecommerce:
         addOrder: (data, callback)->
           clearTimeout @pageview_timeout
-          @_reportAction 'ecommerce', 'addOrder', data, -> callback() if callback
+          @_reportAction 'ecommerce', 'addOrder', data, ->
+            callback() if callback
         addItem: (data, callback)->
           clearTimeout @pageview_timeout
           @_reportAction 'ecommerce', 'addItem', data, -> callback() if callback
@@ -67,7 +70,7 @@ define [
         payload = @_buildBeaconPayload(category, type, data)
 
         ## TODO: THROW ERROR ON REJECT
-        @reporter.sendBeacon(url, payload).then => cb and cb(analytics_session)
+        @reporter.sendBeacon(url, payload).then -> cb and cb(analytics_session)
 
     _redirect: (url, analytics_session) ->
       Settings.redirectTo url

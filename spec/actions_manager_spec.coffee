@@ -228,8 +228,8 @@ describe 'ActionsManager', ->
             beacon_data = @sendbeacon_spy.args[0][1].actions[0]
 
             expect(beacon_data).to.contain
-              category: "site"
-              type: "sendPageView"
+              category: 'site'
+              type: 'sendPageView'
 
           it 'sends a PageView action with empty data', ->
             beacon_data = @sendbeacon_spy.args[0][1].actions[0]
@@ -244,7 +244,8 @@ describe 'ActionsManager', ->
             sa('ecommerce', 'addOrder', 'data1')
 
           it 'clears the AutoPageView timeout', ->
-            expect(@cleartimeout_spy).to.be.calledWith @instance.pageview_timeout
+            expect(@cleartimeout_spy).to.be
+              .calledWith @instance.pageview_timeout
 
           it 'only sends one action', ->
             expect(@sendbeacon_spy).to.be.calledOnce
@@ -259,8 +260,8 @@ describe 'ActionsManager', ->
           it 'does not send a PageView action', ->
             action_data = @sendbeacon_spy.args[0][1].actions[0]
             expect(action_data).to.not.contain
-              category: "site"
-              type: "sendPageView"
+              category: 'site'
+              type: 'sendPageView'
 
         context 'after timeout expires', ->
           beforeEach ->
@@ -269,7 +270,8 @@ describe 'ActionsManager', ->
             sa('ecommerce', 'addOrder', 'data1')
 
           it 'clears the AutoPageView timeout', ->
-            expect(@cleartimeout_spy).to.be.calledWith @instance.pageview_timeout
+            expect(@cleartimeout_spy).to.be
+              .calledWith @instance.pageview_timeout
 
           it 'sends both actions', ->
             expect(@sendbeacon_spy).to.be.calledTwice
@@ -339,7 +341,8 @@ describe 'ActionsManager', ->
         it 'creates a new session', ->
           expect(@session_mock).to.be.calledWithNew
 
-        it 'creates a session with type and passes shop_code, yogurt_session and yogurt_user_id', ->
+        it 'creates a session with type and passes shop_code, yogurt_session and
+          yogurt_user_id', ->
           expect(@session_mock).to.be.calledWith @type,
             shop_code: @shop_code
             yogurt_session: @yogurt_session
@@ -418,7 +421,8 @@ describe 'ActionsManager', ->
 
         context 'when an extra param with value false is passed on action', ->
           it 'does not redirect', ->
-            sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id)
+            sa('session', 'create', @shop_code, @yogurt_session,
+              @yogurt_user_id)
             sa(@category, @type, @data, @redirect_url, false)
             @init()
             @session_promise.resolve(@analytics_session)
@@ -449,7 +453,8 @@ describe 'ActionsManager', ->
             @spy = sinon.spy()
 
             @init2 = ->
-              sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id)
+              sa('session', 'create', @shop_code, @yogurt_session,
+                @yogurt_user_id)
               sa(@category, @type, @data, @spy)
               @init()
               @session_promise.resolve(@analytics_session)
@@ -484,7 +489,8 @@ describe 'ActionsManager', ->
             @spy = sinon.spy()
 
             @init2 = ->
-              sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id)
+              sa('session', 'create', @shop_code, @yogurt_session,
+                @yogurt_user_id)
               sa(@category, @type, @data, @spy)
               @init()
               @session_promise.resolve(@analytics_session)
