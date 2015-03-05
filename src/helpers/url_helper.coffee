@@ -10,7 +10,8 @@ define ['settings'], (Settings)->
 
       for key, value of object
         value = JSON.stringify(value) if typeof value isnt 'string'
-        query_string += "#{encodeURIComponent(key)}=#{encodeURIComponent(value)}&"
+        query_string += "#{encodeURIComponent(key)}="
+        query_string += "#{encodeURIComponent(value)}&"
 
       query_string[0...-1]
 

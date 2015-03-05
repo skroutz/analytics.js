@@ -57,9 +57,9 @@ describe 'URLHelper', ->
     context 'when param is json', ->
       it 'returns proper serialized string', ->
         o = {
-          "foo1": '=&foo10=bar10&'
-          "foo2": "bar '2'"
-          "foo3": "bar 3"
+          'foo1': '=&foo10=bar10&'
+          'foo2': "bar '2'"
+          'foo3': 'bar 3'
         }
         q = "foo1=%3D%26foo10%3Dbar10%26&foo2=bar%20'2'&foo3=bar%203"
         expect(@serialize(o)).to.equal(q)
@@ -74,7 +74,8 @@ describe 'URLHelper', ->
             k2: 'v2'
           }
         }
-        q = "foo1=%3D%26foo10%3Dbar10%26&foo2=bar%20'2'&foo3=%7B%22k1%22%3A%22v1%22%2C%22k2%22%3A%22v2%22%7D"
+        q = "foo1=%3D%26foo10%3Dbar10%26&foo2=bar%20'2'&"
+        q += 'foo3=%7B%22k1%22%3A%22v1%22%2C%22k2%22%3A%22v2%22%7D'
         expect(@serialize(o)).to.equal(q)
 
   describe '.extractGetParam', ->
