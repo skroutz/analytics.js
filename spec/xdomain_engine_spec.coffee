@@ -99,7 +99,8 @@ describe 'XDomain Session Retrieval Engine', ->
 
     context 'when called with type "create"', ->
       beforeEach ->
-        @instance = new @xdomain_engine(@type_create, @shop_code, @yogurt_session, @yogurt_user_id)
+        @instance = new @xdomain_engine(@type_create, @shop_code,
+          @yogurt_session, @yogurt_user_id)
         return
 
       it 'opens "track/create" url', ->
@@ -178,4 +179,5 @@ describe 'XDomain Session Retrieval Engine', ->
           expect(@reject_spy).to.be.calledOnce
 
         it 'rejects @promise with timeout error message', ->
-          expect(@reject_spy).to.be.calledWith 'XDomain retrieval of analytics_session timed out'
+          expect(@reject_spy).to.be
+            .calledWith 'XDomain retrieval of analytics_session timed out'

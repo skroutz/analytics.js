@@ -4,9 +4,11 @@ define [
   'easyxdm'
 ], (Settings, Promise, easyXDM)->
   class XDomainEngine
-    constructor: (type, shop_code = '', yogurt_session = '', yogurt_user_id = '')->
+    constructor: (type, shop_code = '', yogurt_session = '',
+                  yogurt_user_id = '')->
       @promise = new Promise()
-      @url = Settings.url.analytics_session[type](shop_code, yogurt_session, yogurt_user_id)
+      @url = Settings.url.analytics_session[type](shop_code, yogurt_session,
+        yogurt_user_id)
 
       @socket = @_createSocket @url
       @timeout = @_checkForSocketTimeout()
@@ -15,7 +17,9 @@ define [
     _timeout_message: 'XDomain retrieval of analytics_session timed out'
     _nonexistant_message: 'Analytics_session does not exist'
 
-    _checkForSocketTimeout: -> setTimeout (=> @promise.reject(@_timeout_message )), Settings.xdomain_session_timeout
+    _checkForSocketTimeout: ->
+      setTimeout((=> @promise.reject(@_timeout_message)),
+        Settings.xdomain_session_timeout)
 
     _onSocketReady: => @socket.postMessage(Settings.iframe_message)
 
