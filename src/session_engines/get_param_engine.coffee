@@ -7,8 +7,14 @@ define [
     constructor: ->
       @promise = new Promise()
 
-      value = URLHelper.extractGetParam(Settings.params.analytics_session) or null
-      if value then @promise.resolve(value) else @promise.reject(@_nonexistant_message)
+      value = URLHelper
+        .extractGetParam(Settings.params.analytics_session) or null
+
+      if value
+        @promise.resolve(value)
+      else
+        @promise.reject(@_nonexistant_message)
+
       return
 
     then: (success, fail)-> @promise.then(success, fail)

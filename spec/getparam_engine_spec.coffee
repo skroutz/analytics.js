@@ -56,7 +56,7 @@ describe 'GetParam Session Retrieval Engine', ->
       return
 
     it 'returns the @promise', ->
-      ret = @instance.then (->),(->)
+      ret = @instance.then (-> undefined), (-> undefined)
       expect(ret).to.equal @instance.promise
 
   describe 'Param extraction', ->
