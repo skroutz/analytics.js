@@ -1,7 +1,8 @@
 define ['settings', 'promise'], (Settings, Promise)->
   class BrowserHelper
     @_setUpCallbacks: (base_obj, promise)->
-      base_obj.step1_complete = -> BrowserHelper._createScript(Settings.url.utils.third_party_step2())
+      base_obj.step1_complete = ->
+        BrowserHelper._createScript(Settings.url.utils.third_party_step2())
       base_obj.step2_complete = (status)-> promise.resolve(status)
 
     @_cleanUpCallbacks: (base_obj)->
@@ -16,9 +17,10 @@ define ['settings', 'promise'], (Settings, Promise)->
       sibling.parentNode.insertBefore(element, sibling)
 
     @_firstPartyCookiesEnabled: ->
-      document.cookie = "TemporaryTestCookie=yes;"
-      cookies_enabled = document.cookie.indexOf("TemporaryTestCookie=") isnt -1
-      document.cookie = "TemporaryTestCookie=; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+      tmp_cookie = 'TemporaryTestCookie'
+      document.cookie = "#{tmp_cookie}=yes;"
+      cookies_enabled = document.cookie.indexOf("#{tmp_cookie}=") isnt -1
+      document.cookie = "#{tmp_cookie}=; expires=Thu, 01 Jan 1970 00:00:00 GMT"
       return cookies_enabled
 
     @_thirdPartyCookiesEnabled: ->
@@ -45,15 +47,17 @@ define ['settings', 'promise'], (Settings, Promise)->
      *  So we have to listen to the onerror event on them.
      *  IE >= 8 support inline images, so we listen to the onload event.
      * All other:
-     * Watching the .complete attr is sufficient
-     * The .readyState check depends on the src attribute been set before the appending of the img element
+     *  Watching the .complete attr is sufficient
+     *  The .readyState check depends on the src attribute been set before the
+     *  appending of the img element
     ###
     @checkImages: ->
-      promise     = new Promise()
+      promise = new Promise()
       img_enabled = false
 
       parent = document.getElementsByTagName('head')[0]
-      src  = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+      empty_data = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+      src = "data:image/gif;base64,#{empty_data}"
 
       img = document.createElement('img')
       img.onload = img.onerror = -> img_enabled = true
