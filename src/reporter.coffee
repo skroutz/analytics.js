@@ -40,7 +40,8 @@ define [
       element = document.createElement(@transport)
       element.onload = -> promise.resolve()
       element.onerror = -> promise.reject()
-      element.src = URLHelper.appendData url, URLHelper.serialize(transport_options)
+      element.src = URLHelper
+        .appendData url, URLHelper.serialize(transport_options)
 
       sibling = document.getElementsByTagName('script')[0]
       sibling.parentNode.insertBefore(element, sibling)
