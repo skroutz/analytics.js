@@ -1,6 +1,7 @@
 clear_all_cookies = ->
   document.cookie.split(/;\s/g).forEach (cookie)->
-    document.cookie = "#{cookie.split('=')[0]}= ;expires=Wed, 28 May 2000 10:53:43 GMT"
+    expires = 'expires=Wed, 28 May 2000 10:53:43 GMT'
+    document.cookie = "#{cookie.split('=')[0]}= ;#{expires}"
 
 session_creation_tests = (cookies_enabled = false, cookie_exists = false)->
   if cookies_enabled
@@ -8,19 +9,22 @@ session_creation_tests = (cookies_enabled = false, cookie_exists = false)->
       it 'replaces first-party cookie data with retrieved data', (done)->
         @init2()
         @instance.then =>
-          expect(@biskoto.get(@cookie_name).analytics_session).to.equal @analytics_session
+          expect(@biskoto.get(@cookie_name).analytics_session).to
+            .equal @analytics_session
           done()
     else
       it 'creates a first-party cookie with that value', (done)->
         @init2()
         @instance.then =>
-          expect(@biskoto.get(@cookie_name).analytics_session).to.equal @analytics_session
+          expect(@biskoto.get(@cookie_name).analytics_session).to
+            .equal @analytics_session
           done()
 
       it 'creates first-party cookie with proper version', (done)->
         @init2()
         @instance.then =>
-          expect(@biskoto.get(@cookie_name).version).to.equal @settings.cookies.version
+          expect(@biskoto.get(@cookie_name).version).to
+            .equal @settings.cookies.version
           done()
   else
     it 'does not create a cookie', ->
@@ -89,7 +93,7 @@ session_retrieval_tests = (cookies_enabled = false, cookie_exists = false)->
       @init()
       @xdomain_promise.resolve('asd')
       @get_param_promise.resolve('dsa')
-      @instance.then (sess_id)=>
+      @instance.then (sess_id)->
         expect(sess_id).to.equal 'asd'
         done()
 
@@ -121,7 +125,8 @@ inside_yogurt_tests = (cookies_enabled = false)->
   if cookies_enabled
     context 'when a first-party cookie exists', ->
       beforeEach ->
-        @biskoto.set @cookie_name, {version:1, analytics_session: 'asd'}, @cookie_options
+        cookie_data = {version: 1, analytics_session: 'asd'}
+        @biskoto.set @cookie_name, cookie_data, @cookie_options
 
       it 'intializes @analytics_session to the first-party cookie\'s value', ->
         @init()
@@ -159,21 +164,25 @@ outside_yogurt_tests = (cookies_enabled = false)->
   if cookies_enabled
     context 'when a first-party cookie exists', ->
       beforeEach ->
-        @biskoto.set @cookie_name, {version:1, analytics_session: 'asd'}, @cookie_options
+        cookie_data = {version: 1, analytics_session: 'asd'}
+        @biskoto.set @cookie_name, cookie_data, @cookie_options
 
-      it 'resolves the @promise with the "analytics_session" found in the cookie', (done)->
+      it 'resolves the @promise with the "analytics_session" found in the
+        cookie', (done)->
         @init()
         @instance.then (sess_id)->
           expect(sess_id).to.equal 'asd'
           done()
 
-      it 'does not use the XDomain engine to retrieve the "analytics_session"', ->
-        @init()
-        expect(@xdomain_spy).to.not.be.called
+      it 'does not use the XDomain engine to retrieve the "analytics_session"',
+        ->
+          @init()
+          expect(@xdomain_spy).to.not.be.called
 
-      it 'does not use the GetParam engine to retrieve the "analytics_session"', ->
-        @init()
-        expect(@get_param_spy).to.not.be.called
+      it 'does not use the GetParam engine to retrieve the "analytics_session"',
+        ->
+          @init()
+          expect(@get_param_spy).to.not.be.called
 
     context 'when a first-party cookie does not exist', ->
       session_retrieval_tests(cookies_enabled, false)
