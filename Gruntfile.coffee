@@ -23,8 +23,9 @@ module.exports = (grunt) ->
 
         expand: true
         extDot: 'last'
+        ext: '.js.gz'
         cwd: 'dist/'
-        src: ['**/*']
+        src: ['**/*.js']
         dest: 'dist/'
 
     hash:
