@@ -20,7 +20,8 @@ define [
         @promise.resolve @analytics_session
       else
         # Always try to create third party cookie in 'create'
-        @_extractAnalyticsSession(type, @shop_code, @yogurt_session, @yogurt_user_id)
+        @_extractAnalyticsSession(type, @shop_code, @yogurt_session,
+          @yogurt_user_id)
 
     then: (success, fail)-> @promise.then(success, fail)
 
@@ -30,14 +31,17 @@ define [
       cookie_data = Biskoto.get(cookie_name)
       return unless cookie_data
 
-      if cookie_data.version isnt cookie_settings.version or !cookie_settings.first_party_enabled
+      cookies_enabled = cookie_settings.first_party_enabled
+
+      if cookie_data.version isnt cookie_settings.version or !cookies_enabled
         Biskoto.expire(cookie_name)
 
     _getCookieAnalyticsSession: ->
       data = Biskoto.get(Settings.cookies.analytics.name)
       if data then data.analytics_session else null
 
-    _extractAnalyticsSession: (type, shop_code, yogurt_session, yogurt_user_id)->
+    _extractAnalyticsSession: (type, shop_code, yogurt_session,
+                               yogurt_user_id)->
       Promise.any([
         (new XDomainEngine(type, shop_code, yogurt_session, yogurt_user_id))
         (new GetParamEngine())

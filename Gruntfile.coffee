@@ -105,7 +105,10 @@ module.exports = (grunt) ->
           'spec/**/*.json'
           '!spec/coverage/**/*'
         ]
-        tasks: ['karma:unit:run']
+        tasks: [
+          'coffeelint'
+          'karma:unit:run'
+        ]
 
       payload:
         options:
@@ -119,6 +122,12 @@ module.exports = (grunt) ->
           'create_env_settings'
           'build_dist'
         ]
+
+    coffeelint:
+      options:
+        configFile: '.coffeelint.json'
+      src: ['src/**/*.coffee']
+      test: ['spec/**/*.coffee']
 
     coffee:
       options:
@@ -266,6 +275,7 @@ module.exports = (grunt) ->
   grunt.registerTask 'build_payload', [
     'clean:payload'
     'create_easyxdm_module'
+    'coffeelint'
     'coffee:payload'
     'optimize_rjs'
     'concat:payload'
@@ -277,6 +287,7 @@ module.exports = (grunt) ->
 
   #BUILD LOADER
   grunt.registerTask 'build_loader', [
+    'coffeelint'
     'coffee:loader'
     'hash:payload'
     'replace:loader'

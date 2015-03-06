@@ -23,4 +23,5 @@ require.config
   # we have to kickoff jasmine, as it is asynchronous
   callback: window.__karma__.start
 
-requirejs.onResourceLoad = (context, map, deps) -> window.__requirejs__.loaded_amds[map.id] = true
+requirejs.onResourceLoad = (context, map, deps) ->
+  window.__requirejs__.loaded_amds[map.id] = true

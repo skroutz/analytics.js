@@ -26,7 +26,11 @@ describe 'Reporter', ->
       @sendBeacon_spy = sinon.spy(@subject, 'sendBeacon')
       @clock.tick 10
 
-    @simple_serialized_data = '?url=some_url&shop_code=SA-XXXX-Y&actions=%5B%7B%22category%22%3A%22yogurt%22%2C%22type%22%3A%22productClick%22%2C%22data%22%3A%7B%22product_id%22%3A%2215400722%22%2C%22shop_product_id%22%3A%22752%22%2C%22shop_id%22%3A%222032%22%7D%7D%5D'
+    @serialized_data = '?url=some_url&shop_code=SA-XXXX-Y&actions=%5B%7B%22cate'
+    @serialized_data += 'gory%22%3A%22yogurt%22%2C%22type%22%3A%22productClick%'
+    @serialized_data += '22%2C%22data%22%3A%7B%22product_id%22%3A%2215400722%22'
+    @serialized_data += '%2C%22shop_product_id%22%3A%22752%22%2C%22shop_id%22%3'
+    @serialized_data += 'A%222032%22%7D%7D%5D'
     window.__requirejs__.clearRequireState()
     require ['promise', 'settings'], (Promise, Settings) =>
       @promise = Promise
@@ -97,7 +101,8 @@ describe 'Reporter', ->
     describe '#then', ->
       beforeEach ->
         @checkImage_promise = new @promise()
-        @checkImage_stub = sinon.stub(@browser_helper, 'checkImages').returns(@checkImage_promise)
+        @checkImage_stub = sinon.stub(@browser_helper, 'checkImages')
+          .returns(@checkImage_promise)
 
       afterEach ->
         @checkImage_stub.restore()
@@ -179,7 +184,8 @@ describe 'Reporter', ->
 
         @subject.sendBeacon(@url, @simple_beacon_data).then callback, callback
 
-      it 'waits for transport element to finish before fulfilling the promise returned', (done)->
+      it 'waits for transport element to finish before fulfilling the promise
+        returned', (done)->
         @start()
         callback = =>
           states = []
@@ -200,7 +206,7 @@ describe 'Reporter', ->
 
       callback = =>
         transport = @createElement_stub.returnValues[0]
-        expect(transport.src).to.contain("#{@url}#{@simple_serialized_data}")
+        expect(transport.src).to.contain("#{@url}#{@serialized_data}")
         done()
       @subject.sendBeacon(@url, @simple_beacon_data).then callback, callback
 
@@ -214,7 +220,8 @@ describe 'Reporter', ->
 
     context 'when images are disabled', ->
       beforeEach ->
-        @checkImage_stub = sinon.stub(@browser_helper, 'checkImages').returns( new @promise().resolve(false) )
+        @checkImage_stub = sinon.stub(@browser_helper, 'checkImages')
+          .returns(new @promise().resolve(false))
 
       afterEach ->
         @checkImage_stub.restore()
@@ -236,7 +243,8 @@ describe 'Reporter', ->
 
     context 'when images are enabled', ->
       beforeEach ->
-        @checkImage_stub = sinon.stub(@browser_helper, 'checkImages').returns( new @promise().resolve(true) )
+        @checkImage_stub = sinon.stub(@browser_helper, 'checkImages')
+          .returns(new @promise().resolve(true))
 
       afterEach ->
         @checkImage_stub.restore()

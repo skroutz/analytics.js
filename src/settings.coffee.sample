@@ -28,8 +28,10 @@ define ->
       beacon: (analytics_session)->
         "@@base@@url.beacon"
       utils:
-        third_party_step1: -> "@@base@@url.utils.third_party_step1"
-        third_party_step2: -> "@@base@@url.utils.third_party_step2"
+        third_party_step1: ->
+          '@@base@@url.utils.third_party_step1'
+        third_party_step2: ->
+          '@@base@@url.utils.third_party_step2'
     api:
       settings:
         key: '@@api.settings.key'
