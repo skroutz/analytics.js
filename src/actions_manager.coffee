@@ -56,8 +56,7 @@ define [
           @_reportAction 'site', 'sendPageView'
 
     _sessionAction: (type, args)->
-      ## TODO Create custom error class
-      throw new Error('Session already initiated') if @session
+      return if @session?
 
       @session = new Session(type, args)
       @session.then @promise.resolve, @promise.reject
