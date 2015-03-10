@@ -2,19 +2,6 @@ describe 'Reporter', ->
   before (done) ->
     @url = 'foo.bar'
 
-    @simple_beacon_data =
-      url: 'some_url'
-      shop_code: 'SA-XXXX-Y'
-      actions: [{
-        category: 'yogurt'
-        type: 'productClick'
-        data: {
-          product_id: '15400722'
-          shop_product_id: '752'
-          shop_id: '2032'
-        }
-      }]
-
     @mockup_dom_methods = =>
       @createElement_stub = sinon.stub()
       document.createElement = @createElement_stub.returns({})
@@ -56,6 +43,20 @@ describe 'Reporter', ->
       require ['reporter'], (Reporter) =>
         @reporter = Reporter
         done()
+
+  beforeEach ->
+    @simple_beacon_data =
+      url: 'some_url'
+      shop_code: 'SA-XXXX-Y'
+      actions: [{
+        category: 'yogurt'
+        type: 'productClick'
+        data: {
+          product_id: '15400722'
+          shop_product_id: '752'
+          shop_id: '2032'
+        }
+      }]
 
   after ->
     requirejs.undef 'helpers/browser_helper'
