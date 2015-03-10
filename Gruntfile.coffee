@@ -119,6 +119,7 @@ module.exports = (grunt) ->
         tasks: [
           'create_env_settings'
           'build_dist'
+          'karma:unit:run'
         ]
 
     coffee:
