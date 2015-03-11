@@ -102,10 +102,10 @@ session_retrieval_tests = (cookies_enabled = false, cookie_exists = false)->
 
     it 'it rejects the @promise', (done)->
       resolve = ->
-        expect(false).to.equal(true)
+        assert.fail()
         done()
       reject = ->
-        expect(true).to.equal(true)
+        assert.ok(true)
         done()
 
       @instance.then(resolve, reject)

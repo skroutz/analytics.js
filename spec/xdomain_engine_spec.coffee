@@ -72,10 +72,10 @@ describe 'XDomain Session Retrieval Engine', ->
 
     it 'triggers success callback argument on @promise.resolve()', (done)->
       success = ->
-        expect(true).to.equal(true)
+        assert.ok(true)
         done()
       fail = ->
-        expect(false).to.equal(true)
+        assert.fail()
         done()
 
       @instance.then(success, fail)
@@ -83,10 +83,10 @@ describe 'XDomain Session Retrieval Engine', ->
 
     it 'triggers fail callback argument on @promise.reject()', (done)->
       success = ->
-        expect(false).to.equal(true)
+        assert.fail()
         done()
       fail = ->
-        expect(true).to.equal(true)
+        assert.ok(true)
         done()
 
       @instance.then(success, fail)

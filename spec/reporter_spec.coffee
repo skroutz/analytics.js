@@ -111,10 +111,10 @@ describe 'Reporter', ->
       it 'calls success argument when transport_ready succeeds', (done)->
         @subject = new @reporter()
         @success = ->
-          expect(true).to.equal(true)
+          assert.ok(true)
           done()
         @failure = ->
-          expect(true).to.equal(false)
+          assert.fail()
           done()
         res = @subject.then(@success, @failure)
         @checkImage_promise.resolve()
@@ -122,10 +122,10 @@ describe 'Reporter', ->
       it 'calls error argument when transport_ready fails', (done)->
         @subject = new @reporter()
         @success = ->
-          expect(true).to.equal(false)
+          assert.fail()
           done()
         @failure = ->
-          expect(true).to.equal(true)
+          assert.ok(true)
           done()
         res = @subject.then(@success, @failure)
         @checkImage_promise.reject()
