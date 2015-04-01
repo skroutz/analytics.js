@@ -166,6 +166,25 @@ describe 'XDomain Session Retrieval Engine', ->
       it 'rejects @promise and passes error message', ->
         expect(@reject_spy).to.be.calledWith 'Analytics_session does not exist'
 
+    context 'when the backend responds after the timeout', ->
+      beforeEach ->
+        @clock.tick @settings.xdomain_session_timeout + 100
+
+        @instance._onSocketMessage('any message', @settings.url.base)
+        return
+
+      it 'does not clear the timeout', ->
+        expect(@timeout_spy).to.not.be.called
+
+      it 'does not resolve @promise', ->
+        expect(@resolve_spy).to.not.be.called
+
+      it 'rejects @promise', ->
+        expect(@reject_spy).to.be.calledOnce
+
+      it 'rejects @promise with timeout error message', ->
+        expect(@reject_spy).to.be.calledWith 'XDomain retrieval of analytics_session timed out'
+
     context 'when backend does not respond', ->
       it 'does not clear the timeout', ->
         expect(@timeout_spy).to.not.be.called

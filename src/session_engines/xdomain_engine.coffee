@@ -21,6 +21,8 @@ define [
 
     _onSocketMessage: (analytics_session, origin)=>
       return unless origin is Settings.url.base
+      return unless @promise.state is 'pending'
+
       @timeout and clearTimeout(@timeout)
 
       if analytics_session is ''
