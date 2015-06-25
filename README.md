@@ -140,10 +140,13 @@ The above command is useful when in development and it will just:
 
 ## Authors
 
+- Dimitrios Zorbas (*[Zorbash](https://github.com/Zorbash)*)
+
+**Alumni**
+
 - Bill Trikalinos (*[billtrik](https://github.com/billtrik)*)
 - Chrisovalantis Kefalidis (*[cvkef](https://github.com/cvkef)*)
 - Fotos Georgiadis (*[fotos](https://github.com/fotos)*)
-- Dimitrios Zorbas (*[Zorbash](https://github.com/Zorbash)*)
 
 ## License
 
