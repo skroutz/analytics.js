@@ -172,7 +172,7 @@ module.exports = (grunt) ->
 
         options:
           banner: '/*! <%= pkg.name %> v<%= pkg.version %> \n ' +
-            '(c) 2014, <%= grunt.template.today("yyyy") %> <%= pkg.company %> \n ' +
+            '(c) <%= grunt.template.today("yyyy") %> <%= pkg.company %> \n ' +
             '<%= pkg.license %> */\n'
 
     concat:
