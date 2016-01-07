@@ -2420,11 +2420,6 @@
         }
       }
     },
-    "grunt-contrib-environment": {
-      "version": "0.1.0",
-      "from": "https://registry.npmjs.org/grunt-contrib-environment/-/grunt-contrib-environment-0.1.0.tgz",
-      "resolved": "https://registry.npmjs.org/grunt-contrib-environment/-/grunt-contrib-environment-0.1.0.tgz"
-    },
     "grunt-contrib-uglify": {
       "version": "0.8.0",
       "from": "https://registry.npmjs.org/grunt-contrib-uglify/-/grunt-contrib-uglify-0.8.0.tgz",
@@ -2661,6 +2656,11 @@
           "resolved": "https://registry.npmjs.org/uri-path/-/uri-path-0.0.2.tgz"
         }
       }
+    },
+    "grunt-env": {
+      "version": "0.4.4",
+      "from": "grunt-env@>=0.4.4 <0.5.0",
+      "resolved": "https://registry.npmjs.org/grunt-env/-/grunt-env-0.4.4.tgz"
     },
     "grunt-git-authors": {
       "version": "3.0.0",
