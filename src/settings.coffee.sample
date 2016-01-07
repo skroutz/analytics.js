@@ -17,7 +17,7 @@ define ->
       version: @@cookies.version
       analytics:
         name: '@@cookies.analytics.name'
-        duration: @@cookies.analytics.duration #In seconds: one week
+        duration: @@cookies.analytics.duration
     url:
       base: '@@base'
       analytics_session:
