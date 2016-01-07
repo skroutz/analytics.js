@@ -1,5 +1,17 @@
 module.exports = (grunt) ->
-  ENV = grunt.option("env") or process.env.GRUNT_ENV or 'development'
+  ENV = grunt.option('env') or process.env.GRUNT_ENV or 'development'
+  ASSETS_MAP_FILE = 'compiled/assets.json'
+
+  assets_map = (asset) ->
+    unless grunt.file.exists(ASSETS_MAP_FILE)
+      throw "Error: #{ASSETS_MAP_FILE} not found. [#{asset}]"
+
+    map = grunt.file.readJSON(ASSETS_MAP_FILE)
+
+    if map[asset]?
+      return map[asset]
+    else
+      throw "Error: asset mapping <#{asset}> does not exist."
 
   grunt.initConfig
     env: ENV
@@ -30,7 +42,7 @@ module.exports = (grunt) ->
 
     hash:
       options:
-        mapping: 'compiled/assets.json'
+        mapping: ASSETS_MAP_FILE
         srcBasePath: 'dist/'
         destBasePath: 'dist/'
         hashFunction: (source, encoding) -> # default is md5
@@ -38,6 +50,12 @@ module.exports = (grunt) ->
 
       payload:
         src: 'dist/js/payload.js'
+        dest: 'dist/js'
+
+      easyxdm:
+        options:
+          flatten: true
+        src: 'bower_components/easyxdm/work/easyXDM.min.js'
         dest: 'dist/js'
 
     replace:
@@ -59,7 +77,7 @@ module.exports = (grunt) ->
             {
               match: 'payload_hash'
               replacement: ->
-                filename = grunt.file.readJSON('compiled/assets.json')['js/payload.js']
+                filename = assets_map('js/payload.js')
                 if grunt.config('env') isnt 'development'
                   filename = filename.replace('.js', '.min.js')
                 filename
@@ -74,6 +92,27 @@ module.exports = (grunt) ->
         files: [
           src: 'compiled/loader.js'
           dest: 'dist/analytics.js'
+        ]
+
+      vendor_loader:
+        options:
+          patterns: [
+            {
+              match: 'vendor_hash'
+              replacement: ->
+                'js/' + (assets_map('easyXDM.min.js').replace('.min', '')
+                  .replace('.js', '.min.js'))
+            }
+            {
+              match: 'base'
+              replacement: ->
+                grunt.config('env_settings').base
+            }
+          ]
+
+        files: [
+          src: 'compiled/vendor_loader.js'
+          dest: 'dist/vendor.js'
         ]
 
     bump:
@@ -140,6 +179,10 @@ module.exports = (grunt) ->
         src: ['src/loader.coffee']
         dest: 'compiled/loader.js'
 
+      vendor_loader:
+        src: ['src/vendor_loader.coffee']
+        dest: 'compiled/vendor_loader.js'
+
     uglify:
       options:
         mangle: false
@@ -174,6 +217,10 @@ module.exports = (grunt) ->
           banner: '/*! <%= pkg.name %> v<%= pkg.version %> \n ' +
             '(c) <%= grunt.template.today("yyyy") %> <%= pkg.company %> \n ' +
             '<%= pkg.license %> */\n'
+
+      vendor_loader:
+        files:
+          'dist/vendor.min.js': 'dist/vendor.js'
 
     concat:
       options:
@@ -219,6 +266,15 @@ module.exports = (grunt) ->
           stdout: true
 
         command: 'cd bower_components/easyxdm/ && ant'
+
+      rename_easyxdm_cache:
+        options:
+          stdout: true
+
+        command: ->
+          if grunt.file.exists(ASSETS_MAP_FILE)
+            'cd dist/js/ && mv ' + assets_map('easyXDM.min.js') + ' ' +
+            assets_map('easyXDM.min.js').replace('.min', '').replace('.js', '.min.js')
 
       cleanup:
         options:
@@ -286,12 +342,25 @@ module.exports = (grunt) ->
 
   #CREATE DIST ASSETS
   grunt.registerTask 'build_dist', [
-    'vendor_assets'
     'build_payload'
     'build_loader'
+    'build_vendor'
     'uglify'
   ]
-  grunt.registerTask 'vendor_assets', ['copy:easyxdm_dist']
+
+  #BUILD VENDOR
+  grunt.registerTask 'build_vendor', [
+    'build_vendor_assets'
+    'build_vendor_loader'
+  ]
+  grunt.registerTask 'build_vendor_assets', [
+    'hash:easyxdm'
+    'shell:rename_easyxdm_cache'
+  ]
+  grunt.registerTask 'build_vendor_loader', [
+    'coffee:vendor_loader'
+    'replace:vendor_loader'
+  ]
 
   #ON DEPLOY
   grunt.registerTask 'build', [
