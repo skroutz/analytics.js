@@ -2,19 +2,21 @@ module.exports = (grunt) ->
   ENV = grunt.option("env") or process.env.GRUNT_ENV or 'development'
 
   grunt.initConfig
-    env: ENV
+    environment: ENV
     pkg: grunt.file.readJSON('package.json')
     clean:
       payload:
         src: ['dist/js/payload*']
 
-    environment:
-      src: './config/settings/'
-      default: 'default'
-      format: 'yaml'
-      active: 'development'
-      configVariable: 'env_settings'
-      envFilePath: '.environment'
+    env:
+      development:
+        env_settings: ->
+          grunt.config('env_settings', grunt.util._.merge({}, grunt.file.readYAML('./config/settings/default.yml'),
+                                                              grunt.file.readYAML('./config/settings/development.yml')))
+      production:
+        env_settings: ->
+          grunt.config('env_settings', grunt.util._.merge({}, grunt.file.readYAML('./config/settings/default.yml'),
+                                                              grunt.file.readYAML('./config/settings/production.yml')))
 
     compress:
       dist:
@@ -60,7 +62,7 @@ module.exports = (grunt) ->
               match: 'payload_hash'
               replacement: ->
                 filename = grunt.file.readJSON('compiled/assets.json')['js/payload.js']
-                if grunt.config('env') isnt 'development'
+                if grunt.config('environment') isnt 'development'
                   filename = filename.replace('.js', '.min.js')
                 filename
             }
@@ -260,7 +262,7 @@ module.exports = (grunt) ->
     'shell:build_easyxdm'
   ]
   grunt.registerTask 'create_env_settings', [
-    'environment:' + ENV
+    'env:' + ENV
     'replace:settings'
   ]
 
