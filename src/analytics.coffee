@@ -1,8 +1,8 @@
 define [
+  'session'
   'actions_manager'
-], (ActionsManager)->
+], (Session, ActionsManager) ->
   class Analytics
     constructor: ->
-      @manager = new ActionsManager()
-
-  return Analytics
+      new Session().run().then (session) ->
+        new ActionsManager(session).run()
