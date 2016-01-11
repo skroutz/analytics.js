@@ -33,10 +33,10 @@ session_creation_tests = (cookies_enabled = false, cookie_exists = false)->
     @init2()
     expect(@instance.analytics_session).to.equal @analytics_session
 
-  it 'it resolves promise with that value', (done)->
+  it 'it resolves promise with that value', (done) ->
     @init2()
-    @instance.then (sess_id)=>
-      expect(sess_id).to.equal @analytics_session
+    @instance.then (session) =>
+      expect(session.analytics_session).to.equal @analytics_session
       done()
 
 session_retrieval_tests = (cookies_enabled = false, cookie_exists = false)->
@@ -51,14 +51,6 @@ session_retrieval_tests = (cookies_enabled = false, cookie_exists = false)->
   it 'passes shop_code to Xdomain engine', ->
     @init()
     expect(@xdomain_spy.args[0][1]).to.equal @shop_code
-
-  it 'passes yogurt_session to Xdomain engine', ->
-    @init()
-    expect(@xdomain_spy.args[0][2]).to.equal @yogurt_session
-
-  it 'passes yogurt_user_id to Xdomain engine', ->
-    @init()
-    expect(@xdomain_spy.args[0][3]).to.equal @yogurt_user_id
 
   it 'tries to extract analytics_session from GetParam engine', ->
     @init()
@@ -89,8 +81,8 @@ session_retrieval_tests = (cookies_enabled = false, cookie_exists = false)->
       @init()
       @xdomain_promise.resolve('asd')
       @get_param_promise.resolve('dsa')
-      @instance.then (sess_id)=>
-        expect(sess_id).to.equal 'asd'
+      @instance.then (session) =>
+        expect(session.analytics_session).to.equal 'asd'
         done()
 
   context 'when both engines reject', ->
@@ -123,7 +115,7 @@ inside_yogurt_tests = (cookies_enabled = false)->
       beforeEach ->
         @biskoto.set @cookie_name, {version:1, analytics_session: 'asd'}, @cookie_options
 
-      it 'intializes @analytics_session to the first-party cookie\'s value', ->
+      it 'initializes @analytics_session to the first-party cookie\'s value', ->
         @init()
         expect(@instance.analytics_session).to.equal 'asd'
 
@@ -163,8 +155,8 @@ outside_yogurt_tests = (cookies_enabled = false)->
 
       it 'resolves the @promise with the "analytics_session" found in the cookie', (done)->
         @init()
-        @instance.then (sess_id)->
-          expect(sess_id).to.equal 'asd'
+        @instance.then (session) ->
+          expect(session.analytics_session).to.equal 'asd'
           done()
 
       it 'does not use the XDomain engine to retrieve the "analytics_session"', ->
@@ -221,10 +213,10 @@ describe 'Session', ->
         'biskoto'
         'settings'
       ], (Session, Promise, Biskoto, Settings)=>
+        @session = Session
         @promise  = Promise
         @biskoto  = Biskoto
         @settings = Settings
-        @session = Session
         done()
 
   after ->
@@ -247,42 +239,9 @@ describe 'Session', ->
       @instance = new @session()
       expect(@instance.promise).to.be.an.instanceof @promise
 
-    describe 'initialization parameters', ->
-      beforeEach ->
-        @params = {}
-
-      context 'when yogurt_session is passed', ->
-        it 'assigns the value to @yogurt_session', ->
-          @params.yogurt_session = @yogurt_session
-          @instance = new @session(@type_create, @params)
-          expect(@instance.yogurt_session).to.equal @yogurt_session
-
-      context 'when yogurt_session is not passed', ->
-        it 'assigns null to @yogurt_session', ->
-          @instance = new @session(@type_create, @params)
-          expect(@instance.yogurt_session).to.equal null
-
-      context 'when yogurt_user_id is passed', ->
-        it 'assigns the value to @yogurt_user_id', ->
-          @params.yogurt_user_id = @yogurt_user_id
-          @instance = new @session(@type_create, @params)
-          expect(@instance.yogurt_user_id).to.equal @yogurt_user_id
-
-      context 'when yogurt_user_id is not passed', ->
-        it 'assigns "" to @yogurt_user_id', ->
-          @instance = new @session(@type_create, @params)
-          expect(@instance.yogurt_user_id).to.equal null
-
-      context 'when shop_code is passed', ->
-        it 'assigns the value to @shop_code', ->
-          @params.shop_code = @shop_code
-          @instance = new @session(@type_create, @params)
-          expect(@instance.shop_code).to.equal @shop_code
-
-      context 'when shop_code is not passed', ->
-        it 'assigns null to @shop_code', ->
-          @instance = new @session(@type_create, @params)
-          expect(@instance.shop_code).to.equal null
+  describe '#run', ->
+    it 'responds to #run', ->
+      expect(new @session()).to.respondTo('run')
 
   describe '#then', ->
     beforeEach ->
@@ -330,14 +289,16 @@ describe 'Session', ->
       @settings.cookies.first_party_enabled = @prev_cookies_enabled
       @settings.cookies.version = @prev_cookies_version
 
-    context 'when we are inside yogurt (type === "create")', ->
+    context 'on session create', ->
       beforeEach ->
         @parsed_settings =
           yogurt_user_id: @yogurt_user_id
           yogurt_session: @yogurt_session
           shop_code: @shop_code
         @type = @type_create
-        @init = => @instance = new @session(@type , @parsed_settings)
+        @init = =>
+          sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id)
+          @instance = new @session().run()
 
       context 'when first-party cookies are enabled', ->
         beforeEach ->
@@ -351,16 +312,16 @@ describe 'Session', ->
 
         inside_yogurt_tests(false)
 
-    context 'when we are outside yogurt (type === "connect")', ->
+    context 'on session connect', ->
       beforeEach ->
-        @yogurt_session = null
-        @yogurt_user_id = null
         @parsed_settings =
           yogurt_user_id: @yogurt_user_id
           yogurt_session: @yogurt_session
           shop_code: @shop_code
         @type = @type_connect
-        @init = => @instance = new @session(@type, @parsed_settings)
+        @init = =>
+          sa('session', 'connect', @shop_code)
+          @instance = new @session().run()
 
       context 'when first-party cookies are enabled', ->
         beforeEach ->

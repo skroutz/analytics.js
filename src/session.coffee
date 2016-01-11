@@ -1,28 +1,36 @@
 define [
   'settings'
   'promise'
+  'runnable'
   'biskoto'
   'session_engines/get_param_engine'
   'session_engines/xdomain_engine'
-], (Settings, Promise, Biskoto, GetParamEngine, XDomainEngine)->
+], (Settings, Promise, Runnable, Biskoto, GetParamEngine, XDomainEngine) ->
   class Session
-    constructor: (type, data = {})->
-      @promise = new Promise()
+    Session::[key] = method for key, method of Runnable
 
+    constructor: ->
+      @promise = new Promise()
       @_cleanUpCookies()
       @analytics_session = @_getCookieAnalyticsSession()
 
-      @shop_code = data.shop_code or null
-      @yogurt_session = data.yogurt_session or null
-      @yogurt_user_id = data.yogurt_user_id or null
+    then: (success, fail) -> @promise.then(success, fail)
 
-      if type is 'connect' and @analytics_session
-        @promise.resolve @analytics_session
-      else
-        # Always try to create third party cookie in 'create'
-        @_extractAnalyticsSession(type, @shop_code, @yogurt_session, @yogurt_user_id)
+    _commands:
+      session:
+        create: (shop_code, yogurt_session, yogurt_user_id) ->
+          @shop_code = shop_code
+          @yogurt_session = yogurt_session
+          @yogurt_user_id = yogurt_user_id
 
-    then: (success, fail)-> @promise.then(success, fail)
+          @_extractAnalyticsSession('create', shop_code, yogurt_session, yogurt_user_id)
+
+        connect: (shop_code)->
+          @shop_code = shop_code
+
+          return @promise.resolve(@) if @analytics_session
+
+          @_extractAnalyticsSession('connect', shop_code)
 
     _cleanUpCookies: ->
       cookie_settings = Settings.cookies
@@ -37,11 +45,11 @@ define [
       data = Biskoto.get(Settings.cookies.analytics.name)
       if data then data.analytics_session else null
 
-    _extractAnalyticsSession: (type, shop_code, yogurt_session, yogurt_user_id)->
+    _extractAnalyticsSession: (type, shop_code, yogurt_session, yogurt_user_id) ->
       Promise.any([
         (new XDomainEngine(type, shop_code, yogurt_session, yogurt_user_id))
         (new GetParamEngine())
-      ]).then @_onSessionSuccess, @_onSessionError
+      ]).then(@_onSessionSuccess, @_onSessionError)
 
     _onSessionError: => @promise.reject()
 
@@ -49,11 +57,11 @@ define [
       if analytics_session = results[0] or results[1]
         @_createFirstPartyCookie(analytics_session)
         @analytics_session = analytics_session
-        @promise.resolve analytics_session
+        @promise.resolve(@)
       else
         @promise.reject()
 
-    _createFirstPartyCookie: (analytics_session)->
+    _createFirstPartyCookie: (analytics_session) ->
       return unless Settings.cookies.first_party_enabled
 
       cookie_data =
