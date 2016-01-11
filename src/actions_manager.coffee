@@ -69,7 +69,9 @@ define [
         ## TODO: THROW ERROR ON REJECT
         @reporter.sendBeacon(url, payload).then => cb and cb(analytics_session)
 
-    _redirect: (url, analytics_session) ->
+    _redirect: (url, _analytics_session) ->
+      # TODO: Find a way to safely append analytics session as query param
+      # for GetParamEngine to work, see: 9dd1d57a
       Settings.redirectTo url
 
     # TODO: implement multiple actions per beacon maybe??
