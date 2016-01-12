@@ -37,6 +37,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      // In development, change the preprocessor of src/**/*.coffee to ['coffee'] for source maps
       'src/**/*.coffee'  : ['coverage'],
       'spec/**/*.coffee' : ['coffee'],
       '**/*.html'        : ['html2js'],
@@ -47,7 +48,7 @@ module.exports = function(config) {
       // options passed to the coffee compiler
       options: {
         bare: true,
-        sourceMap: false
+        sourceMap: true
       },
     },
 
