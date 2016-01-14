@@ -294,10 +294,6 @@ module.exports = (grunt) ->
     'start_test_server'
     'watch'
   ]
-  grunt.registerTask 'test', [
-    'copy:ymls'
-    'create_env_settings'
-    'karma:single'
-  ]
+  grunt.registerTask 'test', ['karma:single']
 
   return
