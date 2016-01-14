@@ -15,9 +15,9 @@ describe 'Settings', ->
         .to.have.property('redirectTo')
         .that.is.an('function')
 
-    it 'has property .actions_queue', ->
+    it 'has property .commands_queue', ->
       expect(@settings)
-        .to.have.property('actions_queue')
+        .to.have.property('commands_queue')
         .that.is.an('array')
 
     it 'has property .iframe_message', ->

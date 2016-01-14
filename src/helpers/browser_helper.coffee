@@ -24,10 +24,10 @@ define ['settings', 'promise'], (Settings, Promise)->
     @_thirdPartyCookiesEnabled: ->
       promise = new Promise()
 
-      BrowserHelper._setUpCallbacks Settings.actions_queue, promise
+      BrowserHelper._setUpCallbacks Settings.commands_queue, promise
       BrowserHelper._createScript Settings.url.utils.third_party_step1()
 
-      promise.then -> BrowserHelper._cleanUpCallbacks Settings.actions_queue
+      promise.then -> BrowserHelper._cleanUpCallbacks Settings.commands_queue
 
     @checkCookies: ->
       promise = new Promise()
