@@ -218,7 +218,7 @@ module.exports = (grunt) ->
       ymls:
         expand: true
         cwd: 'config/settings'
-        src: ['*.yml.sample']
+        src: ['{testing,development}.yml.sample']
         dest: 'config/settings'
         ext: '.yml'
 
@@ -281,6 +281,7 @@ module.exports = (grunt) ->
 
   #ON DEPLOY
   grunt.registerTask 'build', [
+    'copy:ymls'
     'create_env_settings'
     'bower_install'
     'build_dist'
