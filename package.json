@@ -8,7 +8,7 @@
     "build": "npm install && grunt build",
     "cleanup": "rm -rf node_modules bower_components dist compiled src/settings.coffee",
     "dev": "grunt",
-    "test": "grunt test"
+    "test": "grunt build && grunt test"
   },
   "repository": {
     "type": "git",
