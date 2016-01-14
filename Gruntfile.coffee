@@ -208,18 +208,6 @@ module.exports = (grunt) ->
           cleanBowerDir: false
 
     shell:
-      fix_easyxdm_build_number:
-        options:
-          stdout: true
-
-        command: 'echo "build.number=0" > bower_components/easyxdm/build.number'
-
-      build_easyxdm:
-        options:
-          stdout: true
-
-        command: 'cd bower_components/easyxdm/ && ant'
-
       cleanup:
         options:
           stdout: true
@@ -236,13 +224,13 @@ module.exports = (grunt) ->
 
       easyxdm_module:
         expand: true
-        cwd: 'bower_components/easyxdm/work'
+        cwd: 'vendor'
         src: ['easyXDM.js']
         dest: 'compiled/vendor'
 
       easyxdm_dist:
         expand: true
-        cwd: 'bower_components/easyxdm/work'
+        cwd: 'vendor'
         src: ['easyXDM.min.js']
         dest: 'dist/js'
 
@@ -256,8 +244,6 @@ module.exports = (grunt) ->
   #BOWER TASKS
   grunt.registerTask 'bower_install', [
     'bower:install'
-    'shell:fix_easyxdm_build_number'
-    'shell:build_easyxdm'
   ]
   grunt.registerTask 'create_env_settings', [
     'environment:' + ENV
