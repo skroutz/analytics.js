@@ -3,7 +3,7 @@
   "description": "Analytics Client",
   "company": "Skroutz S.A.",
   "license": "MIT",
-  "version": "0.0.1-1",
+  "version": "0.1.0",
   "scripts": {
     "build": "npm install && grunt build",
     "cleanup": "rm -rf node_modules bower_components dist compiled src/settings.coffee",
