@@ -60,7 +60,7 @@ define ->
     return
   Settings.window.sa.q = Settings.window.sa.q or []
 
-  Settings.actions_queue = Settings.window.sa.q
+  Settings.commands_queue = Settings.window.sa.q
   Settings.url.current   = Settings.window.location.href
 
   return Settings

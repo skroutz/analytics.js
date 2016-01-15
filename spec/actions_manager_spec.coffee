@@ -23,17 +23,17 @@ api_session_promise_tests = ->
 
 action_reporting_tests = ->
   it 'reports an action', ->
-    @init2()
+    @run()
     expect(@sendbeacon_spy).to.be.called
 
   it 'reports an action to proper url', ->
-    @init2()
+    @run()
     url = @settings.url.beacon(@analytics_session)
     expect(@sendbeacon_spy).to.be.calledWith url
 
   describe 'format of data reported', ->
     beforeEach ->
-      @init2()
+      @run()
       @payload = @sendbeacon_spy.args[0][1]
 
     it 'has url, shop_code and actions keys', ->
@@ -73,30 +73,7 @@ describe 'ActionsManager', ->
         @settings.window.sa.q.push(arguments)
       @settings.window.sa.q = []
 
-    @init_session = (resolve = true)->
-      @instance.session =
-        shop_code: 'asd'
-
-      if resolve
-        @instance.promise.resolve('asd')
-      else
-        @instance.promise.reject('asd')
-      return
-
     require ['promise'], (Promise) =>
-      # Mock Session
-      window.__requirejs__.clearRequireState()
-      requirejs.undef 'session'
-      @session_promise = new Promise()
-      @session_mock = (type, data = {})->
-        @shop_code = data.shop_code or null
-        return
-      @session_mock::then = (success, error)=>
-        @session_promise.then(success, error)
-
-      @session_spy = sinon.spy @, 'session_mock'
-      define 'session', [], => @session_mock
-
       # Mock Reporter
       window.__requirejs__.clearRequireState()
       requirejs.undef 'reporter'
@@ -110,21 +87,24 @@ describe 'ActionsManager', ->
       define 'reporter', [], => @reporter_mock
 
       require [
+        'session'
         'actions_manager'
         'settings'
         'reporter'
         'promise'
-      ], (ActionsManager, Settings, Reporter, Promise) =>
-        @promise = Promise
+      ], (Session, ActionsManager, Settings, Reporter, Promise) =>
+        @session = new Session()
+        @session.analytics_session = @analytics_session
+        @session.shop_code = @shop_code
+        @actions_manager = ActionsManager
         @settings = Settings
         @reporter = Reporter
-        @subject = ActionsManager
-        @run_spy = sinon.spy(@subject::, 'run')
+        @promise = Promise
+        @run_spy = sinon.spy(@actions_manager::, 'run')
+
         done()
 
-  after ->
-    requirejs.undef 'session'
-    window.__requirejs__.clearRequireState()
+  after -> window.__requirejs__.clearRequireState()
 
   beforeEach ->
     @old_redirect = @settings.redirectTo
@@ -132,7 +112,7 @@ describe 'ActionsManager', ->
     @settings.redirectTo = @redirect_stub
     @clock = sinon.useFakeTimers()
 
-    @init = => @instance = new @subject()
+    @initializeSubject = => @subject = new @actions_manager(@session)
 
   afterEach ->
     @run_spy.reset()
@@ -143,43 +123,30 @@ describe 'ActionsManager', ->
     # Reset mocks
     @sendbeacon_promise = new @promise()
     @sendbeacon_spy.reset()
-    @session_promise = new @promise()
-    @session_spy.reset()
 
   describe '.constructor', ->
     beforeEach ->
-      @init = =>
-        sa('ecommerce', 'addOrder', 'data1')
-        sa('ecommerce', 'addItem', 'data2')
-        sa('ecommerce', 'addItem', 'data3')
-        @instance = new @subject()
+      @subject = new @actions_manager(@session)
 
     it 'creates a reporter', ->
-      @init()
-      expect(@instance.reporter).to.be.instanceof @reporter
+      expect(@subject.reporter).to.be.instanceof @reporter
 
-    it 'creates a promise to handle session retrieval', ->
-      @init()
-      expect(@instance.promise).to.be.instanceof @promise
+    context 'when commands exist', ->
+      beforeEach ->
+        sa('ecommerce', 'addOrder', 'order_data')
+        sa('ecommerce', 'addItem', 'item_data_1')
+        sa('ecommerce', 'addItem', 'item_data_2')
 
-    it 'consumes all commands already passed to window.sa.q', ->
-      q_ref = @settings.window.sa.q
-      @init()
-      expect(q_ref).to.have.length 0
-      q_ref = null
-
-    it 'replaces window.sa.q with internal method', ->
-      @init()
-      expect(@settings.window.sa).to.equal @instance.run
+      it 'consumes all commands already declared', ->
+        @subject.run()
+        expect(@settings.window.sa.q).to.have.length 0
 
   describe 'Automatic PageViews', ->
     beforeEach ->
       @timeout_spy = sinon.spy @settings.window, 'setTimeout'
       @cleartimeout_spy = sinon.spy @settings.window, 'clearTimeout'
       @old_setting = @settings.send_auto_pageview
-      @init = =>
-        @instance = new @subject()
-        @init_session()
+      @initializeSubject = => @subject = new @actions_manager(@session)
 
     afterEach ->
       @settings.send_auto_pageview = @old_setting
@@ -191,11 +158,11 @@ describe 'ActionsManager', ->
         @settings.send_auto_pageview = false
 
       it 'does not set a timeout', ->
-        @init()
+        @initializeSubject()
         expect(@timeout_spy).to.not.be.called
 
       it 'does not send a pageview', ->
-        @init()
+        @initializeSubject()
         @clock.tick @settings.auto_pageview_timeout + 100
 
         expect(@sendbeacon_spy).to.not.be.called
@@ -205,20 +172,19 @@ describe 'ActionsManager', ->
         @settings.send_auto_pageview = true
 
       it 'sets a timeout', ->
-        @init()
+        @initializeSubject()
         expect(@timeout_spy).to.be.calledOnce
 
       context 'when no other actions are declared', ->
         context 'before timeout expires', ->
-          beforeEach ->
-            @init()
+          beforeEach -> @initializeSubject()
 
           it 'does not send a pageview', ->
             expect(@sendbeacon_spy).to.not.be.called
 
         context 'after timeout expires', ->
           beforeEach ->
-            @init()
+            @initializeSubject()
             @clock.tick @settings.auto_pageview_timeout + 100
 
           it 'sends an action', ->
@@ -240,21 +206,21 @@ describe 'ActionsManager', ->
       context 'when another action is created', ->
         context 'before timeout expires', ->
           beforeEach ->
-            @init()
-            sa('ecommerce', 'addOrder', 'data1')
+            sa('ecommerce', 'addOrder', 'order_data')
+            @initializeSubject()
+            @subject.run()
 
           it 'clears the AutoPageView timeout', ->
-            expect(@cleartimeout_spy).to.be.calledWith @instance.pageview_timeout
+            expect(@cleartimeout_spy).to.be.calledWith @subject.pageview_timeout
 
           it 'only sends one action', ->
             expect(@sendbeacon_spy).to.be.calledOnce
 
           it 'sends the newly created action', ->
-            action_data = @sendbeacon_spy.args[0][1].actions[0]
-            expect(action_data).to.contain
+            expect(@sendbeacon_spy.args[0][1].actions[0]).to.contain
               category: 'ecommerce'
               type: 'addOrder'
-              data: 'data1'
+              data: 'order_data'
 
           it 'does not send a PageView action', ->
             action_data = @sendbeacon_spy.args[0][1].actions[0]
@@ -264,117 +230,32 @@ describe 'ActionsManager', ->
 
         context 'after timeout expires', ->
           beforeEach ->
-            @init()
+            @initializeSubject()
             @clock.tick @settings.auto_pageview_timeout + 100
-            sa('ecommerce', 'addOrder', 'data1')
+            sa('ecommerce', 'addOrder', 'order_data')
+            @subject.run()
 
           it 'clears the AutoPageView timeout', ->
-            expect(@cleartimeout_spy).to.be.calledWith @instance.pageview_timeout
+            expect(@cleartimeout_spy).to.be.calledWith @subject.pageview_timeout
 
           it 'sends both actions', ->
             expect(@sendbeacon_spy).to.be.calledTwice
 
-  describe 'Replacement of public endpoint on library load', ->
-    beforeEach ->
-      @init = => @instance = new @subject()
+  describe '#run', ->
+    beforeEach -> @initializeSubject()
 
     context 'when API calls are made before library load', ->
       beforeEach ->
-        sa('ecommerce', 'addOrder', 'data1')
-        sa('ecommerce', 'addItem', 'data2')
-        sa('ecommerce', 'addItem', 'data3')
-        @init()
-        return
+        sa('unknown-category', 'unknown-command', 'data')
+        sa('ecommerce', 'addOrder', 'order_data')
+        sa('ecommerce', 'addItem', 'item_data_1')
+        sa('ecommerce', 'addItem', 'item_data_2')
+        @subject.run()
 
-      it 'executes every API call', ->
-        expect(@run_spy).to.be.calledThrice
+      it 'executes every recognized command', ->
+        expect(@sendbeacon_spy).to.be.calledThrice
 
-    context 'when API calls are made after library load', ->
-      beforeEach ->
-        @init()
-        sa('ecommerce', 'addOrder', 'data1')
-        sa('ecommerce', 'addItem', 'data2')
-        sa('ecommerce', 'addItem', 'data3')
-        return
-
-      it 'executes every API call', ->
-        expect(@run_spy).to.be.calledThrice
-
-  describe 'Synchronization with session retrieval', ->
-    beforeEach ->
-      sa('ecommerce', 'addOrder', 'data1')
-      @init()
-
-    context 'when session retrieval is in progress', ->
-      it 'does not report any actions', ->
-        expect(@sendbeacon_spy).to.not.be.called
-
-    context 'when session retrieval succeeds', ->
-      beforeEach ->
-        @init_session()
-
-      it 'reports actions', ->
-        expect(@sendbeacon_spy).to.be.called
-
-    context 'when session retrieval rejects', ->
-      beforeEach ->
-        @init_session(false)
-
-      it 'does not report any actions', ->
-        expect(@sendbeacon_spy).to.not.be.called
-
-  describe 'API actions', ->
-    describe 'session', ->
-      beforeEach ->
-        @category = 'session'
-        @init2 = ->
-          sa(@category, @type, @shop_code, @yogurt_session, @yogurt_user_id)
-          @init()
-
-      describe 'create', ->
-        beforeEach ->
-          @type = 'create'
-          @init2()
-
-        it 'creates a new session', ->
-          expect(@session_mock).to.be.calledWithNew
-
-        it 'creates a session with type and passes shop_code, yogurt_session and yogurt_user_id', ->
-          expect(@session_mock).to.be.calledWith @type,
-            shop_code: @shop_code
-            yogurt_session: @yogurt_session
-            yogurt_user_id: @yogurt_user_id
-
-        it 'creates only one session', ->
-          @init2 = ->
-            sa(@category, @type, @shop_code, @yogurt_session, @yogurt_user_id)
-            sa(@category, @type, @shop_code, @yogurt_session, @yogurt_user_id)
-            @init()
-            expect(@session_mock).to.be.calledOnce
-
-        api_session_promise_tests()
-
-      describe 'connect', ->
-        beforeEach ->
-          @type = 'connect'
-          @init2()
-
-        it 'creates a new session', ->
-          expect(@session_mock).to.be.calledWithNew
-
-        it 'creates a session with type and passes shop_code', ->
-          expect(@session_mock).to.be.calledWith @type,
-            shop_code: @shop_code
-
-        it 'creates only one session', ->
-          @init2 = ->
-            sa(@category, @type, @shop_code, @yogurt_session, @yogurt_user_id)
-            sa(@category, @type, @shop_code, @yogurt_session, @yogurt_user_id)
-            @init()
-          expect(@session_mock).to.be.calledOnce
-
-        api_session_promise_tests()
-
+  describe 'Commands', ->
     describe 'yogurt', ->
       beforeEach ->
         @category = 'yogurt'
@@ -382,22 +263,19 @@ describe 'ActionsManager', ->
 
         @redirect_url = 'http://redirect_url'
 
-        @init2 = ->
-          sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id)
-          sa(@category, @type, @data, @redirect_url)
-          @init()
-          @session_promise.resolve(@analytics_session)
-          return
+        @run = ->
+          sa(@category, @type, @data, @redirect_url, @redirect)
+          @initializeSubject()
+          @subject.run()
 
       describe 'productClick', ->
-        beforeEach ->
-          @type = 'productClick'
+        beforeEach -> @type = 'productClick'
 
         action_reporting_tests()
 
         context 'when action is reported successfully', ->
           beforeEach ->
-            @init2()
+            @run()
             @sendbeacon_promise.resolve()
             return
 
@@ -409,7 +287,7 @@ describe 'ActionsManager', ->
 
         context 'when action fails to report', ->
           beforeEach ->
-            @init2()
+            @run()
             @sendbeacon_promise.reject()
             return
 
@@ -418,10 +296,8 @@ describe 'ActionsManager', ->
 
         context 'when an extra param with value false is passed on action', ->
           it 'does not redirect', ->
-            sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id)
-            sa(@category, @type, @data, @redirect_url, false)
-            @init()
-            @session_promise.resolve(@analytics_session)
+            @redirect = false
+            @run()
             @sendbeacon_promise.resolve()
 
             expect(@settings.redirectTo).to.not.be.called
@@ -431,11 +307,10 @@ describe 'ActionsManager', ->
         @category = 'ecommerce'
         @data = '{}'
 
-        @init2 = ->
-          sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id)
-          sa(@category, @type, @data, @redirect_url)
-          @init()
-          @session_promise.resolve(@analytics_session)
+        @run = ->
+          sa(@category, @type, @data)
+          @initializeSubject()
+          @subject.run()
           return
 
       describe 'addOrder', ->
@@ -446,32 +321,31 @@ describe 'ActionsManager', ->
 
         context 'when callback is supplied', ->
           beforeEach ->
-            @spy = sinon.spy()
+            @callback_spy = sinon.spy()
 
-            @init2 = ->
-              sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id)
-              sa(@category, @type, @data, @spy)
-              @init()
-              @session_promise.resolve(@analytics_session)
+            @run = ->
+              sa(@category, @type, @data, @callback_spy)
+              @initializeSubject()
+              @subject.run()
               return
 
           context 'when action is reported successfully', ->
             beforeEach ->
-              @init2()
+              @run()
               @sendbeacon_promise.resolve()
               return
-            it 'executes callback', ->
-              expect(@spy).to.be.called
 
+            it 'executes callback', ->
+              expect(@callback_spy).to.be.called
 
           context 'when action fails to report', ->
             beforeEach ->
-              @init2()
+              @run()
               @sendbeacon_promise.reject()
               return
 
             it 'does not execute callback', ->
-              expect(@spy).to.not.be.called
+              expect(@callback_spy).to.not.be.called
 
       describe 'addItem', ->
         beforeEach ->
@@ -481,48 +355,42 @@ describe 'ActionsManager', ->
 
         context 'when callback is supplied', ->
           beforeEach ->
-            @spy = sinon.spy()
+            @callback_spy = sinon.spy()
 
-            @init2 = ->
-              sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id)
-              sa(@category, @type, @data, @spy)
-              @init()
-              @session_promise.resolve(@analytics_session)
-              return
+            @run = ->
+              sa(@category, @type, @data, @callback_spy)
+              @initializeSubject()
+              @subject.run()
 
           context 'when action is reported successfully', ->
             beforeEach ->
-              @init2()
+              @run()
               @sendbeacon_promise.resolve()
               return
-            it 'executes callback', ->
-              expect(@spy).to.be.called
 
+            it 'executes callback', ->
+              expect(@callback_spy).to.be.called
 
           context 'when action fails to report', ->
             beforeEach ->
-              @init2()
+              @run()
               @sendbeacon_promise.reject()
               return
 
             it 'does not execute callback', ->
-              expect(@spy).to.not.be.called
+              expect(@callback_spy).to.not.be.called
 
     describe 'site', ->
       beforeEach ->
         @category = 'site'
         @data = '{}'
 
-        @init2 = ->
-          sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id)
+        @run = ->
           sa(@category, @type)
-          @init()
-          @session_promise.resolve(@analytics_session)
-          return
+          @initializeSubject()
+          @subject.run()
 
       describe 'sendPageView', ->
-        beforeEach ->
-          @type = 'sendPageView'
+        beforeEach -> @type = 'sendPageView'
 
         action_reporting_tests()
-
