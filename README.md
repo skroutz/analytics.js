@@ -41,10 +41,10 @@ You have two options to invoke a specific environment:
 
 > By default the project run in `development` environment.
 
-The available *environment* are:
+The available *environments* are:
 
  - development (**default**)
- - staging
+ - testing
  - production
 
 **`src/settings.coffee`**
