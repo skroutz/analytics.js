@@ -1,12 +1,14 @@
 define [
   'settings'
   'session'
+  'plugins_manager'
   'actions_manager'
-], (Settings, Session, ActionsManager) ->
+], (Settings, Session, PluginsManager, ActionsManager) ->
   class Analytics
     constructor: ->
       new Session().run().then (session) =>
-        @actions = new ActionsManager(session).run()
+        plugins_manager = new PluginsManager(session)
+        @actions = new ActionsManager(session, plugins_manager).run()
         @_live()
 
     ###

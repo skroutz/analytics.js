@@ -1,5 +1,11 @@
 describe 'Analytics', ->
   before (done) ->
+    # mock PluginsManager
+    requirejs.undef 'plugins_manager'
+    @PluginsManager_spy = sinon.spy()
+
+    define 'plugins_manager', => @PluginsManager_spy
+
     # mock ActionsManager
     requirejs.undef 'actions_manager'
     @ActionsManager_spy = sinon.spy()
@@ -10,14 +16,17 @@ describe 'Analytics', ->
       'settings',
       'analytics',
       'session',
-      'actions_manager'], (Settings, Analytics, Session, ActionsManager) =>
+      'plugins_manager'
+      'actions_manager'], (Settings, Analytics, Session, PluginsManager, ActionsManager) =>
       @Settings = Settings
       @Analytics = Analytics
       @Session = Session
+      @PluginsManager = PluginsManager
       @ActionsManager = ActionsManager
       done()
 
   after ->
+    requirejs.undef 'plugins_manager'
     requirejs.undef 'actions_manager'
     window.__requirejs__.clearRequireState()
 
@@ -39,11 +48,17 @@ describe 'Analytics', ->
       expect(@session_run_stub).to.be.calledOnce
 
     context 'when a Session is acquired', ->
+      it 'creates a PluginsManager using new', ->
+        expect(@PluginsManager).to.be.calledWithNew
+
+      it 'provides the session to the PluginsManager instance', ->
+        expect(@PluginsManager).to.be.calledWith(@session)
+
       it 'creates an ActionsManager using new', ->
         expect(@ActionsManager).to.be.calledWithNew
 
-      it 'provides the session to the ActionsManager instance', ->
-        expect(@ActionsManager).to.be.calledWith(@session)
+      it 'provides the session and PluginsManager instance to the ActionsManager instance', ->
+        expect(@ActionsManager).to.be.calledWith(@session, (new @PluginsManager))
 
       it 'calls ActionsManager#run', ->
         expect(@ActionsManager_spy::run).to.be.called
