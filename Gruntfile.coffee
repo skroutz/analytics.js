@@ -1,12 +1,23 @@
 module.exports = (grunt) ->
   ENV = grunt.option("env") or process.env.GRUNT_ENV or 'development'
 
+  plugins_hashes_mapping = ->
+    compiled_assets = grunt.file.readJSON('compiled/assets.json')
+    plugins = {}
+    for k,v of compiled_assets
+      if(/^js\/plugins\//.test(k))
+        plugin = if ENV isnt 'development' then v.replace('.js', '.min.js') else v
+        plugins["#{k.substring(k.lastIndexOf('js/plugins/')+11, k.lastIndexOf('.js'))}_hash"] = plugin
+    plugins
+
   grunt.initConfig
     env: ENV
     pkg: grunt.file.readJSON('package.json')
     clean:
       payload:
         src: ['dist/js/payload*']
+      plugins:
+        src: ['dist/js/plugins/*']
 
     environment:
       src: './config/settings/'
@@ -39,6 +50,10 @@ module.exports = (grunt) ->
       payload:
         src: 'dist/js/payload.js'
         dest: 'dist/js'
+
+      plugins:
+        src: 'dist/js/plugins/*'
+        dest: 'dist/js/plugins/'
 
     replace:
       settings:
@@ -74,6 +89,19 @@ module.exports = (grunt) ->
         files: [
           src: 'compiled/loader.js'
           dest: 'dist/analytics.js'
+        ]
+
+      plugins_settings:
+        options:
+          patterns: [
+            {
+              json: (done) -> done(plugins_hashes_mapping())
+            }
+          ]
+
+        files: [
+          src: 'dist/js/payload.js'
+          dest: 'dist/js/payload.js'
         ]
 
     bump:
@@ -122,6 +150,20 @@ module.exports = (grunt) ->
           'karma:unit:run'
         ]
 
+      plugins:
+        options:
+          livereload: true
+        files: [
+          'config/settings/*.yml'
+          'src/plugins/**/*.coffee'
+          'src/plugins_settings.coffee.sample'
+        ]
+        tasks: [
+          'create_env_settings'
+          'build_plugins'
+          'build_dist'
+        ]
+
     coffee:
       options:
         bare: true
@@ -132,6 +174,7 @@ module.exports = (grunt) ->
         src: [
           '**/*.coffee'
           '!loader.coffee'
+          '!plugins/*'
         ]
         dest: 'compiled/'
         ext: '.js'
@@ -139,6 +182,15 @@ module.exports = (grunt) ->
       loader:
         src: ['src/loader.coffee']
         dest: 'compiled/loader.js'
+
+      plugins:
+        options:
+          bare: false
+        expand: true
+        cwd: 'src/plugins'
+        src: '*.coffee'
+        dest: 'compiled/plugins/'
+        ext: '.js'
 
     uglify:
       options:
@@ -174,6 +226,19 @@ module.exports = (grunt) ->
           banner: '/*! <%= pkg.name %> v<%= pkg.version %> \n ' +
             '(c) <%= grunt.template.today("yyyy") %> <%= pkg.company %> \n ' +
             '<%= pkg.license %> */\n'
+
+      plugins:
+        files: [
+          expand: true
+          cwd: 'dist/js/plugins'
+          extDot: 'last'
+          src: [
+            '**/*.js'
+            '!**/*.min.js'
+          ]
+          dest: 'dist/js/plugins'
+          ext: '.min.js'
+        ]
 
     concat:
       options:
@@ -234,6 +299,12 @@ module.exports = (grunt) ->
         src: ['easyXDM.min.js']
         dest: 'dist/js'
 
+      plugins:
+        expand: true
+        cwd: 'compiled'
+        src: 'plugins/*'
+        dest: 'dist/js'
+
   require('load-grunt-tasks') grunt
   grunt.loadTasks 'tasks'
 
@@ -257,6 +328,7 @@ module.exports = (grunt) ->
     'coffee:payload'
     'optimize_rjs'
     'concat:payload'
+    'replace:plugins_settings'
   ]
   grunt.registerTask 'create_easyxdm_module', [
     'copy:easyxdm_module'
@@ -270,9 +342,17 @@ module.exports = (grunt) ->
     'replace:loader'
   ]
 
+  grunt.registerTask 'build_plugins', [
+    'clean:plugins'
+    'coffee:plugins'
+    'copy:plugins'
+    'hash:plugins'
+  ]
+
   #CREATE DIST ASSETS
   grunt.registerTask 'build_dist', [
     'vendor_assets'
+    'build_plugins'
     'build_payload'
     'build_loader'
     'uglify'
