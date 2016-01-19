@@ -88,14 +88,17 @@ describe 'ActionsManager', ->
 
       require [
         'session'
+        'plugins_manager'
         'actions_manager'
         'settings'
         'reporter'
         'promise'
-      ], (Session, ActionsManager, Settings, Reporter, Promise) =>
+      ], (Session, PluginsManager, ActionsManager, Settings, Reporter, Promise) =>
         @session = new Session()
         @session.analytics_session = @analytics_session
         @session.shop_code = @shop_code
+        @PluginsManager = PluginsManager
+        @plugins_manager = new @PluginsManager
         @actions_manager = ActionsManager
         @settings = Settings
         @reporter = Reporter
@@ -112,7 +115,7 @@ describe 'ActionsManager', ->
     @settings.redirectTo = @redirect_stub
     @clock = sinon.useFakeTimers()
 
-    @initializeSubject = => @subject = new @actions_manager(@session)
+    @initializeSubject = => @subject = new @actions_manager(@session, @plugins_manager)
 
   afterEach ->
     @run_spy.reset()
@@ -126,10 +129,13 @@ describe 'ActionsManager', ->
 
   describe '.constructor', ->
     beforeEach ->
-      @subject = new @actions_manager(@session)
+      @subject = new @actions_manager(@session, @plugins_manager)
 
     it 'creates a reporter', ->
       expect(@subject.reporter).to.be.instanceof @reporter
+
+    it 'caches plugins_manager instance', ->
+      expect(@subject.plugins_manager).to.be.instanceof @PluginsManager
 
     context 'when commands exist', ->
       beforeEach ->
@@ -146,7 +152,7 @@ describe 'ActionsManager', ->
       @timeout_spy = sinon.spy @settings.window, 'setTimeout'
       @cleartimeout_spy = sinon.spy @settings.window, 'clearTimeout'
       @old_setting = @settings.send_auto_pageview
-      @initializeSubject = => @subject = new @actions_manager(@session)
+      @initializeSubject = => @subject = new @actions_manager(@session, @plugins_manager)
 
     afterEach ->
       @settings.send_auto_pageview = @old_setting
