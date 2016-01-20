@@ -49,8 +49,8 @@ module.exports = (grunt) ->
           ]
 
         files: [
-          src: 'src/settings.coffee.sample'
-          dest: 'src/settings.coffee'
+          { src: 'src/settings.coffee.sample', dest: 'src/settings.coffee' },
+          { src: 'src/plugins_settings.coffee.sample', dest: 'src/plugins_settings.coffee' }
         ]
 
       loader:
@@ -212,7 +212,7 @@ module.exports = (grunt) ->
         options:
           stdout: true
 
-        command: 'rm -rf compiled dist src/settings.coffee'
+        command: 'rm -rf compiled dist src/{plugins_,}settings.coffee'
 
     copy:
       ymls:

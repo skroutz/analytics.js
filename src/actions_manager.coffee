@@ -7,7 +7,7 @@ define [
   class ActionsManager
     ActionsManager::[key] = method for key, method of Runnable
 
-    constructor: (@session) ->
+    constructor: (@session, @plugins_manager) ->
       @reporter = new Reporter()
       @pageview_timeout = null
 

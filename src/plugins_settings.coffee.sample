@@ -1,0 +1,21 @@
+define ->
+  ###
+  This module is used by {PluginsManager}
+
+  The format of this file should be like:
+    PluginsSettings =
+      general:
+        fetch_plugins_url: '@@base/plugins'
+      plugins:
+        plugin_name:
+          url: '@@base/@@plugin_name_hash'
+      triggers:
+        action: 'plugin_name'
+  ###
+  PluginsSettings =
+    general:
+      fetch_plugins_url: '@@base/plugins'
+    plugins: {}
+    triggers: {}
+
+  return PluginsSettings
