@@ -1,0 +1,4 @@
+builder:
+  build: .
+  volumes:
+    - .:/analytics.js
