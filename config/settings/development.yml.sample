@@ -1,1 +1,2 @@
-analytics_base_url: "http://analytics.local:9000"
+analytics_base_url: "http://localhost:9000"
+application_base_url: "http://localhost:3000"

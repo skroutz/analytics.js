@@ -100,7 +100,7 @@ describe 'Settings', ->
       expect(@settings)
         .to.have.deep.property('url.base')
         .that.is.a('string')
-        .that.equals('http://analytics.local:9000')
+        .that.equals('http://localhost:9000')
 
     it 'has proper .current', ->
       current_url = window.location.href

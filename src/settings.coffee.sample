@@ -49,6 +49,7 @@ define ->
     ###
     url:
       base: '@@analytics_base_url'
+      application_base: '@@application_base_url'
       analytics_session:
         ###
         Analytics Tracking Session Creation Endpoint
