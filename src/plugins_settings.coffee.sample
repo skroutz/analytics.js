@@ -5,16 +5,16 @@ define ->
   The format of this file should be like:
     PluginsSettings =
       general:
-        fetch_plugins_url: '@@base/plugins'
+        fetch_plugins_url: '@@analytics_base_url/plugins'
       plugins:
         plugin_name:
-          url: '@@base/@@plugin_name_hash'
+          url: '@@analytics_base_url/@@plugin_name_hash'
       triggers:
         action: 'plugin_name'
   ###
   PluginsSettings =
     general:
-      fetch_plugins_url: '@@base/plugins'
+      fetch_plugins_url: '@@analytics_base_url/plugins'
     plugins: {}
     triggers: {}
 

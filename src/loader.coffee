@@ -32,7 +32,7 @@ library without blocking the `window.onload` event.
 
     this.domain = dom if(dom)
     js.id = "js-iframe-async"
-    js.src = "@@base/#{url}"
+    js.src = "@@analytics_base_url/#{url}"
     this.body.appendChild(js)
 
   doc.write('<body onload="window.inDapIF=true; document._l();">')

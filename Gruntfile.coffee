@@ -80,9 +80,9 @@ module.exports = (grunt) ->
                 filename
             }
             {
-              match: 'base'
+              match: 'analytics_base_url'
               replacement: ->
-                grunt.config('env_settings').base
+                grunt.config('env_settings').analytics_base_url
             }
           ]
 
