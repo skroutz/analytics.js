@@ -10,6 +10,31 @@ Minimal cross-domain user tracking library to measure user interaction across Sk
 
 ## Install Dependencies
 
+### Using Docker
+
+Install [docker](https://docs.docker.com/engine/installation/),
+[docker-compose](https://docs.docker.com/compose/install/).
+
+Prefix any of the available commands with `docker-compose run builder <command>`.
+
+> Any changes made to the code locally will be reflected inside the
+> container.
+
+Examples:
+
+#### Run the tests
+
+```shell
+docker-compose run builder npm test
+```
+#### Start a shell
+
+```shell
+docker-compose run builder bash
+```
+
+### Installing platform dependencies locally
+
 First, install [`Node.js`](http://nodejs.org/) and its package manager, [`npm`](https://github.com/npm/npm) (`npm` comes by default with `node` now).
 
 Configure `npm` and make available locally installed binaries to your `$PATH`. To do so, just append the following line to your `.{bash|zsh}rc`:
