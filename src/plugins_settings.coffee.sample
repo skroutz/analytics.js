@@ -15,7 +15,10 @@ define ->
   PluginsSettings =
     general:
       fetch_plugins_url: '@@analytics_base_url/plugins'
-    plugins: {}
-    triggers: {}
+    plugins:
+      order_stash:
+        url: '@@analytics_base_url/@@order_stash_hash'
+    triggers:
+      order: 'order_stash'
 
   return PluginsSettings
