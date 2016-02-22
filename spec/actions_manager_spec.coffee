@@ -98,7 +98,7 @@ describe 'ActionsManager', ->
         @session.analytics_session = @analytics_session
         @session.shop_code = @shop_code
         @PluginsManager = PluginsManager
-        @plugins_manager = new @PluginsManager
+        @plugins_manager = new @PluginsManager(@session)
         @actions_manager = ActionsManager
         @settings = Settings
         @reporter = Reporter
