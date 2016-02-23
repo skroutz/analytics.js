@@ -38,6 +38,8 @@ describe 'OrderStash', ->
       expect(window.parent.document.getElementById('sa-order-stash-plugin')).to.be
 
   describe 'click dismiss button', ->
+    beforeEach -> click_element @subject.querySelectorAll('#sa-order-stash-dismiss')[0]
+
     context 'when the browser supports transitions', ->
       beforeEach ->
         @original_transition = @subject.style.transition
@@ -61,7 +63,7 @@ describe 'OrderStash', ->
 
   describe 'click why button', ->
     beforeEach ->
-      @subject.querySelectorAll('#sa-order-stash-why')[0].click()
+      click_element @subject.querySelectorAll('#sa-order-stash-why')[0]
 
     it 'hides the prompt text', ->
       prompt = @subject.querySelectorAll('#sa-order-stash-prompt')[0]
