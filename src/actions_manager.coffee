@@ -27,6 +27,7 @@ define [
         addOrder: (data, callback) ->
           clearTimeout @pageview_timeout
           @_reportAction 'ecommerce', 'addOrder', data, -> callback() if callback
+          @plugins_manager.notify('order', data)
         addItem: (data, callback) ->
           clearTimeout @pageview_timeout
           @_reportAction 'ecommerce', 'addItem', data, -> callback() if callback

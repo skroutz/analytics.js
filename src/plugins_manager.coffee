@@ -1,7 +1,8 @@
 define [
+  'settings',
   'plugins_settings',
   'jsonp'
-], (PluginsSettings, JSONP) ->
+], (Settings, PluginsSettings, JSONP) ->
   ###
   This module provides the capability to analytics.js to load a designated by the
   backend set of plugins and provides them the context (data, configuration) required to operate.
@@ -19,7 +20,7 @@ define [
     @param [Object, String] data Any additional data required by the plugin
     ###
     notify: (action, data) ->
-       @_fetchEnabledPlugins().then =>
+      @_fetchEnabledPlugins().then =>
         plugin = PluginsSettings.triggers[action]
         return unless plugin
 
@@ -35,6 +36,7 @@ define [
 
       window.sa_plugins ||= {}
       window.sa_plugins[name] ||= {}
+      window.sa_plugins.settings = Settings
 
       data.shop_code = @session.shop_code
       data.analytics_session = @session.analytics_session

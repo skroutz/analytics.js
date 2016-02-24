@@ -16,7 +16,13 @@ describe 'PluginsManager', ->
     requirejs.undef 'plugins_settings'
     define 'plugins_settings', => @settings
 
-    require ['plugins_manager', 'promise', 'plugins_settings', 'jsonp'], (PluginsManager, Promise, PluginsSettings, JSONP) =>
+    require [
+      'settings',
+      'plugins_manager',
+      'promise',
+      'plugins_settings',
+      'jsonp'], (Settings, PluginsManager, Promise, PluginsSettings, JSONP) =>
+      @analytics_settings = Settings
       @plugins_manager = PluginsManager
       @promise = Promise
       @plugins_settings = PluginsSettings
@@ -69,6 +75,11 @@ describe 'PluginsManager', ->
           @subject.notify('addOrder', { order_id: 1 })
 
           expect(@jsonp_load_stub.withArgs(@settings.plugins.analytics_plugin.url).calledOnce).to.be.true
+
+        it 'makes analytics settings available to the plugins', ->
+          @subject.notify('addOrder', { order_id: 1 })
+
+          expect(window.sa_plugins.settings).to.equal(@analytics_settings)
 
         context 'when data is an object', ->
           it 'makes data public', ->

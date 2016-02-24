@@ -48,7 +48,8 @@ define ->
     Backend Endpoints
     ###
     url:
-      base: '@@base'
+      base: '@@analytics_base_url'
+      application_base: '@@application_base_url'
       analytics_session:
         ###
         Analytics Tracking Session Creation Endpoint
@@ -58,14 +59,14 @@ define ->
         @return [String] The formatted URL
         ###
         create: (shop_code, yogurt_session, yogurt_user_id)->
-          "@@base@@url.analytics_session.create"
+          "@@analytics_base_url@@url.analytics_session.create"
 
         ###
         Analytics Tracking Session Connection Endpoint
         @return [String] The formatted URL
         ###
         connect: (shop_code)->
-          "@@base@@url.analytics_session.connect"
+          "@@analytics_base_url@@url.analytics_session.connect"
 
       ###
       Analytics Action Endpoint
@@ -73,12 +74,12 @@ define ->
       @return [String] The Formatted URL
       ###
       beacon: (analytics_session)->
-        "@@base@@url.beacon"
+        "@@analytics_base_url@@url.beacon"
 
       utils:
         # Helper endpoints to detect whether 3rd party cookies are enabled or not
-        third_party_step1: -> "@@base@@url.utils.third_party_step1"
-        third_party_step2: -> "@@base@@url.utils.third_party_step2"
+        third_party_step1: -> "@@analytics_base_url@@url.utils.third_party_step1"
+        third_party_step2: -> "@@analytics_base_url@@url.utils.third_party_step2"
 
     api:
       settings:
