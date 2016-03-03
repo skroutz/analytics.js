@@ -32,11 +32,22 @@ class OrderStash
     100% { left: -250px; }
   }
 
+  #sa-order-stash-plugin * {
+    all: unset;
+    padding: 0;
+    overflow: auto;
+    width: initial;
+    height: initial;
+  }
+
   #sa-order-stash-plugin {
+    all: unset;
+    display: block;
+
     position: fixed;
     background-color: white;
     bottom: 35px;
-    padding-bottom: 10px;
+    padding: 0 0 10px 0;
     width: 250px;
     height: 220px;
     text-align: center;
@@ -61,6 +72,8 @@ class OrderStash
   }
 
   #sa-order-stash-header {
+    display: block;
+
     padding: 35px;
 
     background-image: url('#{asset_url("logo.png")}');
@@ -93,6 +106,7 @@ class OrderStash
   }
 
   #sa-order-stash-prompt {
+    display: inline-block;
     margin: 0;
     padding: 0 20px;
     color: #333;
@@ -155,16 +169,10 @@ class OrderStash
                padding-right .2s ease-in-out;
   }
 
-  #sa-order-stash-button.read-more:hover {
+  #sa-order-stash-plugin #sa-order-stash-button.read-more:hover {
     padding-right: 28px;
     background-color: #d8721c !important;
     background-position: 200px 17px;
-  }
-
-  #sa-order-stash-why {
-    font-size: 12px;
-    transition: none;
-    text-decoration: none;
   }
 
   #sa-order-stash-why {
@@ -176,6 +184,11 @@ class OrderStash
     font-style: italic;
     line-height: 13px;
     box-sizing: border-box;
+
+    transition: none;
+    text-decoration: none;
+
+    cursor: pointer;
   }
 
   #sa-order-stash-why:hover {
@@ -194,7 +207,8 @@ class OrderStash
   }
 
   #sa-order-stash-rationale p {
-    margin-bottom: 23px;
+    display: inline-block;
+    margin: 13px 0 6px 0;
     line-height: 17px;
     font-family: Verdana, Arial, sans-serif;
     font-size: 13px;
