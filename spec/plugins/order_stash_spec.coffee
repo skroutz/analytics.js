@@ -49,8 +49,8 @@ describe 'OrderStash', ->
 
       afterEach -> @subject.style.transition = @original_transition
 
-      it 'adds the slide-out class to the plugin element', ->
-        expect(@subject.className).to.eql('slide-out')
+      it 'adds the sa-order-stash-slide-out class to the plugin element', ->
+        expect(@subject.className).to.eql('sa-order-stash-slide-out')
 
     context 'when the browser does not support transitions', ->
       beforeEach ->
@@ -78,7 +78,7 @@ describe 'OrderStash', ->
     it 'hides the logo', ->
       header = @subject.querySelectorAll('#sa-order-stash-header')[0]
 
-      expect(header.className).to.eql('no-logo')
+      expect(header.className).to.eql('sa-order-stash-no-logo')
 
     it 'displays the rationale text', ->
       rationale = @subject.querySelectorAll('#sa-order-stash-rationale')[0]
@@ -93,10 +93,10 @@ describe 'OrderStash', ->
 
       expect(button.text).to.eq('Αποθήκευση της παραγγελίας')
 
-    it 'adds the read-more class to the call to action button', ->
+    it 'adds the sa-order-stash-read-more class to the call to action button', ->
       button = @subject.querySelectorAll('#sa-order-stash-button')[0]
 
-      expect(button.className).to.eql('read-more')
+      expect(button.className).to.eql('sa-order-stash-read-more')
 
   describe 'stash button', ->
     before -> @$stash_button = @subject.querySelectorAll('#sa-order-stash-button')[0]

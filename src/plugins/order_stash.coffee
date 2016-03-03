@@ -12,22 +12,22 @@ class OrderStash
     "#{settings.url.application_base}/account/analytics/orders/#{order_code}/save"
 
   STYLE = (configuration) -> """
-  @keyframes slide-in-right {
+  @keyframes sa-order-stash-slide-in-right {
     0%   { right: -250px; }
     100% { right: 35px; }
   }
 
-  @keyframes slide-out-right {
+  @keyframes sa-order-stash-slide-out-right {
     0%   { right: 35px; }
     100% { right: -250px; }
   }
 
-  @keyframes slide-in-left {
+  @keyframes sa-order-stash-slide-in-left {
     0%   { left: -250px; }
     100% { left: 35px; }
   }
 
-  @keyframes slide-out-left {
+  @keyframes sa-order-stash-slide-out-left {
     0%   { left: 35px; }
     100% { left: -250px; }
   }
@@ -63,11 +63,11 @@ class OrderStash
     border-radius: 2px 2px 0 0;
     z-index: 10000;
 
-    animation: slide-in-#{configuration.position.split('-')[1]} 1s;
+    animation: sa-order-stash-slide-in-#{configuration.position.split('-')[1]} 1s;
   }
 
-  #sa-order-stash-plugin.slide-out {
-    animation: slide-out-#{configuration.position.split('-')[1]} .5s;
+  #sa-order-stash-plugin.sa-order-stash-slide-out {
+    animation: sa-order-stash-slide-out-#{configuration.position.split('-')[1]} .5s;
     animation-fill-mode: forwards;
   }
 
@@ -84,7 +84,7 @@ class OrderStash
     background-size: 120px 33px;
   }
 
-  #sa-order-stash-header.no-logo {
+  #sa-order-stash-header.sa-order-stash-no-logo {
     background: none;
     padding: 10px;
   }
@@ -149,13 +149,13 @@ class OrderStash
     transition: background-color .2s, background-position .2s, padding-right .2s ease-in-out;
   }
 
-  #sa-order-stash-button.read-less:hover {
+  #sa-order-stash-button.sa-order-stash-read-less:hover {
     background-color: #d8721c !important;
     background-position-x: 152px;
     padding-right: 30px;
   }
 
-  #sa-order-stash-button.read-more {
+  #sa-order-stash-button.sa-order-stash-read-more {
    width: 220px;
    margin-bottom: 8px;
 
@@ -169,7 +169,7 @@ class OrderStash
                padding-right .2s ease-in-out;
   }
 
-  #sa-order-stash-plugin #sa-order-stash-button.read-more:hover {
+  #sa-order-stash-plugin #sa-order-stash-button.sa-order-stash-read-more:hover {
     padding-right: 28px;
     background-color: #d8721c !important;
     background-position: 200px 17px;
@@ -266,7 +266,7 @@ class OrderStash
       </p>
     </div>
   </div>
-  <a id="sa-order-stash-button" class="read-less" href="#{assigns.endpoint}">Αποθήκευση</a>
+  <a id="sa-order-stash-button" class="sa-order-stash-read-less" href="#{assigns.endpoint}">Αποθήκευση</a>
   <a id="sa-order-stash-why" href="javascript:void(0)">Γιατί να την αποθηκεύσω;</a>
   """
 
@@ -317,14 +317,14 @@ class OrderStash
     element.attachEvent "on#{event}", handler              if element.attachEvent
 
   _onClickDismiss: =>
-    return @$el.className = 'slide-out' if @_transitionSupport()
+    return @$el.className = 'sa-order-stash-slide-out' if @_transitionSupport()
 
     @$el.parentNode.removeChild(@$el)
 
   _onClickWhy: =>
     @$prompt().style.display = 'none'
     @$whyButton().style.display = 'none'
-    @$header().className = "no-logo"
+    @$header().className = "sa-order-stash-no-logo"
     @$rationale().style.display = 'block'
     @$el.style.height = 'auto'
 
@@ -334,7 +334,7 @@ class OrderStash
         button.innerText = CTA_READMORE_TEXT
       else
         button.textContent = CTA_READMORE_TEXT
-      button.className = 'read-more')(@$stashButton())
+      button.className = 'sa-order-stash-read-more')(@$stashButton())
 
   _onClickStash: (e) =>
     return unless @_transitionSupport()
@@ -343,7 +343,7 @@ class OrderStash
 
     @$stashButton().removeEventListener('click', @_onClickStash, false)
     @_attachEvent(@$el, 'transitionend', => @$stashButton().click())
-    @$el.className = 'slide-out'
+    @$el.className = 'sa-order-stash-slide-out'
 
   _head: -> @_document().head || @_document().getElementsByTagName('head')[0]
   _document: -> window.parent.document
