@@ -52,7 +52,6 @@ class OrderStash
     height: 220px;
     text-align: center;
     font-family: Verdana, Arial, sans-serif;
-    border: 1px solid #dcdcdc;
     box-shadow: 0px 1px 11px 0px rgba(77,77,77,0.33);
 
     #{switch configuration.position
@@ -71,7 +70,7 @@ class OrderStash
     animation-fill-mode: forwards;
   }
 
-  #sa-order-stash-header {
+  #sa-order-stash-plugin #sa-order-stash-header {
     display: block;
 
     padding: 35px;
@@ -84,12 +83,12 @@ class OrderStash
     background-size: 120px 33px;
   }
 
-  #sa-order-stash-header.sa-order-stash-no-logo {
+  #sa-order-stash-plugin #sa-order-stash-header.sa-order-stash-no-logo {
     background: none;
     padding: 10px;
   }
 
-  #sa-order-stash-dismiss {
+  #sa-order-stash-plugin #sa-order-stash-dismiss {
     display: block;
     position: absolute;
     top: 9px;
@@ -105,7 +104,7 @@ class OrderStash
     cursor: pointer;
   }
 
-  #sa-order-stash-prompt {
+  #sa-order-stash-plugin #sa-order-stash-prompt {
     display: inline-block;
     margin: 0;
     padding: 0 20px;
@@ -114,11 +113,11 @@ class OrderStash
     font-family: Verdana, Arial, sans-serif;
   }
 
-  #sa-order-stash-privacy {
+  #sa-order-stash-plugin #sa-order-stash-privacy {
     font-style: italic;
   }
 
-  #sa-order-stash-button {
+  #sa-order-stash-plugin #sa-order-stash-button {
     display: inline-block;
     width: 185px;
     height: 36px;
@@ -149,13 +148,13 @@ class OrderStash
     transition: background-color .2s, background-position .2s, padding-right .2s ease-in-out;
   }
 
-  #sa-order-stash-button.sa-order-stash-read-less:hover {
+  #sa-order-stash-plugin #sa-order-stash-button.sa-order-stash-read-less:hover {
     background-color: #d8721c !important;
     background-position-x: 152px;
     padding-right: 30px;
   }
 
-  #sa-order-stash-button.sa-order-stash-read-more {
+  #sa-order-stash-plugin #sa-order-stash-button.sa-order-stash-read-more {
    width: 220px;
    margin-bottom: 8px;
 
@@ -175,7 +174,7 @@ class OrderStash
     background-position: 200px 17px;
   }
 
-  #sa-order-stash-why {
+  #sa-order-stash-plugin #sa-order-stash-why {
     display: inline-block;
     margin-top: 17px;
     color: #909090;
@@ -191,22 +190,22 @@ class OrderStash
     cursor: pointer;
   }
 
-  #sa-order-stash-why:hover {
+  #sa-order-stash-plugin #sa-order-stash-why:hover {
     color: #666;
     border-bottom: 1px dashed #909090;
   }
 
-  #sa-order-stash-rationale {
+  #sa-order-stash-plugin #sa-order-stash-rationale {
     display: none;
     padding: 0 15px;
     text-align: left;
   }
 
-  #sa-order-stash-rationale p:first-child {
+  #sa-order-stash-plugin #sa-order-stash-rationale p:first-child {
     font-size: 14px;
   }
 
-  #sa-order-stash-rationale p {
+  #sa-order-stash-plugin #sa-order-stash-rationale p {
     display: inline-block;
     margin: 13px 0 6px 0;
     line-height: 17px;
@@ -214,7 +213,7 @@ class OrderStash
     font-size: 13px;
   }
 
-  #sa-order-stash-rationale p.sa-order-stash-privacy {
+  #sa-order-stash-plugin #sa-order-stash-rationale p.sa-order-stash-privacy {
     font-size: 11px;
     color: #909090;
     margin-bottom: 0;
@@ -227,15 +226,15 @@ class OrderStash
          only screen and (     min-resolution: 192dpi),
          only screen and (     min-resolution: 2dppx) {
 
-    #sa-order-stash-header {
+    #sa-order-stash-plugin #sa-order-stash-header {
       background-image: url('#{asset_url("logo@2x.png")}');
     }
 
-    #sa-order-stash-dismiss {
+    #sa-order-stash-plugin #sa-order-stash-dismiss {
       background-image: url('#{asset_url("btn_close@2x.png")}');
     }
 
-    #sa-order-stash-button {
+    #sa-order-stash-plugin #sa-order-stash-button {
       background-image: url('#{asset_url("arrow@2x.png")}');
     }
   }
