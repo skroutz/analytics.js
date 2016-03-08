@@ -35,7 +35,7 @@ class OrderStash
   #sa-order-stash-plugin * {
     all: unset;
     padding: 0;
-    overflow: auto;
+    overflow: hidden;
     width: initial;
     height: initial;
   }
