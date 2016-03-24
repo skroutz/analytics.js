@@ -45,6 +45,7 @@ define [
       script = document.createElement('script')
       script.type = 'text/javascript'
       script.src = if data then JSONP._query(url, data) else url
+      script.charset = 'utf-8'
       script.async = true
 
       script.onload = script.onreadystatechange = ->
