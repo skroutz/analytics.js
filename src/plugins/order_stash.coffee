@@ -60,7 +60,8 @@ class OrderStash
 
     border: 1px solid #eee;
     border-radius: 2px 2px 0 0;
-    z-index: 10000;
+    # see: http://stackoverflow.com/questions/491052/minimum-and-maximum-value-of-z-index/25461690#25461690
+    z-index: 2147483647;
 
     animation: sa-order-stash-slide-in-#{configuration.position.split('-')[1]} 1s;
   }
