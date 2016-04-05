@@ -209,6 +209,7 @@ class OrderStash
     display: inline-block;
     margin: 13px 0 6px 0;
     line-height: 17px;
+    color: #333;
     font-family: Verdana, Arial, sans-serif;
     font-size: 13px;
   }
