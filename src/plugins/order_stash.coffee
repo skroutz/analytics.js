@@ -271,6 +271,9 @@ class OrderStash
   """
 
   constructor: ->
+    order_id = context().order_id
+    return if !order_id? || order_id in ['', 'null']
+
     @addStyle()
     @render()
     @_bindHandlers()
