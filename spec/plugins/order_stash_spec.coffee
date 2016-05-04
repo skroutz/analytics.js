@@ -32,10 +32,52 @@ describe 'OrderStash', ->
 
   describe '.constructor', ->
     it 'adds the plugin style to the head', ->
-      expect(window.parent.document.getElementById('sa-order-stash-style')).to.be
+      expect(window.parent.document.getElementById('sa-order-stash-style')).to.exist
 
     it 'adds the plugin markup to the body', ->
-      expect(window.parent.document.getElementById('sa-order-stash-plugin')).to.be
+      expect(window.parent.document.getElementById('sa-order-stash-plugin')).to.exist
+
+    context 'when order_id is "null" string', ->
+      beforeEach (done) ->
+        window.sa_plugins.order_stash.order_id = 'null'
+
+        @subject.parentNode.removeChild(@subject)
+
+        requirejs.undef 'plugins/order_stash'
+        require ['plugins/order_stash'], =>
+          @subject = window.parent.document.getElementById('sa-order-stash-plugin')
+          done()
+
+      it 'does not add the plugin markup to the body', ->
+        expect(window.parent.document.getElementById('sa-order-stash-plugin')).to.not.exist
+
+    context 'when order_id is empty string', ->
+      beforeEach (done) ->
+        window.sa_plugins.order_stash.order_id = ''
+
+        @subject.parentNode.removeChild(@subject)
+
+        requirejs.undef 'plugins/order_stash'
+        require ['plugins/order_stash'], =>
+          @subject = window.parent.document.getElementById('sa-order-stash-plugin')
+          done()
+
+      it 'does not add the plugin markup to the body', ->
+        expect(window.parent.document.getElementById('sa-order-stash-plugin')).to.not.exist
+
+    context 'when order_id is undefined', ->
+      beforeEach (done) ->
+        window.sa_plugins.order_stash.order_id = undefined
+
+        @subject.parentNode.removeChild(@subject)
+
+        requirejs.undef 'plugins/order_stash'
+        require ['plugins/order_stash'], =>
+          @subject = window.parent.document.getElementById('sa-order-stash-plugin')
+          done()
+
+      it 'does not add the plugin markup to the body', ->
+        expect(window.parent.document.getElementById('sa-order-stash-plugin')).to.not.exist
 
   describe 'click dismiss button', ->
     beforeEach -> click_element @subject.querySelectorAll('#sa-order-stash-dismiss')[0]
