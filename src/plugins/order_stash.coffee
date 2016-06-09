@@ -66,6 +66,10 @@ class OrderStash
     animation: sa-order-stash-slide-in-#{configuration.position.split('-')[1]} 1s;
   }
 
+  #sa-order-stash-plugin a:hover, #sa-order-stash-plugin p:hover {
+    text-shadow: none !important;
+  }
+
   #sa-order-stash-plugin.sa-order-stash-slide-out {
     animation: sa-order-stash-slide-out-#{configuration.position.split('-')[1]} .5s;
     animation-fill-mode: forwards;
@@ -149,6 +153,10 @@ class OrderStash
     transition: background-color .2s, background-position .2s, padding-right .2s ease-in-out;
   }
 
+  #sa-order-stash-plugin #sa-order-stash-button:hover {
+    color: white !important;
+  }
+
   #sa-order-stash-plugin #sa-order-stash-button.sa-order-stash-read-less:hover {
     background-color: #d8721c !important;
     background-position-x: 152px;
@@ -192,7 +200,7 @@ class OrderStash
   }
 
   #sa-order-stash-plugin #sa-order-stash-why:hover {
-    color: #666;
+    color: #666 !important;
     border-bottom: 1px dashed #909090;
   }
 
