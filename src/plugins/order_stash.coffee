@@ -3,6 +3,7 @@ Plugin which prompts the user to save his/her order
 ###
 class OrderStash
   CTA_READMORE_TEXT = 'Αποθήκευση της παραγγελίας'
+  DOMREADY_TIMEOUT = 2000 # 2 seconds
 
   settings = window.sa_plugins.settings
   context = -> window.sa_plugins.order_stash
@@ -275,8 +276,26 @@ class OrderStash
     return if !order_id? || order_id in ['', 'null']
 
     @addStyle()
+    @onDOMReady => @initialize()
+
+  initialize: ->
     @render()
     @_bindHandlers()
+
+  ###
+  Detect DOM ready
+  ###
+  onDOMReady: (cb) ->
+    # IE is only safe when readyState is 'complete'
+    return cb() if @_document().readyState == 'complete'
+    return cb() if !@_document().attachEvent && @_document().readyState in ['interactive', 'complete']
+
+    if @_document().addEventListener # Mozilla, Opera, Webkit
+      @_document().addEventListener 'DOMContentLoaded', cb, false
+    else if @_document().attachEvent # IE
+      @_document().attachEvent('onreadystatechange', (=> cb() if @_document().readyState == 'complete'))
+    else
+      setTimeout((=> try cb() catch), DOMREADY_TIMEOUT)
 
   ###
   Displays the plugin
