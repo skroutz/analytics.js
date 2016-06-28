@@ -2,7 +2,7 @@ common:
   iframe_message: "get_analytics_session"
   get_param_name: "analytics_session"
   single_beacon: false
-xdomain_session_timeout: 1000
+xdomain_session_timeout: 5000
 auto_pageview_timeout: 1000
 send_auto_pageview: true
 cookies:
