@@ -283,6 +283,8 @@ class OrderStash
     order_id = context().order_id
     return if !order_id? || order_id in ['', 'null']
 
+    @_setParentDoc()
+
     @addStyle()
     @onDOMReady => @initialize()
 
@@ -295,13 +297,13 @@ class OrderStash
   ###
   onDOMReady: (cb) ->
     # IE is only safe when readyState is 'complete'
-    return cb() if @_document().readyState == 'complete'
-    return cb() if !@_document().attachEvent && @_document().readyState in ['interactive', 'complete']
+    return cb() if @parent_doc.readyState == 'complete'
+    return cb() if !@parent_doc.attachEvent && @parent_doc.readyState in ['interactive', 'complete']
 
-    if @_document().addEventListener # Mozilla, Opera, Webkit
-      @_document().addEventListener 'DOMContentLoaded', cb, false
-    else if @_document().attachEvent # IE
-      @_document().attachEvent('onreadystatechange', (=> cb() if @_document().readyState == 'complete'))
+    if @parent_doc.addEventListener # Mozilla, Opera, Webkit
+      @parent_doc.addEventListener 'DOMContentLoaded', cb, false
+    else if @parent_doc.attachEvent # IE
+      @parent_doc.attachEvent('onreadystatechange', (=> cb() if @parent_doc.readyState == 'complete'))
     else
       setTimeout((=> try cb() catch), DOMREADY_TIMEOUT)
 
@@ -312,14 +314,14 @@ class OrderStash
     @$el = document.createElement('div')
     @$el.id = 'sa-order-stash-plugin'
     @$el.innerHTML = TEMPLATE(endpoint: @_endpoint())
-    @_document().body.appendChild(@$el)
+    @parent_doc.body.appendChild(@$el)
 
-  $header: -> @_document().getElementById('sa-order-stash-header')
-  $dismissButton: -> @_document().getElementById('sa-order-stash-dismiss')
-  $stashButton: -> @_document().getElementById('sa-order-stash-button')
-  $whyButton: -> @_document().getElementById('sa-order-stash-why')
-  $prompt: -> @_document().getElementById('sa-order-stash-prompt')
-  $rationale: -> @_document().getElementById('sa-order-stash-rationale')
+  $header: -> @parent_doc.getElementById('sa-order-stash-header')
+  $dismissButton: -> @parent_doc.getElementById('sa-order-stash-dismiss')
+  $stashButton: -> @parent_doc.getElementById('sa-order-stash-button')
+  $whyButton: -> @parent_doc.getElementById('sa-order-stash-why')
+  $prompt: -> @parent_doc.getElementById('sa-order-stash-prompt')
+  $rationale: -> @parent_doc.getElementById('sa-order-stash-rationale')
 
   ###
   Adds the required css for the plugin
@@ -375,9 +377,10 @@ class OrderStash
     @_attachEvent(@$el, 'transitionend', => @$stashButton().click())
     @$el.className = 'sa-order-stash-slide-out'
 
-  _head: -> @_document().head || @_document().getElementsByTagName('head')[0]
-  _document: -> window.parent.document
+  _head: -> @parent_doc.head || @parent_doc.getElementsByTagName('head')[0]
   _transitionSupport: -> @$el.style.transition?
+
+  _setParentDoc: -> @parent_doc = window.parent.document
 
   _endpoint: ->
     params =
