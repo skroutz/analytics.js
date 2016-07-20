@@ -52,7 +52,7 @@ class OrderStash
     width: 250px;
     height: 220px;
     text-align: center;
-    font-family: Verdana, Arial, sans-serif;
+    font-family: Verdana, Arial, sans-serif !important;
     box-shadow: 0px 1px 11px 0px rgba(77,77,77,0.33);
 
     #{switch configuration.position
@@ -114,8 +114,8 @@ class OrderStash
     margin: 0;
     padding: 0 20px;
     color: #333 !important;
-    font-size: 13px;
-    font-family: Verdana, Arial, sans-serif;
+    font-size: 13px !important;
+    font-family: Verdana, Arial, sans-serif !important;
   }
 
   #sa-order-stash-plugin #sa-order-stash-privacy {
@@ -129,9 +129,9 @@ class OrderStash
     line-height: 16px;
     background-color: #f68b24 !important;
     color: white !important;
-    font-family: Verdana, Arial, sans-serif;
+    font-family: Verdana, Arial, sans-serif !important;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 14px !important;
 
     margin-top: 18px;
     padding: 10px 15px;
@@ -168,7 +168,7 @@ class OrderStash
    margin-bottom: 8px;
 
    font-weight: normal;
-   font-size: 12px;
+   font-size: 12px !important;
    background-position: 220px 17px;
 
    transition: none;
@@ -188,7 +188,7 @@ class OrderStash
     margin-top: 17px;
     color: #909090 !important;
 
-    font-size: 12px;
+    font-size: 12px !important;
     font-style: italic;
     line-height: 13px;
     box-sizing: border-box;
@@ -211,7 +211,7 @@ class OrderStash
   }
 
   #sa-order-stash-plugin #sa-order-stash-rationale p:first-child {
-    font-size: 14px;
+    font-size: 14px !important;
   }
 
   #sa-order-stash-plugin #sa-order-stash-rationale p {
@@ -219,12 +219,12 @@ class OrderStash
     margin: 13px 0 6px 0;
     line-height: 17px;
     color: #333 !important;
-    font-family: Verdana, Arial, sans-serif;
-    font-size: 13px;
+    font-family: Verdana, Arial, sans-serif !important;
+    font-size: 13px !important;
   }
 
   #sa-order-stash-plugin #sa-order-stash-rationale p.sa-order-stash-privacy {
-    font-size: 11px;
+    font-size: 11px !important;
     color: #909090 !important;
     margin-bottom: 0;
   }
