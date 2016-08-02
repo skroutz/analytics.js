@@ -115,11 +115,12 @@ describe 'Settings', ->
         @session = 'foo'
         @yogurt_user_id = '123'
         @shop_code = 'shop_code_1'
+        @flavor = 'skroutz'
 
       describe '.create', ->
         it 'returns the proper create endpoint', ->
-          endpoint = "#{@base}/track/create?yogurt_session=#{@session}&yogurt_user_id=#{@yogurt_user_id}&shop_code=#{@shop_code}"
-          expect(@settings.url.analytics_session.create(@shop_code, @session, @yogurt_user_id))
+          endpoint = "#{@base}/track/create?yogurt_session=#{@session}&yogurt_user_id=#{@yogurt_user_id}&shop_code=#{@shop_code}&flavor=#{@flavor}"
+          expect(@settings.url.analytics_session.create(@shop_code, @session, @yogurt_user_id, @flavor))
             .to.equal(endpoint)
 
       describe '.connect', ->

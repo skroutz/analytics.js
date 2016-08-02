@@ -188,6 +188,7 @@ describe 'Session', ->
     @yogurt_user_id    = '1234'
     @shop_code         = 'shop_code_1'
     @analytics_session = 'dummy_analytics_session_hash'
+    @flavor            = 'flavor'
 
     require [
       'promise'
@@ -295,9 +296,10 @@ describe 'Session', ->
           yogurt_user_id: @yogurt_user_id
           yogurt_session: @yogurt_session
           shop_code: @shop_code
+          flavor: @flavor
         @type = @type_create
         @init = =>
-          sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id)
+          sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id, @flavor)
           @instance = new @session().run()
 
       context 'when first-party cookies are enabled', ->
