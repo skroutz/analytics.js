@@ -1,2 +1,11 @@
-analytics_base_url: "http://localhost:9000"
-application_base_url: "http://localhost:3000"
+skroutz:
+  analytics_base_url: "http://localhost:9000"
+  application_base_url: "http://localhost:3000"
+
+alve:
+  analytics_base_url: "http://localhost:9000"
+  application_base_url: "http://localhost:3000"
+
+scrooge:
+  analytics_base_url: "http://localhost:9000"
+  application_base_url: "http://localhost:3000"
