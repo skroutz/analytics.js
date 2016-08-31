@@ -56,9 +56,10 @@ define ->
         @param [String] shop_code Analytics code of the tracked shop
         @param [String] yogurt_session Our Session ID
         @param [String] yogurt_user_id Backend ID of the tracked user
+        @param [String] flavor Application name
         @return [String] The formatted URL
         ###
-        create: (shop_code, yogurt_session, yogurt_user_id)->
+        create: (shop_code, yogurt_session, yogurt_user_id, flavor)->
           "@@analytics_base_url@@url.analytics_session.create"
 
         ###
