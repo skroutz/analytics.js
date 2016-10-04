@@ -116,6 +116,22 @@ module.exports = (grunt) ->
           dest: '.tmp/js/payload.js'
         ]
 
+      plugins_flavor:
+        options:
+          patterns: [
+            {
+              match: 'flavor'
+              replacement: -> grunt.config.get('current_flavor')
+            }
+          ]
+
+        files: [
+          expand: true
+          cwd: '.tmp/'
+          src: 'js/plugins/**/*.js'
+          dest: '.tmp/'
+        ]
+
     bump:
       options:
         pushTo: 'origin'
@@ -366,6 +382,7 @@ module.exports = (grunt) ->
     'clean:plugins'
     'coffee:plugins'
     'copy:plugins'
+    'replace:plugins_flavor'
     'hash:plugins'
   ]
 

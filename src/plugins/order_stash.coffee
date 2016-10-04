@@ -80,7 +80,7 @@ class OrderStash
 
     padding: 35px;
 
-    background-image: url('#{asset_url("logo.png")}');
+    background-image: url('#{asset_url("logo_@@flavor.png")}');
     background-position: center;
     background-position-y: 20px;
     background-position-x: 66px;
@@ -237,7 +237,7 @@ class OrderStash
          only screen and (     min-resolution: 2dppx) {
 
     #sa-order-stash-plugin #sa-order-stash-header {
-      background-image: url('#{asset_url("logo@2x.png")}');
+      background-image: url('#{asset_url("logo_@@flavor@2x.png")}');
     }
 
     #sa-order-stash-plugin #sa-order-stash-dismiss {
