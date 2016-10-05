@@ -133,7 +133,7 @@ describe 'OrderStash', ->
     it 'changes the text of the call to action button', ->
       button = @subject.querySelectorAll('#sa-order-stash-button')[0]
 
-      expect(button.text).to.eq('Αποθήκευση της παραγγελίας')
+      expect(button.text).to.be.a('string')
 
     it 'adds the sa-order-stash-read-more class to the call to action button', ->
       button = @subject.querySelectorAll('#sa-order-stash-button')[0]

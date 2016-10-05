@@ -2,7 +2,7 @@
 Plugin which prompts the user to save his/her order
 ###
 class OrderStash
-  CTA_READMORE_TEXT = 'Αποθήκευση της παραγγελίας'
+  CTA_READMORE_TEXT = '@@translations.order_stash.cta_readmore_text'
   DOMREADY_TIMEOUT = 2000 # 2 seconds
 
   settings = window.sa_plugins.settings
@@ -257,26 +257,27 @@ class OrderStash
 
   <div id="sa-order-stash-content">
     <p id="sa-order-stash-prompt">
-      Αποθήκευση της παραγγελίας σου στο Skroutz;
+      @@translations.order_stash.prompt
     </p>
 
     <div id="sa-order-stash-rationale">
       <p>
-        Γιατί να αποθηκεύσω την παραγγελία μου στο Skroutz;
+        @@translations.order_stash.rationale
       </p>
 
       <p>
-        Ώστε να μπορείς να ανατρέξεις σε πληροφορίες σχετικά με τις αγορές που έκανες,
-        μέσα στο λογαριασμό σου στο Skroutz.
+        @@translations.order_stash.rationale_why
       </p>
 
       <p class="sa-order-stash-privacy">
-        Τα δεδομένα αυτά είναι προσωπικά και παραμένουν ασφαλή στο Skroutz.
+        @@translations.order_stash.privacy
       </p>
     </div>
   </div>
-  <a id="sa-order-stash-button" class="sa-order-stash-read-less" href="#{assigns.endpoint}">Αποθήκευση</a>
-  <a id="sa-order-stash-why" href="javascript:void(0)">Γιατί να την αποθηκεύσω;</a>
+  <a id="sa-order-stash-button" class="sa-order-stash-read-less" href="#{assigns.endpoint}">
+    @@translations.order_stash.save
+  </a>
+  <a id="sa-order-stash-why" href="javascript:void(0)">@@translations.order_stash.save_why</a>
   """
 
   constructor: ->

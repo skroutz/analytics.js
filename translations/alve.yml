@@ -1,0 +1,9 @@
+translations:
+  order_stash:
+    cta_readmore_text: 'Siparişinizi kaydedin'
+    prompt: "Siparişinizi Alve'de kaydedilsin mi?"
+    rationale: "Siparişimi neden Alve'de kaydetmeliyim?"
+    rationale_why: 'Bu sayede verdiğiniz siparişleri Alve hesabınızda görebilirsiniz.'
+    privacy: "Kişisel bilgileriniz Alve'de güvenli bir şekilde saklı tutulucaktır."
+    save: 'Kaydet'
+    save_why: 'Neden kaydetmeliyim?'

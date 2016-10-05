@@ -132,6 +132,19 @@ module.exports = (grunt) ->
           dest: '.tmp/'
         ]
 
+      plugins_translations:
+        options:
+          patterns: [json: (done) ->
+            done(grunt.file.readYAML("translations/#{grunt.config.get('current_flavor')}.yml"))
+          ]
+
+        files: [
+          expand: true
+          cwd: '.tmp/'
+          src: 'js/plugins/**/*.js'
+          dest: '.tmp/'
+        ]
+
     bump:
       options:
         pushTo: 'origin'
@@ -383,6 +396,7 @@ module.exports = (grunt) ->
     'coffee:plugins'
     'copy:plugins'
     'replace:plugins_flavor'
+    'replace:plugins_translations'
     'hash:plugins'
   ]
 
