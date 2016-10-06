@@ -34,7 +34,7 @@ namespace :deploy do
   task :copy do
     on roles(:web) do
       within(release_path) do
-        execute :cp, '-r', 'dist/', 'public/client/'
+        execute :cp, '-r', 'dist/*', 'public/client/'
         execute :cp, 'assets/*', 'public/assets/'
       end
     end
