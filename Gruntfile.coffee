@@ -1,6 +1,9 @@
 module.exports = (grunt) ->
   ENV = grunt.option("env") or process.env.GRUNT_ENV or 'development'
 
+  FLAVORS = grunt.file.readYAML('config/settings/flavors.yml')
+  DEFAULT_FLAVOR = 'skroutz'
+
   plugins_hashes_mapping = ->
     compiled_assets = grunt.file.readJSON('compiled/assets.json')
     plugins = {}
@@ -13,11 +16,14 @@ module.exports = (grunt) ->
   grunt.initConfig
     env: ENV
     pkg: grunt.file.readJSON('package.json')
+
     clean:
       payload:
-        src: ['dist/js/payload*']
+        src: ['.tmp/js/payload*']
       plugins:
-        src: ['dist/js/plugins/*']
+        src: ['.tmp/js/plugins/*']
+      tmp:
+        src: ['.tmp']
 
     environment:
       src: './config/settings/'
@@ -35,31 +41,37 @@ module.exports = (grunt) ->
         expand: true
         extDot: 'last'
         ext: '.js.gz'
-        cwd: 'dist/'
+        cwd: '.tmp/'
         src: ['**/*.js']
-        dest: 'dist/'
+        dest: '.tmp/'
 
     hash:
       options:
         mapping: 'compiled/assets.json'
-        srcBasePath: 'dist/'
-        destBasePath: 'dist/'
+        srcBasePath: '.tmp/'
+        destBasePath: '.tmp/'
         hashFunction: (source, encoding) -> # default is md5
           require('crypto').createHash('sha1').update(source, encoding).digest 'hex'
 
       payload:
-        src: 'dist/js/payload.js'
-        dest: 'dist/js'
+        src: '.tmp/js/payload.js'
+        dest: '.tmp/js'
 
       plugins:
-        src: 'dist/js/plugins/*'
-        dest: 'dist/js/plugins/'
+        src: '.tmp/js/plugins/*'
+        dest: '.tmp/js/plugins/'
 
     replace:
       settings:
         options:
           patterns: [json: (done) ->
-            done grunt.config('env_settings')
+            settings = grunt.config('env_settings')
+            flavor_settings = settings[grunt.config.get('current_flavor')]
+
+            for property of flavor_settings
+              settings[property] = flavor_settings[property]
+
+            done settings
             return
           ]
 
@@ -82,13 +94,13 @@ module.exports = (grunt) ->
             {
               match: 'analytics_base_url'
               replacement: ->
-                grunt.config('env_settings').analytics_base_url
+                grunt.config('env_settings')[grunt.config.get('current_flavor')].analytics_base_url
             }
           ]
 
         files: [
           src: 'compiled/loader.js'
-          dest: 'dist/analytics.js'
+          dest: '.tmp/analytics.js'
         ]
 
       plugins_settings:
@@ -100,8 +112,37 @@ module.exports = (grunt) ->
           ]
 
         files: [
-          src: 'dist/js/payload.js'
-          dest: 'dist/js/payload.js'
+          src: '.tmp/js/payload.js'
+          dest: '.tmp/js/payload.js'
+        ]
+
+      plugins_flavor:
+        options:
+          patterns: [
+            {
+              match: 'flavor'
+              replacement: -> grunt.config.get('current_flavor')
+            }
+          ]
+
+        files: [
+          expand: true
+          cwd: '.tmp/'
+          src: 'js/plugins/**/*.js'
+          dest: '.tmp/'
+        ]
+
+      plugins_translations:
+        options:
+          patterns: [json: (done) ->
+            done(grunt.file.readYAML("translations/#{grunt.config.get('current_flavor')}.yml"))
+          ]
+
+        files: [
+          expand: true
+          cwd: '.tmp/'
+          src: 'js/plugins/**/*.js'
+          dest: '.tmp/'
         ]
 
     bump:
@@ -139,6 +180,7 @@ module.exports = (grunt) ->
       payload:
         options:
           livereload: true
+          spawn: false
         files: [
           'config/settings/*.yml'
           'src/**/*.coffee'
@@ -153,6 +195,7 @@ module.exports = (grunt) ->
       plugins:
         options:
           livereload: true
+          spawn: false
         files: [
           'config/settings/*.yml'
           'src/plugins/**/*.coffee'
@@ -208,19 +251,19 @@ module.exports = (grunt) ->
       payload:
         files: [
           expand: true
-          cwd: 'dist/js'
+          cwd: '.tmp/js'
           extDot: 'last'
           src: [
             '**/*.js'
             '!**/*.min.js'
           ]
-          dest: 'dist/js'
+          dest: '.tmp/js'
           ext: '.min.js'
         ]
 
       loader:
         files:
-          'dist/analytics.min.js': 'dist/analytics.js'
+          '.tmp/analytics.min.js': '.tmp/analytics.js'
 
         options:
           banner: '/*! <%= pkg.name %> v<%= pkg.version %> \n ' +
@@ -230,13 +273,13 @@ module.exports = (grunt) ->
       plugins:
         files: [
           expand: true
-          cwd: 'dist/js/plugins'
+          cwd: '.tmp/js/plugins'
           extDot: 'last'
           src: [
             '**/*.js'
             '!**/*.min.js'
           ]
-          dest: 'dist/js/plugins'
+          dest: '.tmp/js/plugins'
           ext: '.min.js'
         ]
 
@@ -254,7 +297,7 @@ module.exports = (grunt) ->
           'compiled/payload.js'
           'tasks/wrappers/analytics/outro.js'
         ]
-        dest: 'dist/js/payload.js'
+        dest: '.tmp/js/payload.js'
 
       easyxdm_module:
         src: [
@@ -293,17 +336,23 @@ module.exports = (grunt) ->
         src: ['easyXDM.js']
         dest: 'compiled/vendor'
 
-      easyxdm_dist:
+      easyxdm:
         expand: true
         cwd: 'vendor'
         src: ['easyXDM.min.js']
-        dest: 'dist/js'
+        dest: '.tmp/js'
 
       plugins:
         expand: true
         cwd: 'compiled'
         src: 'plugins/*'
-        dest: 'dist/js'
+        dest: '.tmp/js'
+
+      tmp:
+        expand: true
+        cwd: '.tmp/'
+        src: '**'
+        dest: "dist/<%= grunt.config.get('current_flavor') %>/"
 
   require('load-grunt-tasks') grunt
   grunt.loadTasks 'tasks'
@@ -346,6 +395,8 @@ module.exports = (grunt) ->
     'clean:plugins'
     'coffee:plugins'
     'copy:plugins'
+    'replace:plugins_flavor'
+    'replace:plugins_translations'
     'hash:plugins'
   ]
 
@@ -357,23 +408,40 @@ module.exports = (grunt) ->
     'build_loader'
     'uglify'
   ]
-  grunt.registerTask 'vendor_assets', ['copy:easyxdm_dist']
+
+  grunt.registerTask 'vendor_assets', ['copy:easyxdm']
 
   #ON DEPLOY
-  grunt.registerTask 'build', [
-    'copy:ymls'
-    'create_env_settings'
-    'bower_install'
-    'build_dist'
-    'compress'
-  ]
+  grunt.registerTask 'build', (flavor) ->
+    return grunt.task.run ('flavor_build:' + flavor) if flavor?
+
+    grunt.task.run ('flavor_build:' + flavor for flavor in FLAVORS)
+
+  grunt.registerTask 'flavor_build', (flavor)->
+    grunt.config.set('current_flavor', flavor)
+
+    grunt.task.run [
+      'clean:tmp'
+      'copy:ymls'
+      'create_env_settings'
+      'bower_install'
+      'build_dist'
+      'compress'
+      'copy:tmp'
+      'clean:tmp'
+    ]
+
+  grunt.registerTask 'set_default_current_flavor', ->
+    grunt.config.set('current_flavor', DEFAULT_FLAVOR)
 
   #DEFAULT TASKS
   grunt.registerTask 'cleanup', ['shell:cleanup']
   grunt.registerTask 'default', [
+    'set_default_current_flavor'
     'start_test_server'
     'watch'
   ]
+
   grunt.registerTask 'test', ['karma:single']
 
   return

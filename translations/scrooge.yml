@@ -1,0 +1,10 @@
+translations:
+  order_stash:
+    cta_readmore_text: 'Save your order'
+    prompt: 'Save your order at Scrooge?'
+    rationale: 'Why should I save my order at Scrooge?'
+    rationale_why:
+      'So that you can see the orders you have placed, inside your Scrooge account.'
+    privacy: 'Your personal data remain protected and secured at Scrooge.'
+    save: 'Save'
+    save_why: 'Why should I save it?'
