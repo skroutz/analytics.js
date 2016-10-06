@@ -94,6 +94,31 @@ $ grunt create_env_settings
 
 ## Build
 
+Analytics Client supports deployment under different sites
+(a.k.a. flavors in Skroutz speak) with different parameters
+configured.
+
+For example, if you want to deploy for flavors `skroutz` and `alve`,
+where `skroutz.gr` and `alve.com` are the respective domains, then you
+you should specify those flavors in `config/settings/flavors.yml`:
+
+```
+- skroutz
+- alve
+```
+
+and then configure `config/settings/production.yml` as follows:
+
+```
+skroutz:
+  analytics_base_url: "https://analytics.skroutz.gr"
+  application_base_url: "https://skroutz.gr"
+
+alve:
+  analytics_base_url: "https://analytics.alve.com"
+  application_base_url: "https://alve.com"
+```
+
 You can build the project with the command:
 
 ```bash
@@ -101,20 +126,64 @@ $ npm run build
 ```
 
 Once the build process is successfully completed you should end up
-with a new `dist` directory created at the root of the project.
+with a new `dist` directory created at the root of the project. Under
+`dist`, there should be one directory for each of the flavors
+specified in `config/settings/flavors.yml`.
 
-The contents of the `dist` directory should look like this:
+So, the contents of the `dist` directory should look like this:
 
 ```bash
 # dist directory
-|- js/
-    |- easyXDM.min.js
-    |- payload.1A2B3C4D.js
-    |- payload.1A2B3C4D.min.js
-    |- payload.js
-    |- payload.min.js
-|- analytics.js
-|- analytics.min.js
+├── skroutz
+│   ├── analytics.js
+│   ├── analytics.js.gz
+│   ├── analytics.min.js
+│   ├── analytics.min.js.gz
+│   └── js
+│       ├── easyXDM.min.js
+│       ├── easyXDM.min.js.gz
+│       ├── payload.3175ee7a.js
+│       ├── payload.3175ee7a.js.gz
+│       ├── payload.3175ee7a.min.js
+│       ├── payload.3175ee7a.min.js.gz
+│       ├── payload.js
+│       ├── payload.js.gz
+│       ├── payload.min.js
+│       ├── payload.min.js.gz
+│       └── plugins
+│           ├── order_stash.3c2ba10f.js
+│           ├── order_stash.3c2ba10f.js.gz
+│           ├── order_stash.3c2ba10f.min.js
+│           ├── order_stash.3c2ba10f.min.js.gz
+│           ├── order_stash.js
+│           ├── order_stash.js.gz
+│           ├── order_stash.min.js
+│           └── order_stash.min.js.gz
+└── alve
+    ├── analytics.js
+    ├── analytics.js.gz
+    ├── analytics.min.js
+    ├── analytics.min.js.gz
+    └── js
+        ├── easyXDM.min.js
+        ├── easyXDM.min.js.gz
+        ├── payload.3175ee7a.js
+        ├── payload.3175ee7a.js.gz
+        ├── payload.3175ee7a.min.js
+        ├── payload.3175ee7a.min.js.gz
+        ├── payload.js
+        ├── payload.js.gz
+        ├── payload.min.js
+        ├── payload.min.js.gz
+        └── plugins
+            ├── order_stash.3c2ba10f.js
+            ├── order_stash.3c2ba10f.js.gz
+            ├── order_stash.3c2ba10f.min.js
+            ├── order_stash.3c2ba10f.min.js.gz
+            ├── order_stash.js
+            ├── order_stash.js.gz
+            ├── order_stash.min.js
+            └── order_stash.min.js.gz
 ```
 
 ## Watch and rebuild changes
