@@ -63,6 +63,7 @@ class OrderStash
     border-radius: 2px 2px 0 0;
     z-index: 2147483647;
 
+    -webkit-animation: sa-order-stash-slide-in-#{configuration.position.split('-')[1]} 1s;
     animation: sa-order-stash-slide-in-#{configuration.position.split('-')[1]} 1s;
   }
 
@@ -71,6 +72,7 @@ class OrderStash
   }
 
   #sa-order-stash-plugin.sa-order-stash-slide-out {
+    -webkit-animation: sa-order-stash-slide-out-#{configuration.position.split('-')[1]} .5s;
     animation: sa-order-stash-slide-out-#{configuration.position.split('-')[1]} .5s;
     animation-fill-mode: forwards;
   }
