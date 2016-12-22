@@ -52,6 +52,7 @@ class OrderStash
     width: 250px;
     height: 220px;
     text-align: center;
+    letter-spacing: 0;
     font-family: Verdana, Arial, sans-serif !important;
     box-shadow: 0px 1px 11px 0px rgba(77,77,77,0.33);
 
