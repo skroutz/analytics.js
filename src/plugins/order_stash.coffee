@@ -353,7 +353,7 @@ class OrderStash
     element.attachEvent "on#{event}", handler              if element.attachEvent
 
   _onClickDismiss: =>
-    return @$el.className = 'sa-order-stash-slide-out' if @_transitionSupport()
+    return @$el.className = 'sa-order-stash-slide-out' if @_animationSupport()
 
     @$el.parentNode.removeChild(@$el)
 
@@ -373,16 +373,16 @@ class OrderStash
       button.className = 'sa-order-stash-read-more')(@$stashButton())
 
   _onClickStash: (e) =>
-    return unless @_transitionSupport()
+    return unless @_animationSupport()
 
     e.preventDefault()
 
     @$stashButton().removeEventListener('click', @_onClickStash, false)
-    @_attachEvent(@$el, 'transitionend', => @$stashButton().click())
+    @_attachEvent(@$el, 'animationend', => @$stashButton().click())
     @$el.className = 'sa-order-stash-slide-out'
 
   _head: -> @parent_doc.head || @parent_doc.getElementsByTagName('head')[0]
-  _transitionSupport: -> @$el.style.transition?
+  _animationSupport: -> @$el.style.animation?
 
   _setParentDoc: -> @parent_doc = window.parent.document
 
