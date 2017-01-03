@@ -82,22 +82,21 @@ describe 'OrderStash', ->
   describe 'click dismiss button', ->
     beforeEach -> click_element @subject.querySelectorAll('#sa-order-stash-dismiss')[0]
 
-    context 'when the browser supports transitions', ->
+    context 'when the browser supports animations', ->
       beforeEach ->
-        @original_transition = @subject.style.transition
-        @subject.style.transition = ""
-        console.log @subject.style.transition
+        @original_animation = @subject.style.animation
+        @subject.style.animation = ""
         click_element @subject.querySelectorAll('#sa-order-stash-dismiss')[0]
 
-      afterEach -> @subject.style.transition = @original_transition
+      afterEach -> @subject.style.animation = @original_animation
 
       it 'adds the sa-order-stash-slide-out class to the plugin element', ->
         expect(@subject.className).to.eql('sa-order-stash-slide-out')
 
-    context 'when the browser does not support transitions', ->
+    context 'when the browser does not support animations', ->
       beforeEach ->
         click_element @subject.querySelectorAll('#sa-order-stash-dismiss')[0]
-        @subject.style.transition = null
+        @subject.style.animation = null
 
       it 'removes the element', ->
         expect(window.parent.document.getElementById('sa-order-stash-plugin')).
