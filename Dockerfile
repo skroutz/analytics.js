@@ -1,7 +1,7 @@
-FROM node:0.10
+FROM node:4.7
 MAINTAINER Dimitris Zorbas "zorbash@skroutz.gr"
-ENV PATH ./node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+RUN echo '{ "allow_root": true }' > /root/.bowerrc # https://github.com/bower/bower/issues/1752
 RUN apt-get -qq update
-RUN npm -g install bower
-RUN npm -g install npm@1.4.29
+RUN npm -g install npm@2.15.11
+RUN npm -g install yarn@0.21.3
 WORKDIR /analytics.js

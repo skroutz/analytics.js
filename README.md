@@ -29,6 +29,14 @@ Examples:
 ```shell
 docker-compose run builder yarn run test
 ```
+
+**NOTE**: If you get an error such as `[launcher]: Cannot start PhantomJS`,
+you should run
+```
+docker-compose run builder yarn install
+```
+in order to install the correct binary for [`phantomjs`](https://github.com/Medium/phantomjs).
+
 #### Start a shell
 
 ```shell
