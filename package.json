@@ -5,7 +5,7 @@
   "license": "MIT",
   "version": "0.1.0",
   "scripts": {
-    "build": "npm install && bower install && grunt build",
+    "build": "yarn install && bower install && grunt build",
     "cleanup": "rm -rf node_modules bower_components dist compiled src/{plugins_,}settings.coffee",
     "dev": "grunt",
     "test": "bower install && grunt build:skroutz && grunt test"
