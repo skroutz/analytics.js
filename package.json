@@ -6,7 +6,7 @@
   "version": "0.1.0",
   "scripts": {
     "build": "npm install && grunt build",
-    "cleanup": "rm -rf node_modules bower_components dist compiled src/settings.coffee",
+    "cleanup": "rm -rf node_modules bower_components dist compiled src/{plugins_,}settings.coffee",
     "dev": "grunt",
     "test": "grunt build:skroutz && grunt test"
   },

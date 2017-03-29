@@ -232,6 +232,7 @@ The above command will:
  -  delete `dist` directory
  -  delete `compiled` directory
  -  delete `src/settings.coffee` file
+ -  delete `src/plugins_settings.coffee` file
 
 > *After a deep cleanup you have to install again the project
 > dependencies. Please check the Installation section.*
