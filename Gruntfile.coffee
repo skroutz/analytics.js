@@ -307,14 +307,6 @@ module.exports = (grunt) ->
         ]
         dest: 'compiled/easyXDM.js'
 
-    bower:
-      install:
-        options:
-          install: true
-          copy: false
-          cleanTargetDir: false
-          cleanBowerDir: false
-
     shell:
       cleanup:
         options:
@@ -361,10 +353,6 @@ module.exports = (grunt) ->
   grunt.registerTask 'start_test_server', ['karma:unit:start']
   grunt.registerTask 'run_tests', ['karma:unit:run']
 
-  #BOWER TASKS
-  grunt.registerTask 'bower_install', [
-    'bower:install'
-  ]
   grunt.registerTask 'create_env_settings', [
     'environment:' + ENV
     'replace:settings'
@@ -424,7 +412,6 @@ module.exports = (grunt) ->
       'clean:tmp'
       'copy:ymls'
       'create_env_settings'
-      'bower_install'
       'build_dist'
       'compress'
       'copy:tmp'

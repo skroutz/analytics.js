@@ -7,8 +7,7 @@ describe 'Settings', ->
   describe 'API', ->
     it 'has property .window', ->
       expect(@settings)
-        .to.have.property('window')
-        .that.is.an('object')
+        .to.have.property('window', window)
 
     it 'has property .redirectTo', ->
       expect(@settings)

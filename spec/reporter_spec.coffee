@@ -163,7 +163,6 @@ describe 'Reporter', ->
         @subject.sendBeacon(@url, @simple_beacon_data).then callback, callback
 
       it 'gives transport element its own promise', (done)->
-        @clock.restore()
         @start()
 
         callback = =>

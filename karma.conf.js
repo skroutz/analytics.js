@@ -59,9 +59,13 @@ module.exports = function(config) {
 
     // configure the coverage reporter
     coverageReporter: {
+      dir: 'spec/coverage',
+      useJSExtensionForCoffeeScript: true,
+      instrumenters: { ibrik: require('ibrik') },
+      instrumenter: { '**/*.coffee': 'ibrik' },
       reporters: [
-        { type: 'html', dir: 'spec/coverage/' },
-        { type: 'cobertura', dir: 'spec/coverage/cobertura' }
+        { type: 'html', subdir: 'html' },
+        { type: 'cobertura', subdir: 'cobertura' }
       ]
     },
 
