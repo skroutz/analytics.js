@@ -9,8 +9,8 @@ cookies:
   first_party_enabled: true
   version: 1
   analytics:
-    name: "analytics_session"
-    duration: 2592000 # 1 month
+    name: "__sa_session"
+    duration: 1800 # 30 minutes
 
 api:
   settings:

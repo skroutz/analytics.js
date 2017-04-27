@@ -86,13 +86,13 @@ describe 'Settings', ->
       expect(@settings)
         .to.have.deep.property('cookies.analytics.name')
         .that.is.a('string')
-        .that.equals('analytics_session')
+        .that.equals('__sa_session')
 
     it 'has proper .analytics.duration', ->
       expect(@settings)
         .to.have.deep.property('cookies.analytics.duration')
         .that.is.an('number')
-        .that.equals( (60 * 60 * 24 * 30) )
+        .that.equals( (60 * 30) )
 
   describe '.url', ->
     it 'has proper .base', ->
