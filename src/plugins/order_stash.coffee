@@ -117,6 +117,7 @@ class OrderStash
     margin: 0;
     padding: 0 20px;
     color: #333 !important;
+    -webkit-text-fill-color: currentColor;
     font-size: 13px !important;
     font-family: Verdana, Arial, sans-serif !important;
   }
@@ -132,6 +133,7 @@ class OrderStash
     line-height: 16px;
     background-color: #f68b24 !important;
     color: white !important;
+    -webkit-text-fill-color: currentColor;
     font-family: Verdana, Arial, sans-serif !important;
     font-weight: bold;
     font-size: 14px !important;
@@ -158,6 +160,7 @@ class OrderStash
 
   #sa-order-stash-plugin #sa-order-stash-button:hover {
     color: white !important;
+    -webkit-text-fill-color: currentColor;
   }
 
   #sa-order-stash-plugin #sa-order-stash-button.sa-order-stash-read-less:hover {
@@ -190,6 +193,7 @@ class OrderStash
     display: inline-block;
     margin-top: 17px;
     color: #909090 !important;
+    -webkit-text-fill-color: currentColor;
 
     font-size: 12px !important;
     font-style: italic;
@@ -204,6 +208,7 @@ class OrderStash
 
   #sa-order-stash-plugin #sa-order-stash-why:hover {
     color: #666 !important;
+    -webkit-text-fill-color: currentColor;
     border-bottom: 1px dashed #909090;
   }
 
@@ -222,6 +227,7 @@ class OrderStash
     margin: 13px 0 6px 0;
     line-height: 17px;
     color: #333 !important;
+    -webkit-text-fill-color: currentColor;
     font-family: Verdana, Arial, sans-serif !important;
     font-size: 13px !important;
   }
@@ -229,6 +235,7 @@ class OrderStash
   #sa-order-stash-plugin #sa-order-stash-rationale p.sa-order-stash-privacy {
     font-size: 11px !important;
     color: #909090 !important;
+    -webkit-text-fill-color: currentColor;
     margin-bottom: 0;
   }
 
