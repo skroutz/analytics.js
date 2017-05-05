@@ -18,6 +18,7 @@ define ->
     plugins:
       order_stash:
         url: '@@analytics_base_url/@@order_stash_hash'
+        elements_to_hide: ['#sa-badge-floating-plugin']
       badge:
         url: '@@analytics_base_url/@@badge_hash'
     triggers:
