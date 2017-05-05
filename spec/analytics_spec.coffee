@@ -35,6 +35,7 @@ describe 'Analytics', ->
       session = @session =
         analytics_session: 'analytics_session'
         shop_code: 'SA-XXXX-XXXX'
+      @plugins_manager = new @PluginsManager()
       @session_run_stub = sinon.stub(@Session::, 'run').returns(then: (fn) -> fn(session))
       @ActionsManager_spy::run = sinon.stub().returnsThis()
       @_live_spy = sinon.spy(@Analytics::, '_live')
@@ -44,21 +45,18 @@ describe 'Analytics', ->
       @session_run_stub.restore()
       @_live_spy.restore()
 
+    it 'creates a PluginsManager using new', ->
+      expect(@PluginsManager).to.be.calledWithNew
+
     it 'tries to acquire a Session', ->
       expect(@session_run_stub).to.be.calledOnce
 
     context 'when a Session is acquired', ->
-      it 'creates a PluginsManager using new', ->
-        expect(@PluginsManager).to.be.calledWithNew
-
-      it 'provides the session to the PluginsManager instance', ->
-        expect(@PluginsManager).to.be.calledWith(@session)
-
       it 'creates an ActionsManager using new', ->
         expect(@ActionsManager).to.be.calledWithNew
 
       it 'provides the session and PluginsManager instance to the ActionsManager instance', ->
-        expect(@ActionsManager).to.be.calledWith(@session, (new @PluginsManager))
+        expect(@ActionsManager).to.be.calledWith(@session, @plugins_manager)
 
       it 'calls ActionsManager#run', ->
         expect(@ActionsManager_spy::run).to.be.called

@@ -37,10 +37,9 @@ describe 'PluginsManager', ->
      window.__requirejs__.clearRequireState()
 
   beforeEach ->
-    @session = { shop_code: 'SA-XXXX-XXX', analytics_session: 'analytics_session' }
     @jsonp_fetch_stub = sinon.stub(@jsonp, 'fetch').returns((new @promise).resolve(@plugins_response))
     @jsonp_load_stub = sinon.stub(@jsonp, 'load')
-    @subject = new @plugins_manager(@session)
+    @subject = new @plugins_manager()
 
     window.sa_plugins = {}
 
@@ -49,19 +48,23 @@ describe 'PluginsManager', ->
     @jsonp_load_stub.restore()
 
   describe '.constructor', ->
-    it 'caches the session', ->
-      expect(@subject.session).to.equal(@session)
+    it 'initializes the session', ->
+      expect(@subject.session).to.be.null
 
     it 'does not fetch plugins', ->
       expect(@jsonp_fetch_stub.called).to.be.false
 
   describe '#notify', ->
+    beforeEach ->
+      @session = { shop_code: 'SA-XXXX-XXX', analytics_session: 'analytics_session' }
+      @subject.session = @session
+
     context 'when action is set to trigger a plugin', ->
       context 'and plugin is enabled', ->
         beforeEach -> @plugin = (plugin for plugin in @plugins_response.plugins when plugin.name is 'analytics_plugin')[0]
 
         it 'retrieves the enabled plugins', ->
-          data = shop_code: @session.shop_code, analytics_session: @session.analytics_session
+          data = shop_code: @session.shop_code
           @subject.notify('addOrder', { order_id: 1 })
 
           expect(@jsonp_fetch_stub.withArgs(@settings.general.fetch_plugins_url, data).calledOnce).to.be.true
@@ -113,7 +116,7 @@ describe 'PluginsManager', ->
             expect(@jsonp_load_stub.withArgs(@settings.plugins.analytics_plugin.url).calledOnce).to.be.true
 
           it 'does not make multiple api calls', ->
-            data = shop_code: @session.shop_code, analytics_session: @session.analytics_session
+            data = shop_code: @session.shop_code
             expect(@jsonp_fetch_stub.withArgs(@settings.general.fetch_plugins_url, data).calledOnce).to.be.true
 
       context 'and plugin is not enabled', ->

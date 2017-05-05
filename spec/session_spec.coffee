@@ -210,11 +210,13 @@ describe 'Session', ->
 
       require [
         'session'
+        'plugins_manager'
         'promise'
         'biskoto'
         'settings'
-      ], (Session, Promise, Biskoto, Settings)=>
+      ], (Session, PluginsManager, Promise, Biskoto, Settings)=>
         @session = Session
+        @PluginsManager = PluginsManager
         @promise  = Promise
         @biskoto  = Biskoto
         @settings = Settings
@@ -225,6 +227,9 @@ describe 'Session', ->
     requirejs.undef 'session_engines/xdomain_engine'
     window.__requirejs__.clearRequireState()
 
+  beforeEach ->
+    @plugins_manager = new @PluginsManager()
+
   afterEach ->
     @get_param_promise = new @promise()
     @get_param_spy.reset()
@@ -233,20 +238,20 @@ describe 'Session', ->
 
   describe '.contructor', ->
     it 'returns its own instance', ->
-      @instance = new @session()
+      @instance = new @session(@plugins_manager)
       expect(@instance).to.be.an.instanceof @session
 
     it 'creates a promise to notify when session is ready', ->
-      @instance = new @session()
+      @instance = new @session(@plugins_manager)
       expect(@instance.promise).to.be.an.instanceof @promise
 
   describe '#run', ->
     it 'responds to #run', ->
-      expect(new @session()).to.respondTo('run')
+      expect(new @session(@plugins_manager)).to.respondTo('run')
 
   describe '#then', ->
     beforeEach ->
-      @instance = new @session()
+      @instance = new @session(@plugins_manager)
       @stub = sinon.stub @instance, '_extractAnalyticsSession'
       @resolve_spy = sinon.spy()
       @reject_spy = sinon.spy()
@@ -300,7 +305,7 @@ describe 'Session', ->
         @type = @type_create
         @init = =>
           sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id, @flavor)
-          @instance = new @session().run()
+          @instance = new @session(@plugins_manager).run()
 
       context 'when first-party cookies are enabled', ->
         beforeEach ->
@@ -323,7 +328,12 @@ describe 'Session', ->
         @type = @type_connect
         @init = =>
           sa('session', 'connect', @shop_code)
-          @instance = new @session().run()
+          @instance = new @session(@plugins_manager).run()
+
+      it 'assigns itself in plugins_manager', ->
+        @init()
+
+        expect(@plugins_manager.session).to.equal(@instance)
 
       context 'when first-party cookies are enabled', ->
         beforeEach ->
