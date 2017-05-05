@@ -37,7 +37,7 @@ define [
 
       window.sa_plugins ||= {}
       window.sa_plugins[name] ||= {}
-      window.sa_plugins.settings = Settings
+      window.sa_plugins.settings ||= @_settings()
 
       data.shop_code = @session.shop_code
       data.analytics_session = @session.analytics_session
@@ -46,6 +46,12 @@ define [
       window.sa_plugins[name] = data
 
       true
+
+    _settings: ->
+      url:
+        base: Settings.url.base
+        application_base: Settings.url.application_base
+      plugins: PluginsSettings.plugins
 
     _load: (name) ->
       @loaded_plugins.push(name) # Keep which plugins have been loaded

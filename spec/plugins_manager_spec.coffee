@@ -1,6 +1,6 @@
 describe 'PluginsManager', ->
   before (done) ->
-    @settings =
+    mock_plugin_settings =
       general:
         fetch_plugins_url: 'http://example.com/plugins'
       plugins:
@@ -14,7 +14,7 @@ describe 'PluginsManager', ->
 
     # mock PluginsSettings
     requirejs.undef 'plugins_settings'
-    define 'plugins_settings', => @settings
+    define 'plugins_settings', => mock_plugin_settings
 
     require [
       'settings',
@@ -68,7 +68,7 @@ describe 'PluginsManager', ->
           data = shop_code: @session.shop_code
           @subject.notify('addOrder', { order_id: 1 })
 
-          expect(@jsonp_fetch_stub.withArgs(@settings.general.fetch_plugins_url, data).calledOnce).to.be.true
+          expect(@jsonp_fetch_stub.withArgs(@plugins_settings.general.fetch_plugins_url, data).calledOnce).to.be.true
 
         it 'caches the retrieved plugins', ->
           @subject.notify('addOrder', { order_id: 1 })
@@ -78,12 +78,18 @@ describe 'PluginsManager', ->
         it 'loads the plugin', ->
           @subject.notify('addOrder', { order_id: 1 })
 
-          expect(@jsonp_load_stub.withArgs(@settings.plugins.analytics_plugin.url).calledOnce).to.be.true
+          expect(@jsonp_load_stub.withArgs(@plugins_settings.plugins.analytics_plugin.url).calledOnce).to.be.true
 
         it 'makes analytics settings available to the plugins', ->
           @subject.notify('addOrder', { order_id: 1 })
 
-          expect(window.sa_plugins.settings).to.equal(@analytics_settings)
+          settings =
+            url:
+              base: @analytics_settings.url.base
+              application_base: @analytics_settings.url.application_base
+            plugins: @plugins_settings.plugins
+
+          expect(window.sa_plugins.settings).to.eql(settings)
 
         context 'when data is an object', ->
           it 'makes data public', ->
@@ -114,11 +120,11 @@ describe 'PluginsManager', ->
             @subject.notify('addOrder', { order_id: 1 })
 
           it 'loads the plugin only once', ->
-            expect(@jsonp_load_stub.withArgs(@settings.plugins.analytics_plugin.url).calledOnce).to.be.true
+            expect(@jsonp_load_stub.withArgs(@plugins_settings.plugins.analytics_plugin.url).calledOnce).to.be.true
 
           it 'does not make multiple api calls', ->
             data = shop_code: @session.shop_code
-            expect(@jsonp_fetch_stub.withArgs(@settings.general.fetch_plugins_url, data).calledOnce).to.be.true
+            expect(@jsonp_fetch_stub.withArgs(@plugins_settings.general.fetch_plugins_url, data).calledOnce).to.be.true
 
       context 'and plugin is not enabled', ->
         beforeEach ->
