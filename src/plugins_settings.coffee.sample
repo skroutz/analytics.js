@@ -18,7 +18,10 @@ define ->
     plugins:
       order_stash:
         url: '@@analytics_base_url/@@order_stash_hash'
+      badge:
+        url: '@@analytics_base_url/@@badge_hash'
     triggers:
       order: 'order_stash'
+      connect: 'badge'
 
   return PluginsSettings
