@@ -335,6 +335,13 @@ describe 'Session', ->
 
         expect(@plugins_manager.session).to.equal(@instance)
 
+      it 'notifies the plugins manager', ->
+        spy_notify = sinon.spy(@plugins_manager, 'notify')
+
+        @init()
+
+        expect(spy_notify).to.be.calledWithExactly('connect', {})
+
       context 'when first-party cookies are enabled', ->
         beforeEach ->
           @settings.cookies.first_party_enabled = true

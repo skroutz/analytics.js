@@ -30,6 +30,8 @@ define [
           @shop_code = shop_code
           @plugins_manager.session = @
 
+          @plugins_manager.notify('connect', {})
+
           return @promise.resolve(@) if @analytics_session
 
           @_extractAnalyticsSession('connect', shop_code)
