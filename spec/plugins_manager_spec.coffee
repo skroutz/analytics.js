@@ -28,7 +28,8 @@ describe 'PluginsManager', ->
       @plugins_settings = PluginsSettings
       @jsonp = JSONP
 
-      @plugins_response = { plugins: [{ name: 'analytics_plugin', configuration: { position: 'bottom-right' } }] }
+      @plugins_response =
+        { plugins: [{ name: 'analytics_plugin', configuration: { position: 'bottom-right' }, data: { test: 'test' } }] }
 
       done()
 
@@ -89,14 +90,14 @@ describe 'PluginsManager', ->
             @subject.notify('addOrder', { order_id: 1 })
 
             expect(window.sa_plugins.analytics_plugin)
-              .to.deep.equal({ order_id: 1, shop_code: @session.shop_code, analytics_session: @session.analytics_session, configuration: @plugin.configuration })
+              .to.deep.equal({ order_id: 1, shop_code: @session.shop_code, analytics_session: @session.analytics_session, configuration: @plugin.configuration, data: @plugin.data })
 
         context 'when data is json stringified', ->
           it 'makes data public', ->
             @subject.notify('addOrder', JSON.stringify({ order_id: 1 }))
 
             expect(window.sa_plugins.analytics_plugin)
-              .to.deep.equal({ order_id: 1, shop_code: @session.shop_code, analytics_session: @session.analytics_session, configuration: @plugin.configuration })
+              .to.deep.equal({ order_id: 1, shop_code: @session.shop_code, analytics_session: @session.analytics_session, configuration: @plugin.configuration, data: @plugin.data })
 
         context 'when data is not a valid json', ->
           beforeEach -> @subject.notify('addOrder', 'not_a_json')

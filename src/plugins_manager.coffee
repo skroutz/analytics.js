@@ -42,6 +42,7 @@ define [
       data.shop_code = @session.shop_code
       data.analytics_session = @session.analytics_session
       data.configuration = @_plugin(name).configuration
+      data.data = @_plugin(name).data
       window.sa_plugins[name] = data
 
       true
