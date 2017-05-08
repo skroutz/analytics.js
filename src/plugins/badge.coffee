@@ -282,7 +282,9 @@ class Badge
   @media only screen and (max-width: 768px) {
     #sa-badge-floating-plugin {
       bottom: 15px;
-      right: 15px;
+      #{switch configuration.position
+          when 'bottom-left' then 'left: 15px;'
+          when 'bottom-right' then 'right: 15px;'}
 
       width: 70px;
       height: 70px;
