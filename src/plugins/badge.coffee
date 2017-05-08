@@ -239,6 +239,16 @@ class Badge
     background-color: #f1f1f1;
   }
 
+  #sa-badge-modal #sa-badge-modal-iframe-container {
+    position: relative;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: scroll;
+  }
+
   #sa-badge-modal #sa-badge-modal-inner.sa-badge-spinner::before {
     content: "";
     width: 48px;
@@ -260,7 +270,7 @@ class Badge
     display: block;
 
     position: relative;
-    z-index: 2;
+    z-index: 3;
   }
 
   #sa-badge-modal #sa-badge-modal-inner #sa-badge-modal-close-button {
@@ -429,7 +439,9 @@ class Badge
   MODAL_INNER_TEMPLATE = (assigns) -> """
   <div id="sa-badge-modal-inner" class="sa-badge-spinner">
     <span id="sa-badge-modal-close-button"></span>
-      <iframe id="sa-badge-modal-iframe" src="#{assigns.src}" width="100%" height="100%" frameborder="0"></iframe>
+      <div id="sa-badge-modal-iframe-container">
+        <iframe id="sa-badge-modal-iframe" src="#{assigns.src}" width="100%" height="100%" frameborder="0"></iframe>
+      </div>
     </div>
   </div>
   """
