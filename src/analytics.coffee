@@ -6,8 +6,9 @@ define [
 ], (Settings, Session, PluginsManager, ActionsManager) ->
   class Analytics
     constructor: ->
-      new Session().run().then (session) =>
-        plugins_manager = new PluginsManager(session)
+      plugins_manager = new PluginsManager
+
+      new Session(plugins_manager).run().then (session) =>
         @actions = new ActionsManager(session, plugins_manager).run()
         @_live()
 

@@ -9,7 +9,7 @@ define [
   class Session
     Session::[key] = method for key, method of Runnable
 
-    constructor: ->
+    constructor: (@plugins_manager) ->
       @promise = new Promise()
       @_cleanUpCookies()
       @analytics_session = @_getCookieAnalyticsSession()
@@ -28,6 +28,9 @@ define [
 
         connect: (shop_code)->
           @shop_code = shop_code
+          @plugins_manager.session = @
+
+          @plugins_manager.notify('connect', {})
 
           return @promise.resolve(@) if @analytics_session
 

@@ -94,11 +94,14 @@ describe 'ActionsManager', ->
         'reporter'
         'promise'
       ], (Session, PluginsManager, ActionsManager, Settings, Reporter, Promise) =>
-        @session = new Session()
+        @PluginsManager = PluginsManager
+        @plugins_manager = new @PluginsManager
+
+        @session = new Session(@plugins_manager)
         @session.analytics_session = @analytics_session
         @session.shop_code = @shop_code
-        @PluginsManager = PluginsManager
-        @plugins_manager = new @PluginsManager(@session)
+        @plugins_manager.session = @session
+
         @actions_manager = ActionsManager
         @settings = Settings
         @reporter = Reporter

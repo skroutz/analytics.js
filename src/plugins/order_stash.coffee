@@ -258,6 +258,11 @@ class OrderStash
       background-image: url('#{asset_url("arrow@2x.png")}');
     }
   }
+
+  #{
+    if settings.plugins.order_stash.elements_to_hide
+      ("#{element} { display: none !important; }" for element in settings.plugins.order_stash.elements_to_hide).join('')
+  }
   """
 
   TEMPLATE = (assigns) -> """

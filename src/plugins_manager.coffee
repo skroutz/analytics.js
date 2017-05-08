@@ -8,7 +8,8 @@ define [
   backend set of plugins and provides them the context (data, configuration) required to operate.
   ###
   class PluginsManager
-    constructor: (@session) ->
+    constructor: ->
+      @session = null
       @loaded_plugins = [] # Use it in order to load a plugin only once
 
     ###
@@ -36,21 +37,28 @@ define [
 
       window.sa_plugins ||= {}
       window.sa_plugins[name] ||= {}
-      window.sa_plugins.settings = Settings
+      window.sa_plugins.settings ||= @_settings()
 
       data.shop_code = @session.shop_code
       data.analytics_session = @session.analytics_session
       data.configuration = @_plugin(name).configuration
+      data.data = @_plugin(name).data
       window.sa_plugins[name] = data
 
       true
+
+    _settings: ->
+      url:
+        base: Settings.url.base
+        application_base: Settings.url.application_base
+      plugins: PluginsSettings.plugins
 
     _load: (name) ->
       @loaded_plugins.push(name) # Keep which plugins have been loaded
       JSONP.load(@_pluginSettings(name).url)
 
     _fetchEnabledPlugins: ->
-      data = shop_code: @session.shop_code, analytics_session: @session.analytics_session
+      data = shop_code: @session.shop_code
       # @fetched purpose is to memoize request in order to prevent making multiple api calls
       @fetched ||= JSONP.fetch(PluginsSettings.general.fetch_plugins_url, data).then (response) =>
         @enabled_plugins = response.plugins
