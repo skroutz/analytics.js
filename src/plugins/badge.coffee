@@ -549,17 +549,20 @@ class Badge
 
     @$modal.style.display = 'none'
 
+    # Destroy modal with its iframe because some mobile browsers (e.g Android
+    # Firefox and most of iOS browsers) have a scrolling issue when an
+    # iframe transitions from display: 'none' to display: 'block'.
+    @_destroyModal()
+
   _onClickShowReviewsButton: => @_showModal()
   _onClickModal: => @_hideModal()
   _onClickModalCloseButton: => @_hideModal()
 
   _onKeyUp: (event) =>
     if (event.keyCode || event.which) == 27 # ESC
-      @_hideModal()
-
-      # Destroy modal in order to reload iframe on next _showModal,
+      # Make sure to destroy modal in order to reload iframe on next _showModal,
       # as browsers interrupt iframe loading on ESC.
-      @_destroyModal()
+      @_hideModal()
 
   _head: -> @parent_doc.head || @parent_doc.getElementsByTagName('head')[0]
 

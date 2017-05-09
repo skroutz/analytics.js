@@ -99,21 +99,17 @@ describe 'Badge', ->
 
       context 'when click outside of iframe', ->
         beforeEach ->
-          @modal = window.parent.document.getElementById('sa-badge-modal')
+          click_element window.parent.document.getElementById('sa-badge-modal')
 
-          click_element @modal
-
-        it 'hides the modal', ->
-          expect(@modal.style.display).to.eq('none')
+        it 'destroys the modal', ->
+          expect(window.parent.document.getElementById('sa-badge-modal')).to.not.exist
 
       context 'when click modal close button', ->
         beforeEach ->
-          @close_button = window.parent.document.getElementById('sa-badge-modal-close-button')
+          click_element window.parent.document.getElementById('sa-badge-modal-close-button')
 
-          click_element @close_button
-
-        it 'hides the modal', ->
-          expect(window.parent.document.getElementById('sa-badge-modal').style.display).to.eq('none')
+        it 'destroys the modal', ->
+          expect(window.parent.document.getElementById('sa-badge-modal')).to.not.exist
 
       context 'when press ESC key', ->
         it 'destroys the modal', ->
@@ -264,21 +260,17 @@ describe 'Badge', ->
 
       context 'when click outside of iframe', ->
         beforeEach ->
-          @modal = window.parent.document.getElementById('sa-badge-modal')
+          click_element window.parent.document.getElementById('sa-badge-modal')
 
-          click_element @modal
-
-        it 'hides the modal', ->
-          expect(@modal.style.display).to.eq('none')
+        it 'destroys the modal', ->
+          expect(window.parent.document.getElementById('sa-badge-modal')).to.not.exist
 
       context 'when click modal close button', ->
         beforeEach ->
-          @close_button = window.parent.document.getElementById('sa-badge-modal-close-button')
+          click_element window.parent.document.getElementById('sa-badge-modal-close-button')
 
-          click_element @close_button
-
-        it 'hides the modal', ->
-          expect(window.parent.document.getElementById('sa-badge-modal').style.display).to.eq('none')
+        it 'destroys the modal', ->
+          expect(window.parent.document.getElementById('sa-badge-modal')).to.not.exist
 
       context 'when press ESC key', ->
         it 'destroys the modal', ->
