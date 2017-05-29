@@ -226,7 +226,7 @@ class Badge
     height: 100%;
     z-index: 2;
     -webkit-overflow-scrolling: touch;
-    overflow-y: scroll;
+    overflow: auto;
   }
 
   #sa-badge-modal #sa-badge-modal-inner.sa-badge-spinner::before {
