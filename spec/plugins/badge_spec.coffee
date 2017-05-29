@@ -81,6 +81,16 @@ describe 'Badge', ->
       it 'adds the plugin markup to the body', ->
         expect(window.parent.document.getElementById('sa-badge-floating-plugin')).to.exist
 
+      context 'when rating is 0', ->
+        beforeEach (done) ->
+          setSaPlugins(@default_settings, rating: 0)
+
+          renderPlugin done, =>
+            @subject = window.parent.document.getElementById('sa-badge-floating-plugin')
+
+        it 'adds no stars class to container', ->
+          expect(@subject.className).to.include('sa-badge-no-stars')
+
     describe 'click on badge', ->
       beforeEach -> click_element @subject
 
@@ -123,10 +133,10 @@ describe 'Badge', ->
           setSaPlugins(@default_settings, rating: 0)
 
           renderPlugin done, =>
-            @subject = window.parent.document.getElementsByClassName('sa-badge-empty-star')
+            @subject = window.parent.document.getElementById('sa-badge-floating-stars-container')
 
-        it 'shows 5 empty stars', ->
-          expect(@subject.length).to.eql(5)
+        it 'does not show stars', ->
+          expect(@subject).to.not.exist
 
       context 'when rating is 5', ->
         beforeEach (done) ->

@@ -38,14 +38,16 @@ class Badge
     width: 90px;
     height: 90px;
 
-    -moz-border-radius: 49px;
-    -webkit-border-radius: 49px;
-    border-radius: 49px;
+    border-radius: 45px;
 
     background-image: url('#{asset_url("badge/floating/large/theme/#{configuration.theme}/logo_@@flavor.png")}');
     background-position: center;
     background-repeat: no-repeat;
     background-size: 90px 90px;
+    background-color: #{switch configuration.theme
+                        when 'black' then '#363636'
+                        when 'white' then '#F7F7F7'
+                        when 'orange' then '#F68B24'};
 
     cursor: pointer;
 
@@ -55,6 +57,10 @@ class Badge
     animation: sa-badge-fade-in 0.3s ease-in;
 
     box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+  }
+
+  #sa-badge-floating-plugin.sa-badge-no-stars {
+    background-position-y: 4px;
   }
 
   #sa-badge-floating-plugin * {
@@ -291,20 +297,22 @@ class Badge
 
   @media only screen and (max-width: 768px) {
     #sa-badge-floating-plugin {
-      bottom: 15px;
+      bottom: 8px;
       #{switch configuration.position
-          when 'bottom-left' then 'left: 15px;'
-          when 'bottom-right' then 'right: 15px;'}
+          when 'bottom-left' then 'left: 8px;'
+          when 'bottom-right' then 'right: 8px;'}
 
       width: 70px;
       height: 70px;
 
-      -moz-border-radius: 39px;
-      -webkit-border-radius: 39px;
-      border-radius: 39px;
+      border-radius: 35px;
 
       background-image: url('#{asset_url("badge/floating/small/theme/#{configuration.theme}/hat_logo.png")}');
       background-size: 70px 70px;
+    }
+
+    #sa-badge-floating-plugin.sa-badge-no-stars {
+      background-position-y: 9px;
     }
 
     #sa-badge-floating-plugin #sa-badge-floating-stars-container {
@@ -412,9 +420,11 @@ class Badge
   """
 
   FLOATING_TEMPLATE = (assigns) -> """
-  <div id="sa-badge-floating-stars-container">
-    #{(STAR_TEMPLATE(star_type, assigns) for star_type in assigns.stars).join("\n")}
-  </div>
+  #{if assigns.stars.length > 0
+      "<div id='sa-badge-floating-stars-container'>
+        #{(STAR_TEMPLATE(type) for type in assigns.stars).join("\n")}
+      </div>"
+    else ''}
   """
 
   EMBEDDED_TEMPLATE = (assigns) -> """
@@ -432,7 +442,7 @@ class Badge
   </div>
   """
 
-  STAR_TEMPLATE = (type, assigns) -> """
+  STAR_TEMPLATE = (type) -> """
   <div class="sa-badge-star sa-badge-#{type}-star"></div>
   """
 
@@ -510,6 +520,7 @@ class Badge
   _renderFloating: ->
     $el = document.createElement('div')
     $el.id = 'sa-badge-floating-plugin'
+    $el.className += 'sa-badge-no-stars' if @_noStars(context().data.rating)
     $el.innerHTML = FLOATING_TEMPLATE(stars: @_ratingToStars(context().data.rating))
     @parent_doc.body.appendChild($el)
 
@@ -569,6 +580,8 @@ class Badge
   _setParentDoc: -> @parent_doc = window.parent.document
 
   _ratingToStars: (rating = 0, limit = 5) ->
+    return [] if @_noStars(rating)
+
     # When rating is X.5 +/- 0.2, round it to X.5
     rating = Math.round(rating * 2) / 2
 
@@ -583,6 +596,8 @@ class Badge
     stars.push('empty') for star in [limit...full_stars_count+1]
 
     stars
+
+  _noStars: (rating) -> rating is 0
 
   _canRender: ->
     if context().configuration.display == 'embedded' && !@$embeddedBadgePlugin() then false else true
