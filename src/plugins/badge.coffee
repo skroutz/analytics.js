@@ -105,41 +105,38 @@ class Badge
     -ms-user-select: none;
     user-select: none;
 
+    cursor: pointer;
+
     display: #{if configuration.display is 'embedded' then 'block' else 'none !important'};
 
     position: relative;
     clear: both;
 
-    width: 255px;
-    height: 93px;
+    width: 150px;
+    height: 65px;
     box-sizing: border-box;
 
-    padding: 15px;
+    padding: 10px;
     background-color: #{switch configuration.theme
                         when 'white' then '#ffffff'
                         when 'black' then '#363636'};
+
+    border-radius: 2px;
+    border: 1px solid #{switch configuration.theme
+                        when 'white' then '#DEDEDE'
+                        when 'black' then '#575757'};
   }
 
   #sa-badge-embedded-plugin * {
     all: unset;
   }
 
-  #sa-badge-embedded-plugin #sa-badge-embedded-header {
+  #sa-badge-embedded-plugin #sa-badge-embedded-logo {
     display: block;
-    height: 24px;
-  }
-
-  #sa-badge-embedded-plugin #sa-badge-embedded-footer {
-    display: block;
-    margin-top: 10px;
-    text-align: center;
-  }
-
-  #sa-badge-embedded-header #sa-badge-embedded-logo {
-    display: inline-block;
 
     width: 124px;
     height: 24px;
+    margin: 0 auto;
 
     background-image: url('#{asset_url("badge/embedded/theme/#{configuration.theme}/logo_@@flavor.png")}');
     background-position: center;
@@ -147,19 +144,21 @@ class Badge
     background-size: 124px 24px;
   }
 
-  #sa-badge-embedded-header #sa-badge-embedded-rating {
-    display: inline-block;
-
-    width: 90px;
-    height: 24px;
-
-    vertical-align: top;
-    float: right;
-
-    padding-top: 5px;
+  #sa-badge-embedded-plugin.sa-badge-no-stars #sa-badge-embedded-logo {
+    margin-top: 7px;
   }
 
-  #sa-badge-embedded-header #sa-badge-embedded-rating .sa-badge-rating-number {
+  #sa-badge-embedded-plugin #sa-badge-embedded-rating-container {
+    display: block;
+
+    width: 124px;
+    margin: 0 auto;
+    text-align: center;
+
+    padding-top: 2px;
+  }
+
+  #sa-badge-embedded-plugin #sa-badge-embedded-rating-container .sa-badge-embedded-rating-number {
     display: inline-block;
 
     font-family: Verdana, Arial, sans-serif !important;
@@ -171,11 +170,12 @@ class Badge
     -webkit-text-fill-color: currentColor;
   }
 
-  #sa-badge-embedded-header #sa-badge-embedded-rating .sa-badge-stars-container {
+  #sa-badge-embedded-plugin #sa-badge-embedded-rating-container .sa-badge-embedded-stars-container {
     display: inline-block;
+    margin-left: 4px;
   }
 
-  #sa-badge-embedded-header #sa-badge-embedded-rating .sa-badge-stars-container .sa-badge-star {
+  #sa-badge-embedded-plugin #sa-badge-embedded-rating-container .sa-badge-embedded-stars-container .sa-badge-star {
     display: inline-block;
     margin-right: -3px;
 
@@ -187,42 +187,16 @@ class Badge
     background-size: 11px 10px;
   }
 
-  #sa-badge-embedded-header #sa-badge-embedded-rating .sa-badge-stars-container .sa-badge-full-star {
+  #sa-badge-embedded-plugin #sa-badge-embedded-rating-container .sa-badge-embedded-stars-container .sa-badge-full-star {
     background-image: url('#{asset_url("badge/embedded/theme/#{configuration.theme}/star_full.png")}');
   }
 
-  #sa-badge-embedded-header #sa-badge-embedded-rating .sa-badge-stars-container .sa-badge-half-star {
+  #sa-badge-embedded-plugin #sa-badge-embedded-rating-container .sa-badge-embedded-stars-container .sa-badge-half-star {
     background-image: url('#{asset_url("badge/embedded/theme/#{configuration.theme}/star_half.png")}');
   }
 
-  #sa-badge-embedded-header #sa-badge-embedded-rating .sa-badge-stars-container .sa-badge-empty-star {
+  #sa-badge-embedded-plugin #sa-badge-embedded-rating-container .sa-badge-embedded-stars-container .sa-badge-empty-star {
     background-image: url('#{asset_url("badge/embedded/theme/#{configuration.theme}/star_empty.png")}');
-  }
-
-  #sa-badge-embedded-footer #sa-badge-embedded-more-button {
-    display: inline-block;
-
-    padding: 6px 15px 7px 15px;
-    min-width: 90px;
-
-    background-color: #f68b24 !important;
-    color: white !important;
-    -webkit-text-fill-color: currentColor;
-    font-family: Verdana, Arial, sans-serif !important;
-    font-size: 11px !important;
-
-    cursor: pointer;
-    border-radius: 2px;
-
-    text-decoration: none;
-
-    transition: none;
-    transition: background-color .2s ease-in-out;
-  }
-
-  #sa-badge-embedded-footer #sa-badge-embedded-more-button:hover {
-    color: white !important;
-    background-color: #d8721c !important;
   }
 
   #sa-badge-modal {
@@ -378,19 +352,19 @@ class Badge
       background-image: url('#{asset_url("badge/close@2x.png")}');
     }
 
-    #sa-badge-embedded-header #sa-badge-embedded-logo {
+    #sa-badge-embedded-plugin #sa-badge-embedded-logo {
       background-image: url('#{asset_url("badge/embedded/theme/#{configuration.theme}/logo_@@flavor@2x.png")}');
     }
 
-    #sa-badge-embedded-header #sa-badge-embedded-rating .sa-badge-stars-container .sa-badge-full-star {
+    #sa-badge-embedded-plugin #sa-badge-embedded-rating-container .sa-badge-embedded-stars-container .sa-badge-full-star {
       background-image: url('#{asset_url("badge/embedded/theme/#{configuration.theme}/star_full@2x.png")}');
     }
 
-    #sa-badge-embedded-header #sa-badge-embedded-rating .sa-badge-stars-container .sa-badge-half-star {
+    #sa-badge-embedded-plugin #sa-badge-embedded-rating-container .sa-badge-embedded-stars-container .sa-badge-half-star {
       background-image: url('#{asset_url("badge/embedded/theme/#{configuration.theme}/star_half@2x.png")}');
     }
 
-    #sa-badge-embedded-header #sa-badge-embedded-rating .sa-badge-stars-container .sa-badge-empty-star {
+    #sa-badge-embedded-plugin #sa-badge-embedded-rating-container .sa-badge-embedded-stars-container .sa-badge-empty-star {
       background-image: url('#{asset_url("badge/embedded/theme/#{configuration.theme}/star_empty@2x.png")}');
     }
   }
@@ -428,18 +402,16 @@ class Badge
   """
 
   EMBEDDED_TEMPLATE = (assigns) -> """
-  <div id="sa-badge-embedded-header">
     <div id="sa-badge-embedded-logo"></div>
-    <div id="sa-badge-embedded-rating">
-      <div class="sa-badge-rating-number"><span>#{assigns.rating}</span></div>
-      <div class="sa-badge-stars-container">
-        #{(STAR_TEMPLATE(star_type, assigns) for star_type in assigns.stars).join("\n")}
-      </div>
-    </div>
-  </div>
-  <div id="sa-badge-embedded-footer">
-    <span id="sa-badge-embedded-more-button">@@translations.badge.more</span>
-  </div>
+
+    #{if assigns.stars.length > 0
+        "<div id='sa-badge-embedded-rating-container'>
+          <div class='sa-badge-embedded-rating-number'><span>#{assigns.rating}</span></div>
+          <div class='sa-badge-embedded-stars-container'>
+            #{(STAR_TEMPLATE(type) for type in assigns.stars).join("\n")}
+          </div>
+        </div>"
+      else ''}
   """
 
   STAR_TEMPLATE = (type) -> """
@@ -494,12 +466,11 @@ class Badge
 
   $floatingBadgePlugin: -> @parent_doc.getElementById('sa-badge-floating-plugin')
   $embeddedBadgePlugin: -> @parent_doc.getElementById('sa-badge-embedded-plugin')
-  $embeddedBadgeMoreButton: -> @parent_doc.getElementById('sa-badge-embedded-more-button')
   $closeModalButton: -> @parent_doc.getElementById('sa-badge-modal-close-button')
   $showReviewsButton: ->
     switch context().configuration.display
       when 'floating' then @$floatingBadgePlugin()
-      when 'embedded' then @$embeddedBadgeMoreButton()
+      when 'embedded' then @$embeddedBadgePlugin()
 
   ###
   Adds the required css for the plugin
@@ -526,6 +497,7 @@ class Badge
 
   _renderEmbedded: ->
     rating = context().data.rating
+    @$embeddedBadgePlugin().className += ' sa-badge-no-stars' if @_noStars(rating)
     @$embeddedBadgePlugin().innerHTML = EMBEDDED_TEMPLATE(rating: rating.toFixed(1), stars: @_ratingToStars(rating))
 
   _bindHandlers: ->

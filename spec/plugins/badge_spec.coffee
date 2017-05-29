@@ -12,9 +12,12 @@ describe 'Badge', ->
     removeListeners()
 
     # Cleanup rendered plugins and stylesheets
-    selector = '#sa-badge-floating-plugin, #sa-badge-embedded-header, #sa-badge-embedded-footer, #sa-badge-style, #sa-badge-modal'
+    selector = '#sa-badge-floating-plugin, #sa-badge-style, #sa-badge-modal'
     [].forEach.call window.parent.document.querySelectorAll(selector), (e) ->
       e.parentNode.removeChild e
+
+    # Cleanup innerHTML of embedded badge
+    window.parent.document.getElementById('sa-badge-embedded-plugin')?.innerHTML = ''
 
   renderPlugin = (done, cb) ->
     cleanupDom()
@@ -238,8 +241,7 @@ describe 'Badge', ->
         expect(window.parent.document.getElementById('sa-badge-style')).to.exist
 
       it 'adds the plugin markup to the embedded badge container', ->
-        expect(window.parent.document.getElementById('sa-badge-embedded-header')).to.exist
-        expect(window.parent.document.getElementById('sa-badge-embedded-footer')).to.exist
+        expect(window.parent.document.getElementById('sa-badge-embedded-plugin').innerHTML).to.not.be.empty
 
       context 'when embedded badge container is missing', ->
         beforeEach (done) ->
@@ -249,11 +251,20 @@ describe 'Badge', ->
             @subject = window.parent.document.getElementById('sa-badge-embedded-plugin')
 
         it 'does not add the plugin markup to the embedded badge container', ->
-          expect(window.parent.document.getElementById('sa-badge-embedded-header')).to.not.exist
-          expect(window.parent.document.getElementById('sa-badge-embedded-footer')).to.not.exist
+          expect(window.parent.document.getElementById('sa-badge-embedded-plugin')).to.not.exist
 
-    describe 'click on more button', ->
-      beforeEach -> click_element window.parent.document.getElementById('sa-badge-embedded-more-button')
+      context 'when rating is 0', ->
+        beforeEach (done) ->
+          setSaPlugins(@default_settings, rating: 0)
+
+          renderPlugin done, =>
+            @subject = window.parent.document.getElementById('sa-badge-embedded-plugin')
+
+        it 'adds no stars class to container', ->
+          expect(@subject.className).to.include('sa-badge-no-stars')
+
+    describe 'click on badge', ->
+      beforeEach -> click_element @subject
 
       it 'displays the badge modal', ->
         expect(window.parent.document.getElementById('sa-badge-modal')).to.exist
@@ -294,7 +305,11 @@ describe 'Badge', ->
           setSaPlugins(@default_settings, rating: 4)
 
           renderPlugin done, =>
-            @subject = window.parent.document.querySelectorAll('#sa-badge-embedded-rating .sa-badge-rating-number span')[0].textContent
+            @subject =
+              window.parent
+                    .document
+                    .querySelectorAll('#sa-badge-embedded-rating-container .sa-badge-embedded-rating-number span')[0]
+                    .textContent
 
         it 'displays the rating', ->
           expect(@subject).to.eql('4.0')
@@ -304,10 +319,10 @@ describe 'Badge', ->
           setSaPlugins(@default_settings, rating: 0)
 
           renderPlugin done, =>
-            @subject = window.parent.document.getElementsByClassName('sa-badge-empty-star')
+            @subject = window.parent.document.getElementById('sa-badge-embedded-rating-container')
 
-        it 'shows 5 empty stars', ->
-          expect(@subject.length).to.eql(5)
+        it 'does not show either stars or rating number', ->
+          expect(@subject).to.not.exist
 
       context 'when rating is 5', ->
         beforeEach (done) ->
