@@ -391,6 +391,21 @@ class Badge
       background-image: url('#{asset_url("badge/floating/small/theme/#{configuration.theme}/star_empty@2x.png")}');
     }
   }
+
+  #sa-badge-floating-plugin, #sa-badge-embedded-plugin {
+    -webkit-transform: perspective(1px) translateZ(0);
+    transform: perspective(1px) translateZ(0);
+    -webkit-transition-duration: 0.1s;
+    transition-duration: 0.1s;
+    -webkit-transition-property: transform;
+    transition-property: transform;
+  }
+
+  #sa-badge-floating-plugin:hover, #sa-badge-floating-plugin:focus, #sa-badge-floating-plugin:active,
+  #sa-badge-embedded-plugin:hover, #sa-badge-embedded-plugin:focus, #sa-badge-embedded-plugin:active {
+    -webkit-transform: scale(1.02);
+    transform: scale(1.02);
+  }
   """
 
   FLOATING_TEMPLATE = (assigns) -> """
