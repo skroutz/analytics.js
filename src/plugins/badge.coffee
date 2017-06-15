@@ -248,10 +248,16 @@ class Badge
   }
 
   #sa-badge-modal #sa-badge-modal-inner #sa-badge-modal-iframe {
-    display: block;
-
     position: relative;
     z-index: 3;
+
+    display: block;
+    visibility: visible;
+
+    width: 100%;
+    height: 100%;
+
+    opacity: 1;
   }
 
   #sa-badge-modal #sa-badge-modal-inner #sa-badge-modal-close-button {
