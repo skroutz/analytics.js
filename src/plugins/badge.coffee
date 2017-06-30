@@ -38,7 +38,7 @@ class Badge
     width: 90px;
     height: 90px;
 
-    border-radius: 45px;
+    border-radius: 45px !important;
 
     background-image: url('#{asset_url("badge/floating/large/theme/#{configuration.theme}/logo_@@flavor.png")}');
     background-position: center;
@@ -287,7 +287,7 @@ class Badge
       width: 70px;
       height: 70px;
 
-      border-radius: 35px;
+      border-radius: 35px !important;
 
       background-image: url('#{asset_url("badge/floating/small/theme/#{configuration.theme}/hat_logo.png")}');
       background-size: 70px 70px;
