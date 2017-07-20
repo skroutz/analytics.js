@@ -600,6 +600,7 @@ class Badge
   _iframeSrc: ->
     params =
       shop_code: context().shop_code
+      badge_display: context().configuration.display
       origin: window.location.origin
       pathname: window.location.pathname
 
