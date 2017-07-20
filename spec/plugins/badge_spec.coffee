@@ -107,6 +107,7 @@ describe 'Badge', ->
         expect(window.parent.document.getElementById('sa-badge-modal-iframe').src)
           .to.eq(["#{@default_settings.application_base}",
                   "/badge/shop_reviews?shop_code=#{@default_settings.shop_code}",
+                  "&badge_display=#{@default_settings.display}",
                   "&origin=#{encodeURIComponent(window.location.origin)}",
                   "&pathname=#{encodeURIComponent(window.location.pathname)}"].join(''))
 
@@ -276,6 +277,7 @@ describe 'Badge', ->
         expect(window.parent.document.getElementById('sa-badge-modal-iframe').src)
           .to.eq(["#{@default_settings.application_base}",
                   "/badge/shop_reviews?shop_code=#{@default_settings.shop_code}",
+                  "&badge_display=#{@default_settings.display}",
                   "&origin=#{encodeURIComponent(window.location.origin)}",
                   "&pathname=#{encodeURIComponent(window.location.pathname)}"].join(''))
 
