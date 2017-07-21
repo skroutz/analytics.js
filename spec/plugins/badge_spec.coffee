@@ -27,7 +27,7 @@ describe 'Badge', ->
       cb() if cb
       done()
 
-  setSaPlugins = (defaults, { shop_code, display, theme, position, rating }) ->
+  setSaPlugins = (defaults, { shop_code, display, theme, position, hide_onscroll, rating }) ->
     window.sa_plugins =
       badge:
         shop_code: shop_code || defaults.shop_code
@@ -35,6 +35,7 @@ describe 'Badge', ->
           display: display || defaults.display
           theme: theme || defaults.theme
           position: position  || defaults.position
+          hide_onscroll: hide_onscroll || defaults.hide_onscroll
         data:
           rating: rating || defaults.rating
 
@@ -61,6 +62,7 @@ describe 'Badge', ->
       rating: 0.0
       base: 'http://localhost:9000'
       application_base: 'http://test.skroutz.gr'
+      hide_onscroll: false
 
   after -> window.parent.document.addEventListener = orginalAddEventListener
 
@@ -217,6 +219,127 @@ describe 'Badge', ->
 
         it 'shows full stars equal to the integer part, followed by a half star, followed by empty stars up to a maximum of 5 stars', ->
           expect(@subject).to.eql(full_stars: 3, half_stars: 1, empty_stars: 1)
+
+    describe 'show/hide onscroll', ->
+      beforeEach ->
+        @original_body_height = window.parent.document.body.style.height
+        @original_body_width = window.parent.document.body.style.width
+        window.parent.document.body.style.height = '10000px'
+        window.parent.document.body.style.width = '10000px'
+
+      afterEach ->
+        window.parent.document.body.style.height = @original_body_height
+        window.parent.document.body.style.width = @original_body_width
+
+      context 'when hide_onscroll set to true', ->
+        beforeEach -> setSaPlugins(@default_settings, hide_onscroll: true)
+
+        context 'on small screen', ->
+          beforeEach (done) ->
+            @original_viewport_width = window.parent.innerWidth
+            window.parent.innerWidth = 768
+
+            renderPlugin done, =>
+              @subject = window.parent.document.getElementById('sa-badge-floating-plugin')
+
+          afterEach ->
+            window.parent.document.onscroll = null
+            window.parent.innerWidth = @original_viewport_width
+
+          it 'hides floating badge on scroll down', (done) ->
+            window.parent.document.onscroll = =>
+              expect(@subject.style.display).to.eq('none')
+
+              done()
+
+            window.parent.scrollBy(0, 100)
+
+          it 'shows floating badge on scroll up', (done) ->
+            scroll_count = 0
+
+            window.parent.document.onscroll = =>
+              if scroll_count == 1
+                expect(@subject.style.display).to.eq('block')
+
+                done()
+              else
+                scroll_count += 1
+
+                window.parent.scroll(0, 0)
+
+            window.parent.scrollBy(0, 100)
+
+          context 'when scoll horizontally', ->
+            it 'does not change badge visibility', (done) ->
+              window.parent.document.onscroll = =>
+                expect(@subject.style.display).to.eq('')
+
+                done()
+
+              window.parent.scrollBy(100, 0)
+
+        context 'on big screen', ->
+          beforeEach (done) ->
+            @original_viewport_width = window.parent.innerWidth
+            window.parent.innerWidth = 769
+
+            renderPlugin done, =>
+              @subject = window.parent.document.getElementById('sa-badge-floating-plugin')
+
+          afterEach ->
+            window.parent.document.onscroll = null
+            window.parent.innerWidth = @original_viewport_width
+
+          it 'does not change badge visibility', (done) ->
+            window.parent.document.onscroll = =>
+              expect(@subject.style.display).to.eq('')
+
+              done()
+
+            window.parent.scrollBy(0, 100)
+
+      context 'when hide_onscroll set to false', ->
+        beforeEach -> setSaPlugins(@default_settings, hide_onscroll: false)
+
+        context 'on small screen', ->
+          beforeEach (done) ->
+            @original_viewport_width = window.parent.innerWidth
+            window.parent.innerWidth = 768
+
+            renderPlugin done, =>
+              @subject = window.parent.document.getElementById('sa-badge-floating-plugin')
+
+          afterEach ->
+            window.parent.document.onscroll = null
+            window.parent.innerWidth = @original_viewport_width
+
+          it 'does not change badge visibility', (done) ->
+            window.parent.document.onscroll = =>
+              expect(@subject.style.display).to.eq('')
+
+              done()
+
+            window.parent.scrollBy(0, 100)
+
+        context 'on big screen', ->
+          beforeEach (done) ->
+            @original_viewport_width = window.parent.innerWidth
+            window.parent.innerWidth = 769
+
+            renderPlugin done, =>
+              @subject = window.parent.document.getElementById('sa-badge-floating-plugin')
+
+          afterEach ->
+            window.parent.document.onscroll = null
+            window.parent.innerWidth = @original_viewport_width
+
+          it 'does not change badge visibility', (done) ->
+            window.parent.document.onscroll = =>
+              expect(@subject.style.display).to.eq('')
+
+              done()
+
+            window.parent.scrollBy(0, 100)
 
   describe 'embedded', ->
     beforeEach (done) ->

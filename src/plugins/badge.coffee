@@ -518,6 +518,8 @@ class Badge
     $el.innerHTML = FLOATING_TEMPLATE(stars: @_ratingToStars(context().data.rating))
     @parent_doc.body.appendChild($el)
 
+    @_initHideOnScroll($el) if @_smallDevice() && context().configuration.hide_onscroll
+
   _renderEmbedded: ->
     rating = context().data.rating
     @$embeddedBadgePlugin().className += ' sa-badge-no-stars' if @_noStars(rating)
@@ -607,5 +609,38 @@ class Badge
     serialized_params = ("#{k}=#{encodeURIComponent(v)}" for k, v of params).join('&')
 
     "#{settings.url.application_base}/badge/shop_reviews?#{serialized_params}"
+
+  _initHideOnScroll: (badge) =>
+    past_scroll = window.parent.pageYOffset
+    return unless past_scroll? # pageYOffset is not supported for IE < 9
+
+    @_attachEvent @parent_doc, 'scroll', (_event) =>
+      current_scroll = window.parent.pageYOffset
+
+      return if current_scroll == past_scroll # Ignore horizontal scrolling
+      return if @_outOfBound(current_scroll) # Ignore OSX bounce
+
+      scroll_diff = current_scroll - past_scroll
+      return if Math.abs(scroll_diff) <= 5
+
+      badge.style.display = if scroll_diff > 0 then 'none' else 'block'
+
+      past_scroll = current_scroll
+
+  _outOfBound: (current_scroll) ->
+    return true if current_scroll < 0 # top bounce
+
+    current_scroll + @_vieport().height > @_documentHeight() # bottom bounce
+
+  _smallDevice: -> @_vieport().width <= 768
+
+  _documentHeight: ->
+    Math.max @parent_doc.body.scrollHeight, @parent_doc.documentElement.scrollHeight,
+             @parent_doc.body.offsetHeight, @parent_doc.documentElement.offsetHeight,
+             @parent_doc.body.clientHeight, @parent_doc.documentElement.clientHeight
+
+  _vieport: ->
+    width: window.parent.innerWidth || @parent_doc.documentElement.clientWidth || parent_doc.body.clientWidth
+    height: window.parent.innerHeight || @parent_doc.documentElement.clientHeight || parent_doc.body.clientHeight
 
 new Badge
