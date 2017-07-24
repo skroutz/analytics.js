@@ -54,6 +54,7 @@ class OrderStash
     text-align: center;
     letter-spacing: 0;
     font-family: Verdana, Arial, sans-serif !important;
+    font-weight: normal !important;
     box-shadow: 0px 1px 11px 0px rgba(77,77,77,0.33);
 
     #{switch configuration.position
