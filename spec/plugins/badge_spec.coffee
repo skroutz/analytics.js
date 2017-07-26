@@ -249,7 +249,8 @@ describe 'Badge', ->
 
           it 'hides floating badge on scroll down', (done) ->
             window.parent.document.onscroll = =>
-              expect(@subject.style.display).to.eq('none')
+              expect(@subject.classList.contains('sa-badge-floating-hidden')).to.eq(true)
+              expect(@subject.classList.contains('sa-badge-floating-visible')).to.eq(false)
 
               done()
 
@@ -260,7 +261,8 @@ describe 'Badge', ->
 
             window.parent.document.onscroll = =>
               if scroll_count == 1
-                expect(@subject.style.display).to.eq('block')
+                expect(@subject.classList.contains('sa-badge-floating-hidden')).to.eq(false)
+                expect(@subject.classList.contains('sa-badge-floating-visible')).to.eq(true)
 
                 done()
               else
@@ -273,7 +275,8 @@ describe 'Badge', ->
           context 'when scoll horizontally', ->
             it 'does not change badge visibility', (done) ->
               window.parent.document.onscroll = =>
-                expect(@subject.style.display).to.eq('')
+                expect(@subject.classList.contains('sa-badge-floating-hidden')).to.eq(false)
+                expect(@subject.classList.contains('sa-badge-floating-visible')).to.eq(true)
 
                 done()
 
@@ -293,7 +296,8 @@ describe 'Badge', ->
 
           it 'does not change badge visibility', (done) ->
             window.parent.document.onscroll = =>
-              expect(@subject.style.display).to.eq('')
+              expect(@subject.classList.contains('sa-badge-floating-hidden')).to.eq(false)
+              expect(@subject.classList.contains('sa-badge-floating-visible')).to.eq(true)
 
               done()
 
@@ -316,7 +320,8 @@ describe 'Badge', ->
 
           it 'does not change badge visibility', (done) ->
             window.parent.document.onscroll = =>
-              expect(@subject.style.display).to.eq('')
+              expect(@subject.classList.contains('sa-badge-floating-hidden')).to.eq(false)
+              expect(@subject.classList.contains('sa-badge-floating-visible')).to.eq(true)
 
               done()
 
@@ -336,7 +341,8 @@ describe 'Badge', ->
 
           it 'does not change badge visibility', (done) ->
             window.parent.document.onscroll = =>
-              expect(@subject.style.display).to.eq('')
+              expect(@subject.classList.contains('sa-badge-floating-hidden')).to.eq(false)
+              expect(@subject.classList.contains('sa-badge-floating-visible')).to.eq(true)
 
               done()
 

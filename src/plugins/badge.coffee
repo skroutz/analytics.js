@@ -11,8 +11,13 @@ class Badge
 
   STYLE = (configuration) -> """
   @keyframes sa-badge-fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from { opacity: 0; visibility: hidden; }
+    to   { opacity: 1; visibility: visible; }
+  }
+
+  @keyframes sa-badge-fade-out {
+    from { opacity: 1; visibility: visible; }
+    to   { opacity: 0; visibility: hidden; }
   }
 
   @keyframes sa-badge-spin {
@@ -53,10 +58,25 @@ class Badge
 
     z-index: 2147483647;
 
-    -webkit-animation: sa-badge-fade-in 0.3s ease-in;
-    animation: sa-badge-fade-in 0.3s ease-in;
-
     box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+  }
+
+  #sa-badge-floating-plugin.sa-badge-floating-visible {
+    visibility: visible;
+
+    -webkit-animation: sa-badge-fade-in 0.3s ease-in;
+            animation: sa-badge-fade-in 0.3s ease-in;
+
+    opacity: 1;
+  }
+
+  #sa-badge-floating-plugin.sa-badge-floating-hidden {
+    visibility: hidden;
+
+    -webkit-animation: sa-badge-fade-out 0.3s ease-out;
+            animation: sa-badge-fade-out 0.3s ease-out;
+
+    opacity: 0;
   }
 
   #sa-badge-floating-plugin.sa-badge-no-stars {
@@ -514,7 +534,8 @@ class Badge
   _renderFloating: ->
     $el = document.createElement('div')
     $el.id = 'sa-badge-floating-plugin'
-    $el.className += 'sa-badge-no-stars' if @_noStars(context().data.rating)
+    $el.className += 'sa-badge-floating-visible'
+    $el.className += ' sa-badge-no-stars' if @_noStars(context().data.rating)
     $el.innerHTML = FLOATING_TEMPLATE(stars: @_ratingToStars(context().data.rating))
     @parent_doc.body.appendChild($el)
 
@@ -624,7 +645,12 @@ class Badge
       scroll_diff = current_scroll - past_scroll
       return if Math.abs(scroll_diff) <= 5
 
-      badge.style.display = if scroll_diff > 0 then 'none' else 'block'
+      if scroll_diff > 0 # scroll down
+        badge.classList.remove('sa-badge-floating-visible')
+        badge.classList.add('sa-badge-floating-hidden')
+      else # scroll up
+        badge.classList.add('sa-badge-floating-visible')
+        badge.classList.remove('sa-badge-floating-hidden')
 
       past_scroll = current_scroll
 
