@@ -603,6 +603,7 @@ class Badge
     params =
       shop_code: context().shop_code
       badge_display: context().configuration.display
+      hide_onscroll: context().configuration.hide_onscroll
       origin: window.location.origin
       pathname: window.location.pathname
 

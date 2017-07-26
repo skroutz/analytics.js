@@ -110,6 +110,7 @@ describe 'Badge', ->
           .to.eq(["#{@default_settings.application_base}",
                   "/badge/shop_reviews?shop_code=#{@default_settings.shop_code}",
                   "&badge_display=#{@default_settings.display}",
+                  "&hide_onscroll=#{@default_settings.hide_onscroll}"
                   "&origin=#{encodeURIComponent(window.location.origin)}",
                   "&pathname=#{encodeURIComponent(window.location.pathname)}"].join(''))
 
@@ -401,6 +402,7 @@ describe 'Badge', ->
           .to.eq(["#{@default_settings.application_base}",
                   "/badge/shop_reviews?shop_code=#{@default_settings.shop_code}",
                   "&badge_display=#{@default_settings.display}",
+                  "&hide_onscroll=#{@default_settings.hide_onscroll}"
                   "&origin=#{encodeURIComponent(window.location.origin)}",
                   "&pathname=#{encodeURIComponent(window.location.pathname)}"].join(''))
 
