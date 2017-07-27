@@ -11,8 +11,13 @@ class Badge
 
   STYLE = (configuration) -> """
   @keyframes sa-badge-fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from { opacity: 0; visibility: hidden; }
+    to   { opacity: 1; visibility: visible; }
+  }
+
+  @keyframes sa-badge-fade-out {
+    from { opacity: 1; visibility: visible; }
+    to   { opacity: 0; visibility: hidden; }
   }
 
   @keyframes sa-badge-spin {
@@ -53,10 +58,25 @@ class Badge
 
     z-index: 2147483647;
 
-    -webkit-animation: sa-badge-fade-in 0.3s ease-in;
-    animation: sa-badge-fade-in 0.3s ease-in;
-
     box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+  }
+
+  #sa-badge-floating-plugin.sa-badge-floating-visible {
+    visibility: visible;
+
+    -webkit-animation: sa-badge-fade-in 0.3s ease-in;
+            animation: sa-badge-fade-in 0.3s ease-in;
+
+    opacity: 1;
+  }
+
+  #sa-badge-floating-plugin.sa-badge-floating-hidden {
+    visibility: hidden;
+
+    -webkit-animation: sa-badge-fade-out 0.3s ease-out;
+            animation: sa-badge-fade-out 0.3s ease-out;
+
+    opacity: 0;
   }
 
   #sa-badge-floating-plugin.sa-badge-no-stars {
@@ -514,9 +534,12 @@ class Badge
   _renderFloating: ->
     $el = document.createElement('div')
     $el.id = 'sa-badge-floating-plugin'
-    $el.className += 'sa-badge-no-stars' if @_noStars(context().data.rating)
+    $el.className += 'sa-badge-floating-visible'
+    $el.className += ' sa-badge-no-stars' if @_noStars(context().data.rating)
     $el.innerHTML = FLOATING_TEMPLATE(stars: @_ratingToStars(context().data.rating))
     @parent_doc.body.appendChild($el)
+
+    @_initHideOnScroll($el) if @_smallDevice() && context().configuration.hide_onscroll
 
   _renderEmbedded: ->
     rating = context().data.rating
@@ -601,11 +624,50 @@ class Badge
     params =
       shop_code: context().shop_code
       badge_display: context().configuration.display
+      hide_onscroll: context().configuration.hide_onscroll
       origin: window.location.origin
       pathname: window.location.pathname
 
     serialized_params = ("#{k}=#{encodeURIComponent(v)}" for k, v of params).join('&')
 
     "#{settings.url.application_base}/badge/shop_reviews?#{serialized_params}"
+
+  _initHideOnScroll: (badge) =>
+    past_scroll = window.parent.pageYOffset
+    return unless past_scroll? # pageYOffset is not supported for IE < 9
+
+    @_attachEvent @parent_doc, 'scroll', (_event) =>
+      current_scroll = window.parent.pageYOffset
+
+      return if current_scroll == past_scroll # Ignore horizontal scrolling
+      return if @_outOfBound(current_scroll) # Ignore OSX bounce
+
+      scroll_diff = current_scroll - past_scroll
+      return if Math.abs(scroll_diff) <= 5
+
+      if scroll_diff > 0 # scroll down
+        badge.classList.remove('sa-badge-floating-visible')
+        badge.classList.add('sa-badge-floating-hidden')
+      else # scroll up
+        badge.classList.add('sa-badge-floating-visible')
+        badge.classList.remove('sa-badge-floating-hidden')
+
+      past_scroll = current_scroll
+
+  _outOfBound: (current_scroll) ->
+    return true if current_scroll < 0 # top bounce
+
+    current_scroll + @_vieport().height > @_documentHeight() # bottom bounce
+
+  _smallDevice: -> @_vieport().width <= 768
+
+  _documentHeight: ->
+    Math.max @parent_doc.body.scrollHeight, @parent_doc.documentElement.scrollHeight,
+             @parent_doc.body.offsetHeight, @parent_doc.documentElement.offsetHeight,
+             @parent_doc.body.clientHeight, @parent_doc.documentElement.clientHeight
+
+  _vieport: ->
+    width: window.parent.innerWidth || @parent_doc.documentElement.clientWidth || parent_doc.body.clientWidth
+    height: window.parent.innerHeight || @parent_doc.documentElement.clientHeight || parent_doc.body.clientHeight
 
 new Badge
