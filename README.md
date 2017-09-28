@@ -118,11 +118,15 @@ and then configure `config/settings/production.yml` as follows:
 ```
 skroutz:
   analytics_base_url: "https://analytics.skroutz.gr"
-  application_base_url: "https://skroutz.gr"
+  application_base_url: "https://www.skroutz.gr"
 
 alve:
   analytics_base_url: "https://analytics.alve.com"
-  application_base_url: "https://alve.com"
+  application_base_url: "https://www.alve.com"
+
+scrooge:
+  analytics_base_url: "https://analytics.scrooge.co.uk"
+  application_base_url: "https://www.scrooge.co.uk"
 ```
 
 You can build the project with the command:
