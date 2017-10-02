@@ -27,6 +27,9 @@ define [
           @_extractAnalyticsSession('create', shop_code, yogurt_session, yogurt_user_id, flavor)
 
         connect: (shop_code)->
+          # connect should be called only once
+          return console?.warn?('Connect called multiple times') if @shop_code
+
           @shop_code = shop_code
           @plugins_manager.session = @
 
