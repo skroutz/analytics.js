@@ -342,6 +342,40 @@ describe 'Session', ->
 
         expect(spy_notify).to.be.calledWithExactly('connect', {})
 
+      context 'when connect is called multiple times', ->
+        beforeEach ->
+          @init = =>
+            sa('session', 'connect', @shop_code)
+            sa('session', 'connect', @shop_code)
+
+            @instance = new @session(@plugins_manager)
+
+        it 'notifies the plugins manager only once', ->
+          spy_notify = sinon.spy(@plugins_manager, 'notify')
+
+          @init().run()
+
+          expect(spy_notify).to.have.been.calledOnce
+
+        it 'tries to extract the session only once', ->
+          @init()
+          spy_extract = sinon.spy(@instance, '_extractAnalyticsSession')
+
+          @instance.run()
+
+          expect(spy_extract).to.have.been.calledOnce
+
+        context 'when analytics_session is already extracted', ->
+          it 'resolves the promise only once', ->
+            @init()
+            @instance.analytics_session = 'analytics_session'
+
+            stub_promise = sinon.stub(@instance.promise, 'resolve')
+
+            @instance.run()
+
+            expect(stub_promise).to.have.been.calledOnce
+
       context 'when first-party cookies are enabled', ->
         beforeEach ->
           @settings.cookies.first_party_enabled = true
