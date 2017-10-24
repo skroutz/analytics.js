@@ -52,6 +52,7 @@ define [
       payload = {}
       params = Settings.params
       payload[params.url] = Settings.url.current
+      payload[params.referrer] = Settings.url.referrer
       payload[params.shop_code] = @session.shop_code
       payload[params.actions] = [{
         category: category

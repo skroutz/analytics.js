@@ -75,6 +75,12 @@ describe 'Settings', ->
         .that.is.a('string')
         .that.equals('url')
 
+    it 'has property .referrer', ->
+      expect(@settings.params)
+        .to.have.property('referrer')
+        .that.is.a('string')
+        .that.equals('referer')
+
     it 'has property .shop_code', ->
       expect(@settings.params)
         .to.have.property('shop_code')

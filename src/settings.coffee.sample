@@ -31,6 +31,7 @@ define ->
       analytics_session: '@@params.analytics_session'
       signature: '@@params.signature'
       url: '@@params.url'
+      referrer: '@@params.referrer'
       shop_code: '@@params.shop_code'
       actions: '@@params.actions'
 
@@ -120,5 +121,8 @@ define ->
 
   # The current page URL
   Settings.url.current   = Settings.window.location.href
+
+  # The URL of the previous webpage from which a link was followed
+  Settings.url.referrer = Settings.window.document.referrer
 
   return Settings
