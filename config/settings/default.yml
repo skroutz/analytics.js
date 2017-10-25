@@ -44,5 +44,6 @@ params:
   analytics_session: "analytics_session"
   signature: 'sig'
   url: 'url'
+  referrer: 'referer' # Misspelling of referrer, check https://en.wikipedia.org/wiki/HTTP_referer
   shop_code: 'shop_code'
   actions: 'actions'
