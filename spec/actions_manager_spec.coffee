@@ -274,10 +274,8 @@ describe 'ActionsManager', ->
         @category = 'yogurt'
         @data = '{}'
 
-        @redirect_url = 'http://redirect_url'
-
         @run = ->
-          sa(@category, @type, @data, @redirect_url, @redirect)
+          sa(@category, @type, @data)
           @initializeSubject()
           @subject.run()
 
@@ -286,34 +284,61 @@ describe 'ActionsManager', ->
 
         action_reporting_tests()
 
-        context 'when action is reported successfully', ->
+        context 'when redirect callback is supplied', ->
           beforeEach ->
-            @run()
-            @sendbeacon_promise.resolve()
-            return
+            @redirect_url = 'http://redirect_url'
+            @redirect_callback_spy = sinon.spy()
 
-          it 'redirects ', ->
-            expect(@settings.redirectTo).to.be.called
+            @run = ->
+              sa(@category, @type, @data, @redirect_callback_spy, @redirect_url)
+              @initializeSubject()
+              @subject.run()
 
-          it 'redirects to redirect_url', ->
-            expect(@settings.redirectTo.args[0][0]).to.contain @redirect_url
+          context 'when action is reported successfully', ->
+            it 'executes redirect callback', ->
+              @run()
+              @sendbeacon_promise.resolve()
 
-        context 'when action fails to report', ->
-          beforeEach ->
-            @run()
-            @sendbeacon_promise.reject()
-            return
+              expect(@redirect_callback_spy).to.be.calledWith(@redirect_url)
 
-          it 'does not redirect', ->
-            expect(@settings.redirectTo).to.not.be.called
+            context 'when redirect callback throws an error', ->
+              beforeEach ->
+                @redirect_callback_stub = sinon.stub().throws()
 
-        context 'when an extra param with value false is passed on action', ->
-          it 'does not redirect', ->
-            @redirect = false
-            @run()
-            @sendbeacon_promise.resolve()
+                @run = ->
+                  sa(@category, @type, @data, @redirect_callback_stub, @redirect_url)
+                  @initializeSubject()
+                  @subject.run()
 
-            expect(@settings.redirectTo).to.not.be.called
+                @run()
+                @sendbeacon_promise.resolve()
+                return
+
+              it 'redirects to redirect_url', ->
+                expect(@settings.redirectTo).to.be.calledWith(@redirect_url)
+
+          context 'but redirect_url is not supplied', ->
+            beforeEach ->
+              @run = ->
+                sa(@category, @type, @data, @redirect_callback_spy)
+                @initializeSubject()
+                @subject.run()
+
+              @run()
+              @sendbeacon_promise.resolve()
+              return
+
+            it 'does not execute redirect callback', ->
+              expect(@redirect_callback_spy).to.not.be.called
+
+          context 'when action fails to report', ->
+            beforeEach ->
+              @run()
+              @sendbeacon_promise.reject()
+              return
+
+            it 'does not execute redirect callback', ->
+              expect(@redirect_callback_spy).to.not.be.called
 
     describe 'ecommerce', ->
       beforeEach ->
