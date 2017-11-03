@@ -19,10 +19,13 @@ define [
 
     _commands:
       yogurt:
-        productClick: (data, redirect_url, redirect = true) ->
+        productClick: (data, redirect_callback, redirect_url) ->
           clearTimeout @pageview_timeout
           @_reportAction 'yogurt', 'productClick', data, (analytics_session) =>
-            @_redirect(redirect_url, analytics_session) if redirect_url and redirect
+            if redirect_callback and redirect_url
+              redirect_url = @_appendRedirectUrlParams(redirect_url, analytics_session)
+
+              try redirect_callback(redirect_url) catch then Settings.redirectTo(redirect_url)
       ecommerce:
         addOrder: (data, callback) ->
           clearTimeout @pageview_timeout
@@ -42,10 +45,10 @@ define [
         ## TODO: THROW ERROR ON REJECT
         @reporter.sendBeacon(url, payload).then => cb and cb(@session.analytics_session)
 
-    _redirect: (url, _analytics_session) ->
+    _appendRedirectUrlParams: (url, _analytics_session) ->
       # TODO: Find a way to safely append analytics session as query param
       # for GetParamEngine to work, see: 9dd1d57a
-      Settings.redirectTo url
+      url
 
     # TODO: implement multiple actions per beacon maybe??
     _buildBeaconPayload: (category, type, data = '{}') ->
