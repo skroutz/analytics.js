@@ -4,9 +4,9 @@ define [
   'easyxdm'
 ], (Settings, Promise, easyXDM)->
   class XDomainEngine
-    constructor: (type, shop_code = '', yogurt_session = '', yogurt_user_id = '', flavor = '')->
+    constructor: (type, shop_code = '', yogurt_session = '', yogurt_user_id = '', flavor = '', metadata = '') ->
       @promise = new Promise()
-      @url = Settings.url.analytics_session[type](shop_code, yogurt_session, yogurt_user_id, flavor)
+      @url = Settings.url.analytics_session[type](shop_code, yogurt_session, yogurt_user_id, flavor, metadata)
 
       @socket = @_createSocket @url
       @timeout = @_checkForSocketTimeout()

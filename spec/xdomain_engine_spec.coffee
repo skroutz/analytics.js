@@ -21,6 +21,7 @@ describe 'XDomain Session Retrieval Engine', ->
     @shop_code         = 'shop_code_1'
     @analytics_session = 'dummy_analytics_session_hash'
     @flavor            = 'flavor'
+    @metadata          = JSON.stringify({ app_type: 'web', tags: 'tag1,tag2' })
 
     require [
       'settings'
@@ -100,7 +101,7 @@ describe 'XDomain Session Retrieval Engine', ->
 
     context 'when called with type "create"', ->
       beforeEach ->
-        @instance = new @xdomain_engine(@type_create, @shop_code, @yogurt_session, @yogurt_user_id, @flavor)
+        @instance = new @xdomain_engine(@type_create, @shop_code, @yogurt_session, @yogurt_user_id, @flavor, @metadata)
         return
 
       it 'opens "track/create" url', ->
@@ -120,6 +121,10 @@ describe 'XDomain Session Retrieval Engine', ->
 
       it 'passes flavor as a param to the socket url', ->
         url = "flavor=#{@flavor}"
+        expect(@easyxdm_socket_spy.args[0][0].remote).to.contain url
+
+      it 'passes metadata as a param to the socket url', ->
+        url = "metadata=#{@metadata}"
         expect(@easyxdm_socket_spy.args[0][0].remote).to.contain url
 
     context 'when called with type "connect"', ->
