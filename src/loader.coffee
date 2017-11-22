@@ -16,9 +16,13 @@ library without blocking the `window.onload` event.
 
   (iframe.frameElement or iframe).style.cssText =
     "position: absolute; top: 0; left: 0; width: 1px; height: 1px; opacity: 0; border: none;"
-  where = document.getElementsByTagName('script')
-  where = where[where.length - 1]
-  where.parentNode.insertBefore(iframe, where)
+
+  if document.body
+    document.body.appendChild(iframe)
+  else
+    where = document.getElementsByTagName('script')
+    where = where[where.length - 1]
+    where.parentNode.insertBefore(iframe, where)
 
   # Section 2
   try
