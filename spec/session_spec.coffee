@@ -189,6 +189,7 @@ describe 'Session', ->
     @shop_code         = 'shop_code_1'
     @analytics_session = 'dummy_analytics_session_hash'
     @flavor            = 'flavor'
+    @metadata          = JSON.stringify({ app_type: 'web', tags: 'tag1,tag2' })
 
     require [
       'promise'
@@ -302,9 +303,10 @@ describe 'Session', ->
           yogurt_session: @yogurt_session
           shop_code: @shop_code
           flavor: @flavor
+          metadata: @metadata
         @type = @type_create
         @init = =>
-          sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id, @flavor)
+          sa('session', 'create', @shop_code, @yogurt_session, @yogurt_user_id, @flavor, @metadata)
           @instance = new @session(@plugins_manager).run()
 
       context 'when first-party cookies are enabled', ->

@@ -121,11 +121,18 @@ describe 'Settings', ->
         @yogurt_user_id = '123'
         @shop_code = 'shop_code_1'
         @flavor = 'skroutz'
+        @metadata = JSON.stringify({ app_type: 'web', tags: 'tag1,tag2' })
 
       describe '.create', ->
         it 'returns the proper create endpoint', ->
-          endpoint = "#{@base}/track/create?yogurt_session=#{@session}&yogurt_user_id=#{@yogurt_user_id}&shop_code=#{@shop_code}&flavor=#{@flavor}"
-          expect(@settings.url.analytics_session.create(@shop_code, @session, @yogurt_user_id, @flavor))
+          endpoint = "#{@base}/track/create" +
+                     "?yogurt_session=#{@session}" +
+                     "&yogurt_user_id=#{@yogurt_user_id}" +
+                     "&shop_code=#{@shop_code}" +
+                     "&flavor=#{@flavor}" +
+                     "&metadata=#{@metadata}"
+
+          expect(@settings.url.analytics_session.create(@shop_code, @session, @yogurt_user_id, @flavor, @metadata))
             .to.equal(endpoint)
 
       describe '.connect', ->
