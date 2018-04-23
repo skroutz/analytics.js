@@ -69,8 +69,6 @@ describe 'ActionsManager', ->
   before (done) ->
     @analytics_session = 'analytics_session'
     @shop_code = 'shop_code'
-    @yogurt_session = 'yogurt_session'
-    @yogurt_user_id = 'yogurt_user_id'
 
     @reset_saq = ->
       @settings.window.sa = =>
