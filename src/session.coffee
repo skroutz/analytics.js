@@ -20,8 +20,6 @@ define [
       session:
         create: (shop_code, yogurt_session, flavor, metadata) ->
           @shop_code = shop_code
-          @yogurt_session = yogurt_session
-          @flavor = flavor
 
           @_extractAnalyticsSession('create', shop_code, yogurt_session, flavor, metadata)
 
