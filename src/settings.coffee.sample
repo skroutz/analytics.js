@@ -56,12 +56,11 @@ define ->
         Analytics Tracking Session Creation Endpoint
         @param [String] shop_code Analytics code of the tracked shop
         @param [String] yogurt_session Our Session ID
-        @param [String] yogurt_user_id Backend ID of the tracked user
         @param [String] flavor Application name
         @param [String] metadata Additional metadata provided by the base Application
         @return [String] The formatted URL
         ###
-        create: (shop_code, yogurt_session, yogurt_user_id, flavor, metadata) ->
+        create: (shop_code, yogurt_session, flavor, metadata) ->
           "@@analytics_base_url@@url.analytics_session.create"
 
         ###
@@ -88,7 +87,6 @@ define ->
       settings:
         key: '@@api.settings.key'
         yogurt_session: '@@api.settings.yogurt_session'
-        yogurt_user: '@@api.settings.yogurt_user'
         set_account: '@@api.settings.set_account'
         set_callback: '@@api.settings.set_callback'
         redirect_to: '@@api.settings.redirect_to'

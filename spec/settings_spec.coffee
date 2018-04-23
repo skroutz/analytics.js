@@ -118,7 +118,6 @@ describe 'Settings', ->
       beforeEach ->
         @base = @settings.url.base
         @session = 'foo'
-        @yogurt_user_id = '123'
         @shop_code = 'shop_code_1'
         @flavor = 'skroutz'
         @metadata = JSON.stringify({ app_type: 'web', tags: 'tag1,tag2' })
@@ -127,12 +126,11 @@ describe 'Settings', ->
         it 'returns the proper create endpoint', ->
           endpoint = "#{@base}/track/create" +
                      "?yogurt_session=#{@session}" +
-                     "&yogurt_user_id=#{@yogurt_user_id}" +
                      "&shop_code=#{@shop_code}" +
                      "&flavor=#{@flavor}" +
                      "&metadata=#{@metadata}"
 
-          expect(@settings.url.analytics_session.create(@shop_code, @session, @yogurt_user_id, @flavor, @metadata))
+          expect(@settings.url.analytics_session.create(@shop_code, @session, @flavor, @metadata))
             .to.equal(endpoint)
 
       describe '.connect', ->
@@ -183,12 +181,6 @@ describe 'Settings', ->
           .to.have.property('yogurt_session')
           .that.is.a('string')
           .that.equals('setYogurtSession')
-
-      it 'has property .yogurt_user', ->
-        expect(@settings.api.settings)
-          .to.have.property('yogurt_user')
-          .that.is.a('string')
-          .that.equals('setYogurtUser')
 
       it 'has property .set_account', ->
         expect(@settings.api.settings)
