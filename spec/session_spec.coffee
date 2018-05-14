@@ -184,7 +184,6 @@ describe 'Session', ->
   before (done) ->
     @type_create       = 'create'
     @type_connect      = 'connect'
-    @yogurt_session    = 'dummy_yogurt_session_hash'
     @shop_code         = 'shop_code_1'
     @analytics_session = 'dummy_analytics_session_hash'
     @flavor            = 'flavor'
@@ -298,13 +297,12 @@ describe 'Session', ->
     context 'on session create', ->
       beforeEach ->
         @parsed_settings =
-          yogurt_session: @yogurt_session
           shop_code: @shop_code
           flavor: @flavor
           metadata: @metadata
         @type = @type_create
         @init = =>
-          sa('session', 'create', @shop_code, @yogurt_session, @flavor, @metadata)
+          sa('session', 'create', @shop_code, @flavor, @metadata)
           @instance = new @session(@plugins_manager).run()
 
       context 'when first-party cookies are enabled', ->
@@ -322,7 +320,6 @@ describe 'Session', ->
     context 'on session connect', ->
       beforeEach ->
         @parsed_settings =
-          yogurt_session: @yogurt_session
           shop_code: @shop_code
         @type = @type_connect
         @init = =>

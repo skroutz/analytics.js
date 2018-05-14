@@ -18,10 +18,10 @@ define [
 
     _commands:
       session:
-        create: (shop_code, yogurt_session, flavor, metadata) ->
+        create: (shop_code, flavor, metadata) ->
           @shop_code = shop_code
 
-          @_extractAnalyticsSession('create', shop_code, yogurt_session, flavor, metadata)
+          @_extractAnalyticsSession('create', shop_code, flavor, metadata)
 
         connect: (shop_code)->
           # connect should be called only once
@@ -49,9 +49,9 @@ define [
       data = Biskoto.get(Settings.cookies.analytics.name)
       if data then data.analytics_session else null
 
-    _extractAnalyticsSession: (type, shop_code, yogurt_session, flavor, metadata) ->
+    _extractAnalyticsSession: (type, shop_code, flavor, metadata) ->
       Promise.any([
-        (new XDomainEngine(type, shop_code, yogurt_session, flavor, metadata))
+        (new XDomainEngine(type, shop_code, flavor, metadata))
         (new GetParamEngine())
       ]).then(@_onSessionSuccess, @_onSessionError)
 
