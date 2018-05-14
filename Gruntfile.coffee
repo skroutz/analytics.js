@@ -96,6 +96,13 @@ module.exports = (grunt) ->
               replacement: ->
                 grunt.config('env_settings')[grunt.config.get('current_flavor')].analytics_base_url
             }
+            {
+              match: 'flavor'
+              replacement: ->
+                flavor = grunt.config.get('current_flavor')
+
+                "#{flavor[0].toUpperCase()}#{flavor.slice(1)}" # Capitalize first letter
+            }
           ]
 
         files: [

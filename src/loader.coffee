@@ -8,6 +8,15 @@ library without blocking the `window.onload` event.
 @see http://goo.gl/VLDc3F More information on FiF technique
 ###
 ((url)->
+  try
+    # Avoid executing multiple Skroutz Analytics scripts, which leads to
+    # load Payload multiple times.
+    window["@@flavorAnalyticsLoader"] ||= { count: 0 }
+    window["@@flavorAnalyticsLoader"].count += 1
+
+    if window["@@flavorAnalyticsLoader"].count > 1
+      return console.warn("@@flavorAnalytics loaded #{window["@@flavorAnalyticsLoader"].count} times")
+
   # Section 1
   iframe = document.createElement('iframe')
   iframe.src = "javascript:false"
