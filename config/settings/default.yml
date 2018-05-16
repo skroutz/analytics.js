@@ -15,7 +15,6 @@ cookies:
 api:
   settings:
     key: "settings"
-    yogurt_session: "setYogurtSession"
     set_account: "setAccount"
     set_callback: "setCallback"
     redirect_to: "redirectTo"
@@ -32,7 +31,7 @@ api:
 
 url:
   analytics_session:
-    create: "/track/create?yogurt_session=#{yogurt_session}&shop_code=#{shop_code}&flavor=#{flavor}&metadata=#{metadata}"
+    create: "/track/create?shop_code=#{shop_code}&flavor=#{flavor}&metadata=#{metadata}"
     connect: "/track/connect?shop_code=#{shop_code}"
   beacon: "/track/actions/create?analytics_session=#{analytics_session}"
   utils:
