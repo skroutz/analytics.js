@@ -16,7 +16,6 @@ describe 'XDomain Session Retrieval Engine', ->
     @easyxdm_socket_spy = sinon.spy(@easyxdm_mock, 'Socket')
     define 'easyxdm', [], => @easyxdm_mock
 
-    @yogurt_session    = 'dummy_yogurt_session_hash'
     @shop_code         = 'shop_code_1'
     @analytics_session = 'dummy_analytics_session_hash'
     @flavor            = 'flavor'
@@ -100,15 +99,11 @@ describe 'XDomain Session Retrieval Engine', ->
 
     context 'when called with type "create"', ->
       beforeEach ->
-        @instance = new @xdomain_engine(@type_create, @shop_code, @yogurt_session, @flavor, @metadata)
+        @instance = new @xdomain_engine(@type_create, @shop_code, @flavor, @metadata)
         return
 
       it 'opens "track/create" url', ->
         expect(@easyxdm_socket_spy.args[0][0].remote).to.contain 'track/create'
-
-      it 'passes yogurt_session as a param to the socket url', ->
-        url = "yogurt_session=#{@yogurt_session}"
-        expect(@easyxdm_socket_spy.args[0][0].remote).to.contain url
 
       it 'passes shop_code as a param to the socket url', ->
         url = "shop_code=#{@shop_code}"
