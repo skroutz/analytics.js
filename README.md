@@ -59,7 +59,7 @@ $ npm install --global yarn
 Finally, install project dependencies:
 
 ```bash
-$ yarn install && yarn bower install
+$ yarn install
 ```
 
 ## Environments
@@ -238,7 +238,6 @@ $ yarn run cleanup
 The above command will:
 
  -  remove local `node modules`
- -  remove local `bower components`
  -  delete `dist` directory
  -  delete `compiled` directory
  -  delete `src/settings.coffee` file
