@@ -1,6 +1,6 @@
 sudo: false
 language: node_js
 node_js:
-   - "4.8.2"
+   - "8.11.1"
 script:
   - yarn run test

@@ -299,7 +299,7 @@ module.exports = (grunt) ->
           separator: '\n'
 
         src: [
-          'bower_components/json2/json2.js'
+          'node_modules/@bower_components/json2/json2.js'
           'tasks/wrappers/analytics/intro.js'
           'compiled/payload.js'
           'tasks/wrappers/analytics/outro.js'

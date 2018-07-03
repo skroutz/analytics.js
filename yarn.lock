@@ -2,6 +2,14 @@
 # yarn lockfile v1
 
 
+"@bower_components/easyxdm@oyvindkinsey/easyxdm#~2.4.19":
+  version "0.0.0"
+  resolved "https://codeload.github.com/oyvindkinsey/easyxdm/tar.gz/9c3203b0047d816a88982ec44399395215df4a9b"
+
+"@bower_components/json2@douglascrockford/JSON-js#*":
+  version "0.0.0"
+  resolved "https://codeload.github.com/douglascrockford/JSON-js/tar.gz/031b1d9e6971bd4c433ca85e216cc853f5a867bd"
+
 abbrev@1, abbrev@1.0.x:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.0.9.tgz#91b4792588a7738c25f35dd6f63752a2f8776135"
@@ -278,10 +286,6 @@ boom@2.x.x:
   resolved "https://registry.yarnpkg.com/boom/-/boom-2.10.1.tgz#39c8918ceff5799f83f9492a848f625add0c766f"
   dependencies:
     hoek "2.x.x"
-
-bower@~1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/bower/-/bower-1.8.0.tgz#55dbebef0ad9155382d9e9d3e497c1372345b44a"
 
 brace-expansion@^1.0.0:
   version "1.1.6"
