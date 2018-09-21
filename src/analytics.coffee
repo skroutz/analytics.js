@@ -17,8 +17,8 @@ define [
     runs commands. Intended for programmatic usage and/or lazy command declaration.
     ###
     _live: ->
-      Settings.window.sa = =>
-        (Settings.window.sa.q ||= []).push(arguments)
+      Settings.window[Settings.command_queue_name] = =>
+        (Settings.window[Settings.command_queue_name].q ||= []).push(arguments)
         @actions.run()
 
   return Analytics
