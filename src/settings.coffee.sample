@@ -109,6 +109,8 @@ define ->
   Define window.sa and window.sa.q
   @todo Needs refactoring and better place to live
   ###
+  Settings.command_queue_name = Settings.window['@@analytics_object'] || 'sa'
+
   Settings.window.sa = Settings.window.sa or ->
     (Settings.window.sa.q = Settings.window.sa.q || []).push(arguments)
     return

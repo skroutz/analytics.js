@@ -1,8 +1,23 @@
 describe 'Settings', ->
-  before (done) ->
-    require ['settings'], (Settings) =>
-      @settings = Settings
-      done()
+  set_analytics_object = (analytics_object) ->
+    window.SkroutzAnalyticsObject = analytics_object
+
+  unset_analytics_object = -> delete window.SkroutzAnalyticsObject
+
+  beforeEach (done) ->
+    @require_settings = (done) =>
+      requirejs.undef 'settings'
+
+      require ['settings'], (Settings) =>
+        @settings = Settings
+
+        done()
+
+    @require_settings(done)
+
+  afterEach ->
+    unset_analytics_object()
+    delete @settings
 
   describe 'API', ->
     it 'has property .window', ->
@@ -13,6 +28,23 @@ describe 'Settings', ->
       expect(@settings)
         .to.have.property('redirectTo')
         .that.is.an('function')
+
+    describe '.command_queue_name', ->
+      it "defaults to 'sa'", ->
+        expect(@settings)
+          .to.have.property('command_queue_name')
+          .that.equals('sa')
+
+      context 'when Analytics Object is defined', ->
+        beforeEach (done) ->
+          set_analytics_object('skroutz_analytics')
+
+          @require_settings(done)
+
+        it 'assigns the value from Analytics Object', ->
+          expect(@settings)
+            .to.have.property('command_queue_name')
+            .that.equals('skroutz_analytics')
 
     it 'has property .commands_queue', ->
       expect(@settings)
