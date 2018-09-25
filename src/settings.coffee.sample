@@ -109,12 +109,17 @@ define ->
   Define window.sa and window.sa.q
   @todo Needs refactoring and better place to live
   ###
-  Settings.window.sa = Settings.window.sa or ->
-    (Settings.window.sa.q = Settings.window.sa.q || []).push(arguments)
-    return
-  Settings.window.sa.q = Settings.window.sa.q or []
+  Settings.command_queue_name = Settings.window['@@analytics_object'] || 'sa'
 
-  Settings.commands_queue = Settings.window.sa.q
+  Settings.window[Settings.command_queue_name] =
+    Settings.window[Settings.command_queue_name] or ->
+      (Settings.window[Settings.command_queue_name].q = Settings.window[Settings.command_queue_name].q || []).
+        push(arguments)
+      return
+
+  Settings.window[Settings.command_queue_name].q = Settings.window[Settings.command_queue_name].q or []
+
+  Settings.commands_queue = Settings.window[Settings.command_queue_name].q
 
   # The current page URL
   Settings.url.current   = Settings.window.location.href

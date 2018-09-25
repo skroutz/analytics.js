@@ -1,11 +1,14 @@
 skroutz:
+  analytics_object: "SkroutzAnalyticsObject"
   analytics_base_url: "http://localhost:7878"
   application_base_url: "http://localhost:3000"
 
 alve:
+  analytics_object: "AlveAnalyticsObject"
   analytics_base_url: "http://localhost:7878"
   application_base_url: "http://localhost:3000"
 
 scrooge:
+  analytics_object: "ScroogeAnalyticsObject"
   analytics_base_url: "http://localhost:7878"
   application_base_url: "http://localhost:3000"
