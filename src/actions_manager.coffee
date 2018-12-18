@@ -52,6 +52,8 @@ define [
 
     # TODO: implement multiple actions per beacon maybe??
     _buildBeaconPayload: (category, type, data = '{}') ->
+      if typeof data != 'string'
+        data = JSON.stringify data
       payload = {}
       params = Settings.params
       payload[params.url] = Settings.url.current
