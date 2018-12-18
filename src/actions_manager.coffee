@@ -3,7 +3,8 @@ define [
   'reporter'
   'runnable'
   'helpers/url_helper'
-], (Settings, Reporter, Runnable, URLHelper) ->
+  'helpers/validation_helper'
+], (Settings, Reporter, Runnable, URLHelper, ValidationHelper) ->
   class ActionsManager
     ActionsManager::[key] = method for key, method of Runnable
 
@@ -26,14 +27,35 @@ define [
               redirect_url = @_appendRedirectUrlParams(redirect_url, analytics_session)
 
               try redirect_callback(redirect_url) catch then Settings.redirectTo(redirect_url)
+
       ecommerce:
         addOrder: (data, callback) ->
           clearTimeout @pageview_timeout
+
+          try
+            data = ValidationHelper.ensure_valid_object(data, 'addOrder')
+            ValidationHelper.ensure_key(data, 'order_id', 'addOrder')
+            ValidationHelper.ensure_not_empty_string(data, 'order_id', 'addOrder')
+          catch e
+            return console?.error? 'Skroutz Analytics | invalid parameters given:', e.message
+
           @_reportAction 'ecommerce', 'addOrder', data, -> callback() if callback
           @plugins_manager.notify('order', data)
+
         addItem: (data, callback) ->
           clearTimeout @pageview_timeout
+
+          try
+            data = ValidationHelper.ensure_valid_object(data, 'addItem')
+            ValidationHelper.ensure_key(data, 'order_id', 'addItem')
+            ValidationHelper.ensure_not_empty_string(data, 'order_id', 'addItem')
+            ValidationHelper.ensure_key(data, 'product_id', 'addItem')
+            ValidationHelper.ensure_not_empty_string(data, 'product_id', 'addItem')
+          catch e
+            return console?.error? 'Skroutz Analytics | invalid parameters given:', e.message
+
           @_reportAction 'ecommerce', 'addItem', data, -> callback() if callback
+
       site:
         sendPageView: ->
           @_reportAction 'site', 'sendPageView'
