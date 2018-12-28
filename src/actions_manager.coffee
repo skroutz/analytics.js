@@ -37,7 +37,7 @@ define [
             ValidationHelper.ensure_key(data, 'order_id', 'addOrder')
             ValidationHelper.ensure_not_empty_string(data, 'order_id', 'addOrder')
           catch e
-            return console?.error? 'Skroutz Analytics | invalid parameters given:', e.message
+            return console?.error? "#{Settings.flavor}Analytics | invalid parameters given:", e.message
 
           @_reportAction 'ecommerce', 'addOrder', data, -> callback() if callback
           @plugins_manager.notify('order', data)
@@ -52,7 +52,7 @@ define [
             ValidationHelper.ensure_key(data, 'product_id', 'addItem')
             ValidationHelper.ensure_not_empty_string(data, 'product_id', 'addItem')
           catch e
-            return console?.error? 'Skroutz Analytics | invalid parameters given:', e.message
+            return console?.error? "#{Settings.flavor}Analytics | invalid parameters given:", e.message
 
           @_reportAction 'ecommerce', 'addItem', data, -> callback() if callback
 
