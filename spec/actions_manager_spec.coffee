@@ -1,3 +1,20 @@
+VALID_ORDER_DATA = {
+  order_id: '123456',
+  revenue:  '1315.25',
+  shipping: '5.45',
+  tax:      '301.25'
+}
+VALID_ORDER_DATA_STRINGIFIED = JSON.stringify(VALID_ORDER_DATA)
+
+VALID_LINE_ITEM_DATA_1 = {
+  order_id:   '123456',
+  product_id: '47299441',
+  name:       'Product 1 Lalastore'
+  price:      '654.90',
+  quantity:   '1'
+}
+VALID_LINE_ITEM_DATA_1_STRINGIFIED = JSON.stringify(VALID_LINE_ITEM_DATA_1)
+
 api_session_promise_tests = ->
   context 'when session retrieval fulfils', ->
     beforeEach ->
@@ -383,6 +400,18 @@ describe 'ActionsManager', ->
             it 'does not execute callback', ->
               expect(@callback_spy).to.not.be.called
 
+        context 'when data are given as unstringified object', ->
+          beforeEach ->
+            @data = VALID_ORDER_DATA
+            @run()
+
+          it 'reports the action', ->
+            expect(@sendbeacon_spy).to.be.called
+
+          it 'stringifies the data before reporting', ->
+            payload = @sendbeacon_spy.args[0][1]
+            expect(payload.actions[0].data).to.eql VALID_ORDER_DATA_STRINGIFIED
+
       describe 'addItem', ->
         beforeEach ->
           @type = 'addItem'
@@ -415,6 +444,18 @@ describe 'ActionsManager', ->
 
             it 'does not execute callback', ->
               expect(@callback_spy).to.not.be.called
+
+        context 'when data are given as unstringified object', ->
+          beforeEach ->
+            @data = VALID_LINE_ITEM_DATA_1
+            @run()
+
+          it 'reports the action', ->
+            expect(@sendbeacon_spy).to.be.called
+
+          it 'stringifies the data before reporting', ->
+            payload = @sendbeacon_spy.args[0][1]
+            expect(payload.actions[0].data).to.eql VALID_LINE_ITEM_DATA_1_STRINGIFIED
 
     describe 'site', ->
       beforeEach ->
