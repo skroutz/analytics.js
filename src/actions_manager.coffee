@@ -3,7 +3,8 @@ define [
   'reporter'
   'runnable'
   'helpers/url_helper'
-], (Settings, Reporter, Runnable, URLHelper) ->
+  'validator'
+], (Settings, Reporter, Runnable, URLHelper, Validator) ->
   class ActionsManager
     ActionsManager::[key] = method for key, method of Runnable
 
@@ -26,14 +27,29 @@ define [
               redirect_url = @_appendRedirectUrlParams(redirect_url, analytics_session)
 
               try redirect_callback(redirect_url) catch then Settings.redirectTo(redirect_url)
+
       ecommerce:
         addOrder: (data, callback) ->
           clearTimeout @pageview_timeout
+
+          try
+            new Validator(data, 'addOrder').present('order_id')
+          catch e
+            return console?.error? "#{Settings.flavor}Analytics | #{e.message}"
+
           @_reportAction 'ecommerce', 'addOrder', data, -> callback() if callback
           @plugins_manager.notify('order', data)
+
         addItem: (data, callback) ->
           clearTimeout @pageview_timeout
+
+          try
+            new Validator(data, 'addItem').present('order_id', 'product_id')
+          catch e
+            return console?.error? "#{Settings.flavor}Analytics | #{e.message}"
+
           @_reportAction 'ecommerce', 'addItem', data, -> callback() if callback
+
       site:
         sendPageView: ->
           @_reportAction 'site', 'sendPageView'
@@ -52,6 +68,7 @@ define [
 
     # TODO: implement multiple actions per beacon maybe??
     _buildBeaconPayload: (category, type, data = '{}') ->
+      data = JSON.stringify data if typeof data != 'string'
       payload = {}
       params = Settings.params
       payload[params.url] = Settings.url.current

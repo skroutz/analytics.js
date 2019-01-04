@@ -1,3 +1,29 @@
+VALID_ORDER_DATA = {
+  order_id: '123456',
+  revenue:  '1315.25',
+  shipping: '5.45',
+  tax:      '301.25'
+}
+VALID_ORDER_DATA_STRINGIFIED = JSON.stringify(VALID_ORDER_DATA)
+
+VALID_LINE_ITEM_DATA_1 = {
+  order_id:   '123456',
+  product_id: '47299441',
+  name:       'Product 1 Lalastore'
+  price:      '654.90',
+  quantity:   '1'
+}
+VALID_LINE_ITEM_DATA_1_STRINGIFIED = JSON.stringify(VALID_LINE_ITEM_DATA_1)
+
+VALID_LINE_ITEM_DATA_2 = {
+  order_id:   '123456',
+  product_id: '987456',
+  name:       'Product 2 Lalastore'
+  price:      '50.90',
+  quantity:   '2'
+}
+VALID_LINE_ITEM_DATA_2_STRINGIFIED = JSON.stringify(VALID_LINE_ITEM_DATA_2)
+
 api_session_promise_tests = ->
   context 'when session retrieval fulfils', ->
     beforeEach ->
@@ -88,6 +114,8 @@ describe 'ActionsManager', ->
       @reporter_spy = sinon.spy @, 'reporter_mock'
       define 'reporter', [], => @reporter_mock
 
+      @console_error_spy = sinon.spy console, 'error'
+
       require [
         'session'
         'plugins_manager'
@@ -112,7 +140,9 @@ describe 'ActionsManager', ->
 
         done()
 
-  after -> window.__requirejs__.clearRequireState()
+  after ->
+    window.__requirejs__.clearRequireState()
+    @console_error_spy.restore()
 
   beforeEach ->
     @old_redirect = @settings.redirectTo
@@ -131,6 +161,7 @@ describe 'ActionsManager', ->
     # Reset mocks
     @sendbeacon_promise = new @promise()
     @sendbeacon_spy.reset()
+    @console_error_spy.reset()
 
   describe '.constructor', ->
     beforeEach ->
@@ -144,9 +175,9 @@ describe 'ActionsManager', ->
 
     context 'when commands exist', ->
       beforeEach ->
-        sa('ecommerce', 'addOrder', 'order_data')
-        sa('ecommerce', 'addItem', 'item_data_1')
-        sa('ecommerce', 'addItem', 'item_data_2')
+        sa('ecommerce', 'addOrder', VALID_ORDER_DATA_STRINGIFIED)
+        sa('ecommerce', 'addItem', VALID_LINE_ITEM_DATA_1_STRINGIFIED)
+        sa('ecommerce', 'addItem', VALID_LINE_ITEM_DATA_2_STRINGIFIED)
 
       it 'consumes all commands already declared', ->
         @subject.run()
@@ -217,7 +248,7 @@ describe 'ActionsManager', ->
       context 'when another action is created', ->
         context 'before timeout expires', ->
           beforeEach ->
-            sa('ecommerce', 'addOrder', 'order_data')
+            sa('ecommerce', 'addOrder', VALID_ORDER_DATA_STRINGIFIED)
             @initializeSubject()
             @subject.run()
 
@@ -231,7 +262,7 @@ describe 'ActionsManager', ->
             expect(@sendbeacon_spy.args[0][1].actions[0]).to.contain
               category: 'ecommerce'
               type: 'addOrder'
-              data: 'order_data'
+              data: VALID_ORDER_DATA_STRINGIFIED
 
           it 'does not send a PageView action', ->
             action_data = @sendbeacon_spy.args[0][1].actions[0]
@@ -243,7 +274,7 @@ describe 'ActionsManager', ->
           beforeEach ->
             @initializeSubject()
             @clock.tick @settings.auto_pageview_timeout + 100
-            sa('ecommerce', 'addOrder', 'order_data')
+            sa('ecommerce', 'addOrder', VALID_ORDER_DATA_STRINGIFIED)
             @subject.run()
 
           it 'clears the AutoPageView timeout', ->
@@ -258,9 +289,9 @@ describe 'ActionsManager', ->
     context 'when API calls are made before library load', ->
       beforeEach ->
         sa('unknown-category', 'unknown-command', 'data')
-        sa('ecommerce', 'addOrder', 'order_data')
-        sa('ecommerce', 'addItem', 'item_data_1')
-        sa('ecommerce', 'addItem', 'item_data_2')
+        sa('ecommerce', 'addOrder', VALID_ORDER_DATA_STRINGIFIED)
+        sa('ecommerce', 'addItem', VALID_LINE_ITEM_DATA_1_STRINGIFIED)
+        sa('ecommerce', 'addItem', VALID_LINE_ITEM_DATA_2_STRINGIFIED)
         @subject.run()
 
       it 'executes every recognized command', ->
@@ -341,7 +372,6 @@ describe 'ActionsManager', ->
     describe 'ecommerce', ->
       beforeEach ->
         @category = 'ecommerce'
-        @data = '{}'
 
         @run = ->
           sa(@category, @type, @data)
@@ -352,6 +382,7 @@ describe 'ActionsManager', ->
       describe 'addOrder', ->
         beforeEach ->
           @type = 'addOrder'
+          @data = VALID_ORDER_DATA_STRINGIFIED
 
         action_reporting_tests()
 
@@ -382,10 +413,66 @@ describe 'ActionsManager', ->
 
             it 'does not execute callback', ->
               expect(@callback_spy).to.not.be.called
+
+        context 'when data are given as unstringified object', ->
+          beforeEach ->
+            @data = VALID_ORDER_DATA
+            @run()
+
+          it 'reports the action', ->
+            expect(@sendbeacon_spy).to.be.called
+
+          it 'stringifies the data before reporting', ->
+            payload = @sendbeacon_spy.args[0][1]
+            expect(payload.actions[0].data).to.eql VALID_ORDER_DATA_STRINGIFIED
+
+        describe 'validations', ->
+          context 'when an invalid JSON object is given', ->
+            beforeEach ->
+              @data = "invalid JSON"
+              @run()
+
+            it 'does not report the action', ->
+              expect(@sendbeacon_spy).to.not.be.called
+
+            it 'reports error to console', ->
+              expect(@console_error_spy).to.be.calledOnce
+
+          context 'when order_id is missing', ->
+            beforeEach ->
+              @data = JSON.stringify({
+                revenue:  '1315.25',
+                shipping: '5.45',
+                tax:      '301.25'
+              })
+              @run()
+
+            it 'does not report the action', ->
+              expect(@sendbeacon_spy).to.not.be.called
+
+            it 'reports error to console', ->
+              expect(@console_error_spy).to.be.calledOnce
+
+          context 'when order_id is empty', ->
+            beforeEach ->
+              @data = JSON.stringify({
+                order_id: ' \t',
+                revenue:  '1315.25',
+                shipping: '5.45',
+                tax:      '301.25'
+              })
+              @run()
+
+            it 'does not report the action', ->
+              expect(@sendbeacon_spy).to.not.be.called
+
+            it 'reports error to console', ->
+              expect(@console_error_spy).to.be.calledOnce
 
       describe 'addItem', ->
         beforeEach ->
           @type = 'addItem'
+          @data = VALID_LINE_ITEM_DATA_1_STRINGIFIED
 
         action_reporting_tests()
 
@@ -415,6 +502,96 @@ describe 'ActionsManager', ->
 
             it 'does not execute callback', ->
               expect(@callback_spy).to.not.be.called
+
+        context 'when data are given as unstringified object', ->
+          beforeEach ->
+            @data = VALID_LINE_ITEM_DATA_1
+            @run()
+
+          it 'reports the action', ->
+            expect(@sendbeacon_spy).to.be.called
+
+          it 'stringifies the data before reporting', ->
+            payload = @sendbeacon_spy.args[0][1]
+            expect(payload.actions[0].data).to.eql VALID_LINE_ITEM_DATA_1_STRINGIFIED
+
+        describe 'validations', ->
+          context 'when an invalid JSON object is given', ->
+            beforeEach ->
+              @data = "invalid JSON"
+              @run()
+
+            it 'does not report the action', ->
+              expect(@sendbeacon_spy).to.not.be.called
+
+            it 'reports error to console', ->
+              expect(@console_error_spy).to.be.calledOnce
+
+          context 'when order_id is missing', ->
+            beforeEach ->
+              @data = JSON.stringify({
+                product_id: '987456',
+                name:       'Product 2 Lalastore'
+                price:      '50.90',
+                quantity:   '2'
+              })
+              @run()
+
+            it 'does not report the action', ->
+              expect(@sendbeacon_spy).to.not.be.called
+
+            it 'reports error to console', ->
+              expect(@console_error_spy).to.be.calledOnce
+
+          context 'when order_id is empty', ->
+            beforeEach ->
+              @data = JSON.stringify({
+                order_id:   ' \t',
+                product_id: '987456',
+                name:       'Product 2 Lalastore'
+                price:      '50.90',
+                quantity:   '2'
+              })
+              @run()
+
+            it 'does not report the action', ->
+              expect(@sendbeacon_spy).to.not.be.called
+
+            it 'reports error to console', ->
+              expect(@console_error_spy).to.be.calledOnce
+
+          context 'when product_id is missing', ->
+            beforeEach ->
+              @data = JSON.stringify({
+                order_id:   '123456',
+                name:       'Product 2 Lalastore'
+                price:      '50.90',
+                quantity:   '2'
+              })
+              @run()
+
+            it 'does not report the action', ->
+              expect(@sendbeacon_spy).to.not.be.called
+
+            it 'reports error to console', ->
+              expect(@console_error_spy).to.be.calledOnce
+
+          context 'when product_id is empty', ->
+            beforeEach ->
+              @data = JSON.stringify({
+                order_id:   '123456',
+                product_id: ' \t',
+                name:       'Product 2 Lalastore'
+                price:      '50.90',
+                quantity:   '2'
+              })
+              @run()
+
+            it 'does not report the action', ->
+              expect(@sendbeacon_spy).to.not.be.called
+
+            it 'reports error to console', ->
+              expect(@console_error_spy).to.be.calledOnce
 
     describe 'site', ->
       beforeEach ->

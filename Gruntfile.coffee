@@ -66,10 +66,13 @@ module.exports = (grunt) ->
         options:
           patterns: [json: (done) ->
             settings = grunt.config('env_settings')
-            flavor_settings = settings[grunt.config.get('current_flavor')]
+
+            flavor = grunt.config.get('current_flavor')
+            flavor_settings = settings[flavor]
 
             for property of flavor_settings
               settings[property] = flavor_settings[property]
+            settings.flavor = "#{flavor[0].toUpperCase()}#{flavor.slice(1)}"
 
             done settings
             return

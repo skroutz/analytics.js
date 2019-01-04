@@ -19,6 +19,12 @@ describe 'Settings', ->
     unset_analytics_object()
     delete @settings
 
+  describe '.flavor', ->
+    it 'has property .flavor', ->
+      expect(@settings)
+        .to.have.property('flavor')
+        .that.equals('Skroutz')
+
   describe 'API', ->
     it 'has property .window', ->
       expect(@settings)
