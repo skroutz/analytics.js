@@ -47,7 +47,7 @@ define ->
     ###
     present: (keys...) ->
       for key in keys
-        if @data[key] == undefined or @data[key] == null or not @data[key].trim()
+        if @data[key] == undefined or @data[key] == null or @data[key].trim?() == ''
           error_message = "Missing or empty \"#{key}\""+(if @action then " in \"#{@action}\" action" else '')
           throw new ValidationError error_message, {error: 'not_present', key, @action}
 
