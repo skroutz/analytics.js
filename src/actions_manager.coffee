@@ -35,7 +35,10 @@ define [
           try
             new Validator(data, 'addOrder').present('order_id')
           catch e
-            return console?.error? "#{Settings.flavor}Analytics | #{e.message}"
+            if e.name == 'ValidationError'
+              return console?.error? "#{Settings.flavor}Analytics | #{e.message}"
+            else
+              throw e
 
           @_reportAction 'ecommerce', 'addOrder', data, -> callback() if callback
           @plugins_manager.notify('order', data)
@@ -46,7 +49,10 @@ define [
           try
             new Validator(data, 'addItem').present('order_id', 'product_id')
           catch e
-            return console?.error? "#{Settings.flavor}Analytics | #{e.message}"
+            if e.name == 'ValidationError'
+              return console?.error? "#{Settings.flavor}Analytics | #{e.message}"
+            else
+              throw e
 
           @_reportAction 'ecommerce', 'addItem', data, -> callback() if callback
 
