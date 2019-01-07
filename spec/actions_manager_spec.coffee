@@ -426,6 +426,19 @@ describe 'ActionsManager', ->
             payload = @sendbeacon_spy.args[0][1]
             expect(payload.actions[0].data).to.eql VALID_ORDER_DATA_STRINGIFIED
 
+        context 'when order_id is integer', ->
+          beforeEach ->
+            @data = JSON.stringify({
+              order_id: 123456,
+              revenue:  '1315.25',
+              shipping: '5.45',
+              tax:      '301.25'
+            })
+            @run()
+
+          it 'reports the action', ->
+            expect(@sendbeacon_spy).to.be.called
+
         describe 'validations', ->
           context 'when an invalid JSON object is given', ->
             beforeEach ->
@@ -514,6 +527,34 @@ describe 'ActionsManager', ->
           it 'stringifies the data before reporting', ->
             payload = @sendbeacon_spy.args[0][1]
             expect(payload.actions[0].data).to.eql VALID_LINE_ITEM_DATA_1_STRINGIFIED
+
+        context 'when order_id is integer', ->
+          beforeEach ->
+            @data = JSON.stringify({
+              order_id:   123456,
+              product_id: '47299441',
+              name:       'Product 1 Lalastore'
+              price:      '654.90',
+              quantity:   '1'
+            })
+            @run()
+
+          it 'reports the action', ->
+            expect(@sendbeacon_spy).to.be.called
+
+        context 'when product_id is integer', ->
+          beforeEach ->
+            @data = JSON.stringify({
+              order_id:   '123456',
+              product_id: 47299441,
+              name:       'Product 1 Lalastore'
+              price:      '654.90',
+              quantity:   '1'
+            })
+            @run()
+
+          it 'reports the action', ->
+            expect(@sendbeacon_spy).to.be.called
 
         describe 'validations', ->
           context 'when an invalid JSON object is given', ->
