@@ -1,6 +1,6 @@
 define ->
   Settings =
-    flavor: "@@flavor"
+    flavor: '@@flavor'
 
     ###
     @param [String] url The url to redirect to
