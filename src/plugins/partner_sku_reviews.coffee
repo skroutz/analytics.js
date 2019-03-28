@@ -814,12 +814,14 @@ class PartnerSkuReviews
       align-items: center;
       -ms-flex-align: center;
       padding: 15px;
+      margin: 0;
       border-bottom: 1px solid #e3e3e3;
     }
 
     ##{flavor}-product-reviews-extended .sa-extended-reviews-title {
       display: inline-block;
       font-size: 17px;
+      margin: 0;
     }
 
     ##{flavor}-product-reviews-extended .sa-extended-reviews-title::first-letter {
@@ -829,6 +831,7 @@ class PartnerSkuReviews
     ##{flavor}-product-reviews-extended .sa-brand-logo {
       height: 22px;
       width: 80px;
+      margin: 0;
     }
 
     ##{flavor}-product-reviews-extended .sa-brand-powered-by {
@@ -912,7 +915,7 @@ class PartnerSkuReviews
       display: none;
       position: absolute;
       width: 250px;
-      padding: 20px 0 20px 30px;
+      padding: 10px 0 10px 30px;
       top: 30px;
       left: 0;
       margin-left: -20px;
@@ -951,7 +954,7 @@ class PartnerSkuReviews
     ##{flavor}-product-reviews-extended .sa-rating-breakdown-class {
       display: list-item;
       list-style-type: none;
-      margin: 0 0 4px 0;
+      margin: 0;
     }
 
     ##{flavor}-product-reviews-extended .sa-num-stars {
