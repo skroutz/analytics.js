@@ -62,7 +62,7 @@ brandIndicator = -> """
 ratingBreakdown = (breakdown) ->
   list_elements = breakdown.map ({star, percentage, count}) ->
     """
-      <li class="sa-rating-breakdown-class">
+      <div class="sa-rating-breakdown-class">
         <div class="sa-num-stars">
           #{starText(star)}
         </div>
@@ -70,13 +70,13 @@ ratingBreakdown = (breakdown) ->
           <div class="sa-rating-bar" style="width: #{percentage}%"></div>
         </div>
         <div class="sa-rating-count">#{count}</div>
-      </li>
+      </div>
     """
 
   """
-    <ul class="sa-rating-breakdown">
+    <div class="sa-rating-breakdown">
       #{list_elements.join('')}
-    </ul>
+    </div>
   """
 
 ## Components
@@ -167,19 +167,19 @@ class ExtendedSkuReviews extends BaseComponent
       # possible styles are: "good", "so-so" and "bad"
       # which translate into classes: "sa-good", "sa-so-so" and "sa-bad"
       """
-        <li class="sa-reviews-aggregation-feature">
+        <div class="sa-reviews-aggregation-feature">
           <span class="sa-reviews-aggregation-label">#{label}</span>
           <div class="sa-reviews-aggregation-bar-wrap">
             <span class="sa-reviews-aggregation-bar sa-#{style}" style="width: #{score}%"></span>
           </div>
-        </li>
+        </div>
       """
 
     """
       <div class="sa-reviews-aggregation-wrap">
-        <ul class="sa-reviews-aggregation-list">
+        <div class="sa-reviews-aggregation-list">
           #{aggregation_elements.join('')}
-        </ul>
+        </div>
       </div>
     """
 
@@ -198,11 +198,11 @@ class ExtendedSkuReviews extends BaseComponent
       features = sentiments[sentiment]
       return '' unless features && features.length
 
-      feature_elements = features.map (feature) -> "<li class='sa-review-feature-sentiment'>#{feature}</li>"
+      feature_elements = features.map (feature) -> "<div class='sa-review-feature-sentiment'>#{feature}</div>"
       """
-        <ul class="sa-review-sentiment sa-#{sentiment}">
+        <div class="sa-review-sentiment sa-#{sentiment}">
           #{feature_elements.join('')}
-        </ul>
+        </div>
       """
 
     """
@@ -220,7 +220,7 @@ class ExtendedSkuReviews extends BaseComponent
       else
         ''
       """
-        <li class="sa-review #{ if expandable then 'sa-expandable' else ''}" data-index='#{index}'>
+        <div class="sa-review #{ if expandable then 'sa-expandable' else ''}" data-index='#{index}'>
           <div class="sa-review-header">
             <img class="sa-review-avatar" src="#{user.avatar}" alt="avatar of user #{user.username}"/>
             <div class="sa-review-info">
@@ -234,17 +234,17 @@ class ExtendedSkuReviews extends BaseComponent
             </div>
           </div>
           <div class="sa-review-main">
-            <p class="sa-review-text">#{review.review}</p>
+            <div class="sa-review-text">#{review.review}</div>
             #{expand_button}
             #{reviewSentiments(review.sentiments)}
           </div>
-        </li>
+        </div>
       """
 
     """
-      <ul class="sa-reviews-list">
+      <div class="sa-reviews-list">
         #{review_elements.join('')}
-      </ul>
+      </div>
     """
 
   constructor: (el, assigns) ->
@@ -260,7 +260,7 @@ class ExtendedSkuReviews extends BaseComponent
       body = """
         <div class="sa-review-prompt">
           <h4 class="sa-review-prompt-head">@@translations.partner_sku_reviews.share_your_experience</h4>
-          <p class="sa-review-prompt-motive">@@translations.partner_sku_reviews.write_review_for #{@title} @@translations.partner_sku_reviews.and_help</p>
+          <div class="sa-review-prompt-motive">@@translations.partner_sku_reviews.write_review_for #{@title} @@translations.partner_sku_reviews.and_help</div>
           <a class="sa-review-prompt-button" rel="nofollow" target="_blank"
              href="#{write_review_link}">@@translations.partner_sku_reviews.review_this</a>
         </div>
@@ -268,7 +268,7 @@ class ExtendedSkuReviews extends BaseComponent
     else
       body = """
         <div class="sa-extended-reviews-body">
-          <h3 class="sa-sku-title">#{@title}</h3>
+          <div class="sa-sku-title">#{@title}</div>
           <div class="sa-sku-details">
             <div class="sa-rating-full">
               #{starRating(@reviewscore, @reviews_count)}
@@ -509,6 +509,11 @@ class PartnerSkuReviews
     ##{flavor}-product-reviews-inline *, ##{flavor}-product-reviews-extended * {
       all: unset;
       font-family: Verdana, Arial, sans-serif !important;
+    }
+
+    ##{flavor}-product-reviews-inline div, ##{flavor}-product-reviews-inline span,
+    ##{flavor}-product-reviews-extended div, ##{flavor}-product-reviews-extended span {
+      all: unset;
     }
 
     ##{flavor}-product-reviews-inline .sa-star-rating-wrapper,
@@ -814,14 +819,12 @@ class PartnerSkuReviews
       align-items: center;
       -ms-flex-align: center;
       padding: 15px;
-      margin: 0;
       border-bottom: 1px solid #e3e3e3;
     }
 
     ##{flavor}-product-reviews-extended .sa-extended-reviews-title {
       display: inline-block;
       font-size: 17px;
-      margin: 0;
     }
 
     ##{flavor}-product-reviews-extended .sa-extended-reviews-title::first-letter {
@@ -831,7 +834,6 @@ class PartnerSkuReviews
     ##{flavor}-product-reviews-extended .sa-brand-logo {
       height: 22px;
       width: 80px;
-      margin: 0;
     }
 
     ##{flavor}-product-reviews-extended .sa-brand-powered-by {
@@ -954,7 +956,7 @@ class PartnerSkuReviews
     ##{flavor}-product-reviews-extended .sa-rating-breakdown-class {
       display: list-item;
       list-style-type: none;
-      margin: 0;
+      margin: 0 0 4px 0;
     }
 
     ##{flavor}-product-reviews-extended .sa-num-stars {
@@ -1162,7 +1164,6 @@ class PartnerSkuReviews
 
     ##{flavor}-product-reviews-extended .sa-review-text {
       display: block;
-      max-width: 60em;
       margin: 20px 0 10px;
       word-wrap: break-all;
       word-wrap: break-word;
@@ -1300,7 +1301,7 @@ class PartnerSkuReviews
     /* EXTENDED - NO CONTENT */
 
     ##{flavor}-product-reviews-extended .sa-review-prompt {
-      padding: 30px;
+      padding: 20px 15px;
       display: block;
     }
 
