@@ -260,7 +260,7 @@ class ExtendedSkuReviews extends BaseComponent
       body = """
         <div class="sa-review-prompt">
           <h4 class="sa-review-prompt-head">@@translations.partner_sku_reviews.share_your_experience</h4>
-          <div class="sa-review-prompt-motive">@@translations.partner_sku_reviews.write_review_for #{@title} @@translations.partner_sku_reviews.and_help</div>
+          <div class="sa-review-prompt-motive">@@translations.partner_sku_reviews.write_review_for "#{@title}" @@translations.partner_sku_reviews.and_help</div>
           <a class="sa-review-prompt-button" rel="nofollow" target="_blank"
              href="#{write_review_link}">@@translations.partner_sku_reviews.review_this</a>
         </div>
