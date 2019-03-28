@@ -561,7 +561,7 @@ class PartnerSkuReviews
     /* INLINE */
 
     ##{flavor}-product-reviews-inline.sa-reviews-inline-root {
-      all: unset;
+      all: initial;
       display: inline-flex;
       display: -ms-inline-flexbox;
       flex-direction: column;
@@ -799,7 +799,7 @@ class PartnerSkuReviews
     /* EXTENDED */
 
     ##{flavor}-product-reviews-extended.sa-reviews-extended-root {
-      all: unset;
+      all: initial;
       display: block;
       border: 1px solid #e8e8e8;
       border-radius: 2px;
