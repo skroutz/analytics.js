@@ -13,27 +13,33 @@ define [
       @loaded_plugins = [] # Use it in order to load a plugin only once
 
     ###
-    Triggers PluginManager to load a plugin by an action
+    Triggers PluginManager to load one or more plugins by an action
 
     @example plugins_manager.notify('addOrder', { order_id: 'order_id',... })
 
-    @param [String] action The action that triggers a plugin
-    @param [Object, String] data Any additional data required by the plugin
+    @param [String] action The action that triggers plugins
+    @param [Object, String] data Any additional data required by the plugins
     ###
     notify: (action, data) ->
       @_fetchEnabledPlugins().then =>
-        plugin = PluginsSettings.triggers[action]
-        return unless plugin
+        plugins = PluginsSettings.triggers[action]
+        return unless plugins
 
-        return if @_pluginIsLoaded(plugin) || !@_pluginIsEnabled(plugin)
+        # single plugin specified as string
+        # Array.isArray polyfill: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray#Polyfill
+        plugins = [plugins] unless Object.prototype.toString.call(plugins) == '[object Array]'
 
-        @_load(plugin) if @_publishPluginData(plugin, data)
+        for plugin in plugins
+          continue if @_pluginIsLoaded(plugin) || !@_pluginIsEnabled(plugin)
+          @_load(plugin) if @_publishPluginData(plugin, data)
 
     _publishPluginData: (name, data) ->
       if typeof data isnt 'object'
         try data = JSON.parse(data)
         catch
           return false
+       else
+         data = JSON.parse(JSON.stringify(data)) # clone
 
       window.sa_plugins ||= {}
       window.sa_plugins[name] ||= {}

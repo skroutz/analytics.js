@@ -21,8 +21,10 @@ define ->
         elements_to_hide: ['#sa-badge-floating-plugin']
       badge:
         url: '@@analytics_base_url/@@badge_hash'
+      partner_sku_reviews:
+        url: '@@analytics_base_url/@@partner_sku_reviews_hash'
     triggers:
       order: 'order_stash'
-      connect: 'badge'
+      connect: ['badge', 'partner_sku_reviews']
 
   return PluginsSettings

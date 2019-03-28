@@ -376,7 +376,7 @@ class Badge
       background-image: url('#{asset_url("badge/floating/large/theme/#{configuration.theme}/star_empty@2x.png")}');
     }
 
-    #sa-badge-floating-plugin #sa-badge-modal #sa-badge-modal-inner #sa-badge-modal-close-button {
+    #sa-badge-modal #sa-badge-modal-inner #sa-badge-modal-close-button {
       background-image: url('#{asset_url("badge/close@2x.png")}');
     }
 
