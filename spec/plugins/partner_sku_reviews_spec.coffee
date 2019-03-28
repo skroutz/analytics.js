@@ -200,6 +200,14 @@ describe 'PartnerSkuReviews', ->
   PRODUCT_REVIEWS['no_sales_id'] = JSON.parse(JSON.stringify(PRODUCT_REVIEWS['displayable_reviews_id']))
   PRODUCT_REVIEWS['no_sales_id'].sales = null
 
+  event_listener_args = []
+  orginalAddEventListener =parent_doc.addEventListener
+
+  removeListeners = ->
+    while event_listener_args.length > 0
+      args = event_listener_args.pop()
+      parent_doc.removeEventListener args.event, args.func
+
   performTheJSONP = ->
     jsonp_script = parent_doc.getElementById('sa_jsonp_sku_reviews_fetch')
     return unless jsonp_script
@@ -213,8 +221,10 @@ describe 'PartnerSkuReviews', ->
     window.parent[callback](product_information)
 
   cleanupDom = ->
+    removeListeners()
+
     # Cleanup rendered widgets and stylesheets
-    selector = '#sa-partner-sku-reviews-style, #sa-reviews-modal, .\\@\\@flavor-product-reviews-inline, .\\@\\@flavor-product-reviews-extended'
+    selector = '#sa-partner-sku-reviews-style, #sa-reviews-modal, #\\@\\@flavor-product-reviews-inline, #\\@\\@flavor-product-reviews-extended'
     for e in parent_doc.querySelectorAll(selector)
       e.parentNode.removeChild e
 
@@ -252,7 +262,7 @@ describe 'PartnerSkuReviews', ->
   addProductReviewsElement = (type, product_id) ->
     parent_doc = window.parent.document
     element = window.parent.document.createElement('div')
-    element.className = "@@flavor-product-reviews-#{type}"
+    element.id = "@@flavor-product-reviews-#{type}"
     element.setAttribute('data-product-id', product_id)
     parent_doc.body.appendChild(element)
 
@@ -276,6 +286,14 @@ describe 'PartnerSkuReviews', ->
 
     renderPlugin done
 
+  before ->
+    parent_doc.addEventListener = ->
+      event_listener_args.push({ event: arguments[0], func: arguments[1] })
+
+      orginalAddEventListener.apply this, arguments
+
+  after -> window.parent.document.addEventListener = orginalAddEventListener
+
   afterEach ->
     cleanupDom()
 
@@ -287,20 +305,20 @@ describe 'PartnerSkuReviews', ->
         prepare 'inline', 'extended', 'inexistent', {}, done
 
       it 'does not render the inline widget', ->
-        expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-inline').innerHTML.trim()).to.be.empty
+        expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.be.empty
 
       it 'does not render the extended widget', ->
-        expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
+        expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
 
     context 'when a non-reviewable product_id is detected', ->
       beforeEach (done) ->
         prepare 'inline', 'extended', 'non_reviewable_id', {}, done
 
       it 'does not render the inline widget', ->
-        expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-inline').innerHTML.trim()).to.be.empty
+        expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.be.empty
 
       it 'does not render the extended widget', ->
-        expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
+        expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
 
     context 'when a reviewable product_id is detected', ->
       beforeEach (done) ->
@@ -319,26 +337,26 @@ describe 'PartnerSkuReviews', ->
               prepare 'inline', 'extended', 'displayable_reviews_id', { inline_widget_enabled: false }, done
 
             it 'does not render the inline widget', ->
-              expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-inline').innerHTML.trim()).to.be.empty
+              expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.be.empty
 
           context 'and inline widget is enabled', ->
             it 'renders the inline widget', ->
-              expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-inline').innerHTML.trim()).to.not.be.empty
+              expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.not.be.empty
 
         context 'and it doesn\'t have displayable reviews', ->
           it 'renders the inline widget', ->
-            expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-inline').innerHTML.trim()).to.not.be.empty
+            expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.not.be.empty
 
         context 'and extended widget is disabled', ->
           beforeEach (done) ->
             prepare 'inline', 'extended', 'displayable_reviews_id', { extended_widget_enabled: false }, done
 
           it 'does not render the extended widget', ->
-            expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
+            expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
 
         context 'and extended widget is enabled', ->
           it 'renders the extended widget', ->
-            expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended').innerHTML.trim()).to.not.be.empty
+            expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.not.be.empty
 
       context 'and it doesn\'t have ratings', ->
         beforeEach (done) ->
@@ -346,23 +364,23 @@ describe 'PartnerSkuReviews', ->
 
         context 'and inline widget is enabled', ->
           it 'does not render the inline widget', ->
-            expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-inline').innerHTML.trim()).to.be.empty
+            expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.be.empty
 
         context 'and extended widget is disabled', ->
           beforeEach (done) ->
             prepare 'extended', 'no_ratings_id', { extended_widget_enabled: false }, done
 
           it 'does not render the extended widget', ->
-            expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
+            expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
 
         context 'and extended widget is enabled', ->
           it 'renders the extended widget', ->
-            expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended').innerHTML.trim()).to.not.be.empty
+            expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.not.be.empty
 
   describe 'inline widget', ->
     beforeEach (done) ->
       prepare 'inline', 'no_displayable_reviews_id', { inline_widget_theme: 'small-white' }, =>
-        @subject = parent_doc.querySelector('.\\@\\@flavor-product-reviews-inline')
+        @subject = parent_doc.getElementById('@@flavor-product-reviews-inline')
         done()
 
     it 'adds proper theme class', ->
@@ -372,9 +390,8 @@ describe 'PartnerSkuReviews', ->
       expect(@subject.querySelector('.sa-star-rating').innerHTML.trim()).to.not.be.empty
 
     context 'when inline widget is clicked', ->
-      beforeEach (done) ->
+      beforeEach ->
         @subject.click()
-        done()
 
       it 'opens the modal dialog', ->
         expect(parent_doc.getElementById('sa-reviews-modal').style.display).to.eq('block')
@@ -382,7 +399,7 @@ describe 'PartnerSkuReviews', ->
   describe 'extended widget', ->
     beforeEach (done) ->
       prepare 'extended', 'no_ratings_id', { extended_widget_theme: 'white' }, =>
-        @subject = parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended')
+        @subject = parent_doc.getElementById('@@flavor-product-reviews-extended')
         done()
 
     it 'adds proper theme class', ->
@@ -391,7 +408,7 @@ describe 'PartnerSkuReviews', ->
     context 'when there are ratings', ->
       beforeEach (done) ->
         prepare 'extended', 'no_displayable_reviews_id', {}, =>
-          @subject = parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended')
+          @subject = parent_doc.getElementById('@@flavor-product-reviews-extended')
           done()
 
       it 'displays rating details', ->
@@ -401,49 +418,43 @@ describe 'PartnerSkuReviews', ->
         expect(@subject.querySelector('.sa-show-review-modal').innerHTML.trim()).to.not.be.empty
 
       context 'when "read more button" is clicked', ->
-        beforeEach (done) ->
+        beforeEach ->
           @subject.querySelector('.sa-show-review-modal').click()
-          done()
 
         it 'opens the modal dialog', ->
           expect(parent_doc.getElementById('sa-reviews-modal').style.display).to.eq('block')
 
       describe 'reviews breakdown', ->
-        beforeEach (done) ->
+        beforeEach ->
           @subject = parent_doc.querySelector('.sa-rating-breakdown')
-          done()
 
         context 'when reviews count is clicked', ->
-          beforeEach (done) ->
+          beforeEach ->
             parent_doc.querySelector('.sa-reviews-count-compact').click()
-            done()
 
           it 'shows reviews breakdown', ->
             expect(@subject.style.display).to.eq('block')
 
         context 'when reviews count arrow is clicked', ->
-          beforeEach (done) ->
+          beforeEach ->
             parent_doc.querySelector('.sa-rating-arrow').click()
-            done()
 
           it 'shows reviews breakdown', ->
             expect(@subject.style.display).to.eq('block')
 
         context 'when reviews breakdown is opened', ->
           context 'and reviews count is clicked', ->
-            beforeEach (done) ->
+            beforeEach ->
               parent_doc.querySelector('.sa-reviews-count-compact').click()
               parent_doc.querySelector('.sa-reviews-count-compact').click()
-              done()
 
             it 'shows reviews breakdown', ->
               expect(@subject.style.display).to.eq('none')
 
           context 'and reviews count arrow is clicked', ->
-            beforeEach (done) ->
+            beforeEach ->
               parent_doc.querySelector('.sa-rating-arrow').click()
               parent_doc.querySelector('.sa-rating-arrow').click()
-              done()
 
             it 'shows reviews breakdown', ->
               expect(@subject.style.display).to.eq('none')
@@ -451,7 +462,7 @@ describe 'PartnerSkuReviews', ->
       context 'and it has sales', ->
         beforeEach (done) ->
           prepare 'extended', 'no_displayable_reviews_id', {}, =>
-            @subject = parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended')
+            @subject = parent_doc.getElementById('@@flavor-product-reviews-extended')
             done()
 
         it 'displays sales text', ->
@@ -460,55 +471,53 @@ describe 'PartnerSkuReviews', ->
       context 'but it doesn\'t have sales', ->
         beforeEach (done) ->
           prepare 'extended', 'no_sales_id', {}, =>
-            @subject = parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended')
+            @subject = parent_doc.getElementById('@@flavor-product-reviews-extended')
             done()
 
         it 'doesn\'t display sales text', ->
-          expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended .sa-sales-text')).to.not.exist
+          expect(parent_doc.querySelector('#\\@\\@flavor-product-reviews-extended .sa-sales-text')).to.not.exist
 
       context 'and it has reviews', ->
         beforeEach (done) ->
           prepare 'extended', 'displayable_reviews_id', {}, =>
-            @subject = parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended')
+            @subject = parent_doc.getElementById('@@flavor-product-reviews-extended')
             done()
 
         it 'displays reviews list', ->
-          expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended .sa-reviews-list').innerHTML.trim()).to.not.be.empty
+          expect(parent_doc.querySelector('#\\@\\@flavor-product-reviews-extended .sa-reviews-list').innerHTML.trim()).to.not.be.empty
 
         context 'and extended_widget_reviews_count is set', ->
           beforeEach (done) ->
             prepare 'extended', 'displayable_reviews_id', { extended_widget_reviews_count: 3 }, =>
-              @subject = parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended')
+              @subject = parent_doc.getElementById('@@flavor-product-reviews-extended')
               done()
 
           it 'limits displayed reviews count accordingly', ->
-            expect(parent_doc.querySelectorAll('.\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review').length).to.eq(3)
+            expect(parent_doc.querySelectorAll('#\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review').length).to.eq(3)
 
         context 'and it has reviews aggregation', ->
           it 'displays the aggregation', ->
-            expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended .sa-reviews-aggregation-list').innerHTML.trim()).to.not.be.empty
+            expect(parent_doc.querySelector('#\\@\\@flavor-product-reviews-extended .sa-reviews-aggregation-list').innerHTML.trim()).to.not.be.empty
 
         context 'but it doesn\'t have reviews aggregation', ->
           beforeEach (done) ->
             prepare 'extended', 'no_aggregation_id', {}, =>
-              @subject = parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended')
+              @subject = parent_doc.getElementById('@@flavor-product-reviews-extended')
               done()
 
           it 'doesn\'t display the aggregation', ->
-            expect(parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended .sa-reviews-aggregation-list')).to.not.exist
+            expect(parent_doc.querySelector('#\\@\\@flavor-product-reviews-extended .sa-reviews-aggregation-list')).to.not.exist
 
         describe 'review', ->
-          beforeEach (done) ->
-            @subject = parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')
-            done()
+          beforeEach ->
+            @subject = parent_doc.querySelector('#\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')
 
           it 'displays rating stars', ->
             expect(@subject.querySelector('.sa-star-rating').innerHTML.trim()).to.not.be.empty
 
           context 'when review exceeds 500 characters', ->
-            beforeEach (done) ->
-              @subject = parent_doc.querySelectorAll('.\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')[2]
-              done()
+            beforeEach ->
+              @subject = parent_doc.querySelectorAll('#\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')[2]
 
             it 'adds extendable class to review', ->
               expect(@subject.classList.contains('sa-extendable')).to.eq.true
@@ -517,17 +526,15 @@ describe 'PartnerSkuReviews', ->
               expect(@subject.querySelector('.sa-review-expand').innerHTML.trim()).to.not.be.empty
 
             context 'when more button is clicked', ->
-              beforeEach (done) ->
+              beforeEach ->
                 @subject.querySelector('.sa-review-expand').click()
-                done()
 
               it 'removes extendable class from review', ->
                 expect(@subject.classList.contains('sa-extendable')).to.eq.false
 
           context 'when review does not exceed 500 characters', ->
-            beforeEach (done) ->
-              @subject = parent_doc.querySelectorAll('.\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')[0]
-              done()
+            beforeEach ->
+              @subject = parent_doc.querySelectorAll('#\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')[0]
 
             it 'doesn\'t add extendable class to review', ->
               expect(@subject.classList.contains('sa-extendable')).to.eq.false
@@ -536,17 +543,15 @@ describe 'PartnerSkuReviews', ->
               expect(@subject.querySelector('.sa-review-expand')).to.not.exist
 
           context 'when review has all sentiments', ->
-            beforeEach (done) ->
-              @subject = parent_doc.querySelectorAll('.\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')[0]
-              done()
+            beforeEach ->
+              @subject = parent_doc.querySelectorAll('#\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')[0]
 
             it 'displays all sentiments', ->
               expect(@subject.querySelectorAll('.sa-review-sentiment').length).to.eq(3)
 
           context 'when review has some sentiments', ->
-            beforeEach (done) ->
-              @subject = parent_doc.querySelectorAll('.\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')[1]
-              done()
+            beforeEach ->
+              @subject = parent_doc.querySelectorAll('#\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')[1]
 
             it 'displays given sentiments', ->
               expect(@subject.querySelectorAll('.sa-review-sentiment').length).to.eq(1)
@@ -554,7 +559,7 @@ describe 'PartnerSkuReviews', ->
           context 'when review has no sentiments', ->
             beforeEach (done) ->
               prepare 'extended', 'displayable_reviews_id', {}, =>
-                @subject = parent_doc.querySelectorAll('.\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')[4]
+                @subject = parent_doc.querySelectorAll('#\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')[4]
                 done()
 
             it 'doesn\'t display any sentiment', ->
@@ -563,7 +568,7 @@ describe 'PartnerSkuReviews', ->
     context 'when there are no ratings', ->
       beforeEach (done) ->
         prepare 'extended', 'no_ratings_id', {}, =>
-          @subject = parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended')
+          @subject = parent_doc.getElementById('@@flavor-product-reviews-extended')
           done()
 
       it 'doesn\'t display rating details', ->
@@ -573,9 +578,8 @@ describe 'PartnerSkuReviews', ->
         expect(@subject.querySelector('.sa-review-prompt-button').innerHTML.trim()).to.not.be.empty
 
       describe '"add a review" button', ->
-        beforeEach (done) ->
+        beforeEach ->
           @subject = parent_doc.querySelector('.sa-review-prompt-button')
-          done()
 
         it 'targets a blank browsing context', ->
           expect(@subject.getAttribute('target')).to.eq('_blank')
@@ -599,20 +603,19 @@ describe 'PartnerSkuReviews', ->
     it 'starts closed', ->
       expect(parent_doc.getElementById('sa-reviews-modal')).to.not.exist
 
+
     context 'when user clicks modal close button', ->
-      beforeEach (done) ->
-        parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended .sa-show-review-modal').click()
+      beforeEach ->
+        parent_doc.querySelector('#\\@\\@flavor-product-reviews-extended .sa-show-review-modal').click()
         parent_doc.getElementById('sa-reviews-modal-close-button').click()
-        done()
 
       it 'is closed', ->
         expect(parent_doc.getElementById('sa-reviews-modal')).to.not.exist
 
     context 'when user presses ESC key', ->
-      beforeEach (done) ->
-        parent_doc.querySelector('.\\@\\@flavor-product-reviews-extended .sa-show-review-modal').click()
+      beforeEach ->
+        parent_doc.querySelector('#\\@\\@flavor-product-reviews-extended .sa-show-review-modal').click()
         trigger_keyboard_event(27, parent_doc)
-        done()
 
       it 'is closed', ->
         expect(parent_doc.getElementById('sa-reviews-modal')).to.not.exist

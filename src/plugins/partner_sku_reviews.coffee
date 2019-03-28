@@ -391,11 +391,11 @@ class PartnerSkuReviews
       @_renderAll()
 
   _renderAll: ->
-    inline_el = @parent_doc.getElementsByClassName('@@flavor-product-reviews-inline')[0]
+    inline_el = @parent_doc.getElementById('@@flavor-product-reviews-inline')
     if inline_el
       @product_id = inline_el.getAttribute('data-product-id')
 
-    extended_el = @parent_doc.getElementsByClassName('@@flavor-product-reviews-extended')[0]
+    extended_el = @parent_doc.getElementById('@@flavor-product-reviews-extended')
     if extended_el
       @product_id ||= extended_el.getAttribute('data-product-id') # TODO handle case of different product ids
 
@@ -495,10 +495,10 @@ class PartnerSkuReviews
 
   # CSS helpers, only for inline
   coloredSelector = (color, selector = '') ->
-    SIZES.map((size) -> ".@@flavor-product-reviews-inline.sa-#{size}-#{color} #{selector}").join(', ')
+    SIZES.map((size) -> "#@@flavor-product-reviews-inline.sa-#{size}-#{color} #{selector}").join(', ')
 
   sizedSelector = (size, selector = '') ->
-    COLORS.map((color) -> ".@@flavor-product-reviews-inline.sa-#{size}-#{color} #{selector}").join(', ')
+    COLORS.map((color) -> "#@@flavor-product-reviews-inline.sa-#{size}-#{color} #{selector}").join(', ')
 
   STYLE = ->
     flavor = '@@flavor'
@@ -506,21 +506,21 @@ class PartnerSkuReviews
     """
     /* COMMON */
 
-    .#{flavor}-product-reviews-inline *, .#{flavor}-product-reviews-extended * {
+    ##{flavor}-product-reviews-inline *, ##{flavor}-product-reviews-extended * {
       all: unset;
       font-family: Verdana, Arial, sans-serif !important;
     }
 
-    .#{flavor}-product-reviews-inline .sa-star-rating-wrapper,
-    .#{flavor}-product-reviews-extended .sa-star-rating-wrapper {
+    ##{flavor}-product-reviews-inline .sa-star-rating-wrapper,
+    ##{flavor}-product-reviews-extended .sa-star-rating-wrapper {
       display: inline-block;
       background-size: contain;
       background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyB3aWR0aD0iMTRweCIgaGVpZ2h0PSIxNHB4IiB2aWV3Qm94PSIwIDAgMTQgMTQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+ICAgICAgICA8dGl0bGU+RGVza3RvcCAvIEljb24gLyBTdGFyIC8gU3RhciBhY3RpdmUgNiBDb3B5PC90aXRsZT4gICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+ICAgIDxkZWZzPjwvZGVmcz4gICAgPGcgaWQ9IlNrdS1Qcm9kdWN0LUluZm8iIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPiAgICAgICAgPGcgaWQ9IjE1MDBweC0vLVNrdS0vLUxheW91dC0vLc6azrnOvc63z4TOsS3OpM63zrvOtc+Gz4nOvc6xLUNvcHktMyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTUxNi4wMDAwMDAsIC0yMTkuMDAwMDAwKSIgZmlsbD0iI0RERERERCI+ICAgICAgICAgICAgPGcgaWQ9IlByb2R1Y3QtSW5mby1Db3B5LTUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxMi41MDAwMDAsIDE3NC4wMDAwMDApIj4gICAgICAgICAgICAgICAgPGcgaWQ9IkxpbmtzIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjUwMDAwMCwgMzguNTAwMDAwKSI+ICAgICAgICAgICAgICAgICAgICA8ZyBpZD0iUmF0aW5nLUNvcHkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuNTAwMDAwLCAxLjUwMDAwMCkiPiAgICAgICAgICAgICAgICAgICAgICAgIDxnIGlkPSJSYXRpbmctYmlnLUNvcHkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQwLjAwMDAwMCwgNS4wMDAwMDApIj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTY5LjQzNjI0MTksMCBMNjcuMTEwMDg4MSw0LjYxNTM4NDYyIEw2Mi40OTQ3MDM1LDQuOTIxMTUzODUgTDY1Ljk1MTYyNjYsOC44MjgwNzY5MiBMNjQuODU2NjI2NiwxMy44NDYxNTM4IEw2OS40MDczOTU4LDExLjA3NTc2OTIgTDc0LjAzMzE2NSwxMy44NDYxNTM4IEw3Mi44NjMxNjUsOC44MjgwNzY5MiBMNzYuMzQwODU3Myw0Ljg0OTYxNTM4IEw3MS43MjY2MjY2LDQuNjE1Mzg0NjIgTDY5LjQzNjI0MTksMCIgaWQ9IkRlc2t0b3AtLy1JY29uLS8tU3Rhci0vLVN0YXItYWN0aXZlLTYtQ29weSI+PC9wYXRoPiAgICAgICAgICAgICAgICAgICAgICAgIDwvZz4gICAgICAgICAgICAgICAgICAgIDwvZz4gICAgICAgICAgICAgICAgPC9nPiAgICAgICAgICAgIDwvZz4gICAgICAgIDwvZz4gICAgPC9nPjwvc3ZnPg==");
       background-repeat: repeat-x;
     }
 
-    .#{flavor}-product-reviews-inline .sa-actual-star-rating,
-    .#{flavor}-product-reviews-extended .sa-actual-star-rating {
+    ##{flavor}-product-reviews-inline .sa-actual-star-rating,
+    ##{flavor}-product-reviews-extended .sa-actual-star-rating {
       display: block;
       background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjEzcHgiIGhlaWdodD0iMTNweCIgdmlld0JveD0iMCAwIDEzIDEzIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbG5zOnNrZXRjaD0iaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoL25zIj4KICAgIDwhLS0gR2VuZXJhdG9yOiBTa2V0Y2ggMy4zICgxMTk3MCkgLSBodHRwOi8vd3d3LmJvaGVtaWFuY29kaW5nLmNvbS9za2V0Y2ggLS0+CiAgICA8dGl0bGU+U2hhcGU8L3RpdGxlPgogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+CiAgICA8ZGVmcz48L2RlZnM+CiAgICA8ZyBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBza2V0Y2g6dHlwZT0iTVNQYWdlIj4KICAgICAgICA8ZyBpZD0ib3JhbmdlLXN0YXIiIHNrZXRjaDp0eXBlPSJNU0xheWVyR3JvdXAiIGZpbGw9IiNGNjhCMjQiPgogICAgICAgICAgICA8ZyBpZD0iUGFnZS0xIiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJzdGFyX2JpZyI+CiAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTYuNSwwLjQgTDguNSw0LjQgTDEyLjUsNC42IEw5LjUsOCBMMTAuNSwxMi4zIEw2LjUsOS45IEwyLjYsMTIuMyBMMy41LDggTDAuNSw0LjYgTDQuNSw0LjMgTDYuNSwwLjQiIGlkPSJTaGFwZSI+PC9wYXRoPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=");
       background-size: inherit;
@@ -528,14 +528,14 @@ class PartnerSkuReviews
       height: 100%;
     }
 
-    .#{flavor}-product-reviews-inline .sa-brand-powered-by,
-    .#{flavor}-product-reviews-extended .sa-brand-powered-by {
+    ##{flavor}-product-reviews-inline .sa-brand-powered-by,
+    ##{flavor}-product-reviews-extended .sa-brand-powered-by {
       color: #707070;
       -webkit-text-fill-color: currentColor;
     }
 
-    .#{flavor}-product-reviews-inline .sa-brand-logo,
-    .#{flavor}-product-reviews-extended .sa-brand-logo {
+    ##{flavor}-product-reviews-inline .sa-brand-logo,
+    ##{flavor}-product-reviews-extended .sa-brand-logo {
       display: inline-block;
       background-image: url('#{asset_url("logo_#{flavor}.png")}');
       background-position: center;
@@ -543,24 +543,24 @@ class PartnerSkuReviews
       background-size: contain;
     }
 
-    .#{flavor}-product-reviews-inline .sa-reviews-count-compact,
-    .#{flavor}-product-reviews-extended .sa-reviews-count-compact {
+    ##{flavor}-product-reviews-inline .sa-reviews-count-compact,
+    ##{flavor}-product-reviews-extended .sa-reviews-count-compact {
       letter-spacing: 1px;
     }
 
-    .#{flavor}-product-reviews-inline .sa-reviews-count-compact::before,
-    .#{flavor}-product-reviews-extended .sa-reviews-count-compact::before {
+    ##{flavor}-product-reviews-inline .sa-reviews-count-compact::before,
+    ##{flavor}-product-reviews-extended .sa-reviews-count-compact::before {
       content: "(";
     }
 
-    .#{flavor}-product-reviews-inline .sa-reviews-count-compact::after,
-    .#{flavor}-product-reviews-extended .sa-reviews-count-compact::after {
+    ##{flavor}-product-reviews-inline .sa-reviews-count-compact::after,
+    ##{flavor}-product-reviews-extended .sa-reviews-count-compact::after {
       content: ")";
     }
 
     /* INLINE */
 
-    .#{flavor}-product-reviews-inline.sa-reviews-inline-root {
+    ##{flavor}-product-reviews-inline.sa-reviews-inline-root {
       all: unset;
       display: inline-flex;
       display: -ms-inline-flexbox;
@@ -575,7 +575,7 @@ class PartnerSkuReviews
       cursor: pointer;
     }
 
-    .#{flavor}-product-reviews-inline .sa-rating-with-count {
+    ##{flavor}-product-reviews-inline .sa-rating-with-count {
       display: flex;
       display: -ms-flexbox;
       height: 41px;
@@ -585,41 +585,41 @@ class PartnerSkuReviews
       -ms-flex-align: center;
     }
 
-    .#{flavor}-product-reviews-inline .sa-rating {
+    ##{flavor}-product-reviews-inline .sa-rating {
       display: flex;
       display: -ms-flexbox;
       align-items: baseline;
       -ms-flex-align: baseline;
     }
 
-    .#{flavor}-product-reviews-inline .sa-star-rating {
+    ##{flavor}-product-reviews-inline .sa-star-rating {
       margin-right: 3px;
     }
 
-    .#{flavor}-product-reviews-inline .sa-star-rating-wrapper {
+    ##{flavor}-product-reviews-inline .sa-star-rating-wrapper {
       width: 65px;
       height: 13px;
       background-size: contain;
     }
 
-    .#{flavor}-product-reviews-inline .sa-reviews-count-texty {
+    ##{flavor}-product-reviews-inline .sa-reviews-count-texty {
       display: none
     }
 
-    .#{flavor}-product-reviews-inline .sa-rating-value {
+    ##{flavor}-product-reviews-inline .sa-rating-value {
       font-size: 15px;
       font-weight: bold;
       margin-right: 3px;
     }
 
-    .#{flavor}-product-reviews-inline .sa-reviews-count-compact {
+    ##{flavor}-product-reviews-inline .sa-reviews-count-compact {
       font-size: 11px;
       color: #909090;
       -webkit-text-fill-color: currentColor;
       letter-spacing: 1px;
     }
 
-    .#{flavor}-product-reviews-inline .sa-rating-with-count::after {
+    ##{flavor}-product-reviews-inline .sa-rating-with-count::after {
       content: "›";
       flex: 1 1 auto;
       -ms-flex: 1 1 auto;
@@ -630,13 +630,13 @@ class PartnerSkuReviews
       -webkit-text-fill-color: currentColor;
     }
 
-    .#{flavor}-product-reviews-inline .sa-inline-separator {
+    ##{flavor}-product-reviews-inline .sa-inline-separator {
       height: 1px;
       background: #797979;
       opacity: 0.3;
     }
 
-    .#{flavor}-product-reviews-inline .sa-brand {
+    ##{flavor}-product-reviews-inline .sa-brand {
       display: flex;
       display: -ms-flexbox;
       height: 29px;
@@ -645,13 +645,13 @@ class PartnerSkuReviews
       -ms-flex-align: center;
     }
 
-    .#{flavor}-product-reviews-inline .sa-brand-powered-by {
+    ##{flavor}-product-reviews-inline .sa-brand-powered-by {
       font-size: 12px;
       vertical-align: middle;
       text-transform: lowercase;
     }
 
-    .#{flavor}-product-reviews-inline .sa-brand-logo {
+    ##{flavor}-product-reviews-inline .sa-brand-logo {
       width: 54.5px;
       height: 15px;
     }
@@ -798,7 +798,7 @@ class PartnerSkuReviews
 
     /* EXTENDED */
 
-    .#{flavor}-product-reviews-extended.sa-reviews-extended-root {
+    ##{flavor}-product-reviews-extended.sa-reviews-extended-root {
       all: unset;
       display: block;
       border: 1px solid #e8e8e8;
@@ -806,7 +806,7 @@ class PartnerSkuReviews
       background: #f1f1f1;
     }
 
-    .#{flavor}-product-reviews-extended .sa-extended-reviews-header {
+    ##{flavor}-product-reviews-extended .sa-extended-reviews-header {
       display: flex;
       display: -ms-flexbox;
       justify-content: space-between;
@@ -817,63 +817,63 @@ class PartnerSkuReviews
       border-bottom: 1px solid #e3e3e3;
     }
 
-    .#{flavor}-product-reviews-extended .sa-extended-reviews-title {
+    ##{flavor}-product-reviews-extended .sa-extended-reviews-title {
       display: inline-block;
       font-size: 17px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-extended-reviews-title::first-letter {
+    ##{flavor}-product-reviews-extended .sa-extended-reviews-title::first-letter {
       text-transform: uppercase;
     }
 
-    .#{flavor}-product-reviews-extended .sa-brand-logo {
+    ##{flavor}-product-reviews-extended .sa-brand-logo {
       height: 22px;
       width: 80px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-brand-powered-by {
+    ##{flavor}-product-reviews-extended .sa-brand-powered-by {
       display: inline-block;
       font-size: 15px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-extended-reviews-body {
+    ##{flavor}-product-reviews-extended .sa-extended-reviews-body {
       display: block;
       padding: 0 15px 20px;
      }
 
-    .#{flavor}-product-reviews-extended .sa-sku-title {
+    ##{flavor}-product-reviews-extended .sa-sku-title {
       display: block;
       font-size: 16px;
       margin: 1.2em 0;
     }
 
-    .#{flavor}-product-reviews-extended .sa-sku-details {
+    ##{flavor}-product-reviews-extended .sa-sku-details {
       display: block;
       margin-bottom: 25px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-sku-details > * {
+    ##{flavor}-product-reviews-extended .sa-sku-details > * {
       display: inline-block;
       vertical-align: middle;
     }
 
-    .#{flavor}-product-reviews-extended .sa-rating-full {
+    ##{flavor}-product-reviews-extended .sa-rating-full {
       margin: 0 30px 20px 10px;
       font-size: 0;
     }
 
-    .#{flavor}-product-reviews-extended .sa-star-rating {
+    ##{flavor}-product-reviews-extended .sa-star-rating {
       display: inline-block;
       vertical-align: middle;
       margin-right: 7px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-star-rating-wrapper {
+    ##{flavor}-product-reviews-extended .sa-star-rating-wrapper {
       width: 100px;
       height: 20px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-rating-value {
+    ##{flavor}-product-reviews-extended .sa-rating-value {
       display: block;
       text-align: center;
       font-size: 25px;
@@ -881,26 +881,26 @@ class PartnerSkuReviews
       margin-bottom: 0.2em;
     }
 
-    .#{flavor}-product-reviews-extended .sa-reviews-count-compact {
+    ##{flavor}-product-reviews-extended .sa-reviews-count-compact {
       display: inline-block;
       vertical-align: middle;
       font-size: 14px;
       cursor: pointer;
     }
 
-    .#{flavor}-product-reviews-extended .sa-rating-breakdown-wrap {
+    ##{flavor}-product-reviews-extended .sa-rating-breakdown-wrap {
       display: inline-block;
       vertical-align: middle;
       position: relative;
     }
 
-    .#{flavor}-product-reviews-extended .sa-rating-arrow {
+    ##{flavor}-product-reviews-extended .sa-rating-arrow {
       padding-left: 4px;
       display: inline-block;
       cursor: pointer;
     }
 
-    .#{flavor}-product-reviews-extended .sa-rating-arrow::after {
+    ##{flavor}-product-reviews-extended .sa-rating-arrow::after {
       content: "∟";
       transform: translateY(-20%) rotate(-45deg);
       display: inline-block;
@@ -908,7 +908,7 @@ class PartnerSkuReviews
       font-size: 14px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-rating-breakdown {
+    ##{flavor}-product-reviews-extended .sa-rating-breakdown {
       display: none;
       position: absolute;
       width: 250px;
@@ -927,7 +927,7 @@ class PartnerSkuReviews
       box-sizing: border-box;
     }
 
-    .#{flavor}-product-reviews-extended .sa-rating-breakdown:before { /* Used to create an arrow for the breakdown popup */
+    ##{flavor}-product-reviews-extended .sa-rating-breakdown:before { /* Used to create an arrow for the breakdown popup */
       content: "";
       position: absolute;
       border: 10px solid transparent;
@@ -938,7 +938,7 @@ class PartnerSkuReviews
       margin-left: 10px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-rating-breakdown:after { /* Used to create an arrow for the breakdown popup */
+    ##{flavor}-product-reviews-extended .sa-rating-breakdown:after { /* Used to create an arrow for the breakdown popup */
       content: "";
       position: absolute;
       border: 10px solid transparent;
@@ -948,13 +948,13 @@ class PartnerSkuReviews
       margin-left: 10px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-rating-breakdown-class {
+    ##{flavor}-product-reviews-extended .sa-rating-breakdown-class {
       display: list-item;
       list-style-type: none;
-      margin-bottom: 4px;
+      margin: 0 0 4px 0;
     }
 
-    .#{flavor}-product-reviews-extended .sa-num-stars {
+    ##{flavor}-product-reviews-extended .sa-num-stars {
       display: inline-block;
       width: 55px;
       margin: 0 10px 0 0;
@@ -963,7 +963,7 @@ class PartnerSkuReviews
       white-space: nowrap;
     }
 
-    .#{flavor}-product-reviews-extended .sa-rating-bar-wrap {
+    ##{flavor}-product-reviews-extended .sa-rating-bar-wrap {
       display: inline-block;
       height: 4px;
       width: 100px;
@@ -976,13 +976,13 @@ class PartnerSkuReviews
       pointer-events: none;
      }
 
-    .#{flavor}-product-reviews-extended .sa-rating-bar {
+    ##{flavor}-product-reviews-extended .sa-rating-bar {
       display: block;
       height: 100%;
       background: #f68b24;
     }
 
-    .#{flavor}-product-reviews-extended .sa-rating-count {
+    ##{flavor}-product-reviews-extended .sa-rating-count {
       display: inline-block;
       width: 30px;
       vertical-align: baseline;
@@ -990,12 +990,12 @@ class PartnerSkuReviews
       font-size: 12px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-reviews-aggregation-feature {
+    ##{flavor}-product-reviews-extended .sa-reviews-aggregation-feature {
       display: list-item;
       list-style-type: none;
     }
 
-    .#{flavor}-product-reviews-extended .sa-reviews-aggregation-feature {
+    ##{flavor}-product-reviews-extended .sa-reviews-aggregation-feature {
       display: flex;
       display: -ms-flexbox;
       justify-content: space-between;
@@ -1005,7 +1005,7 @@ class PartnerSkuReviews
       margin-bottom: 6px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-reviews-aggregation-feature {
+    ##{flavor}-product-reviews-extended .sa-reviews-aggregation-feature {
       width: 255px;
       display: flex;
       display: -ms-flexbox;
@@ -1016,7 +1016,7 @@ class PartnerSkuReviews
       margin-bottom: 6px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-reviews-aggregation-label {
+    ##{flavor}-product-reviews-extended .sa-reviews-aggregation-label {
       max-width: 200px;
       white-space: nowrap;
       overflow: hidden;
@@ -1029,7 +1029,7 @@ class PartnerSkuReviews
       -webkit-text-fill-color: currentColor;
     }
 
-    .#{flavor}-product-reviews-extended .sa-reviews-aggregation-bar-wrap {
+    ##{flavor}-product-reviews-extended .sa-reviews-aggregation-bar-wrap {
       position: relative;
       width: 100px;
       height: 4px;
@@ -1037,7 +1037,7 @@ class PartnerSkuReviews
       flex-shrink: 0;
     }
 
-    .#{flavor}-product-reviews-extended .sa-reviews-aggregation-bar-wrap:before {
+    ##{flavor}-product-reviews-extended .sa-reviews-aggregation-bar-wrap:before {
       content: "";
       display: block;
       position: absolute;
@@ -1050,26 +1050,26 @@ class PartnerSkuReviews
       background-image: repeating-linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 18%, #fff 18%, #f1f1f1 20%, rgba(241,241,241,0) 20%);
     }
 
-    .#{flavor}-product-reviews-extended .sa-reviews-aggregation-bar {
+    ##{flavor}-product-reviews-extended .sa-reviews-aggregation-bar {
       position: absolute;
       left: 0;
       top: 0;
       height: 100%;
     }
 
-    .#{flavor}-product-reviews-extended .sa-reviews-aggregation-bar.sa-good {
+    ##{flavor}-product-reviews-extended .sa-reviews-aggregation-bar.sa-good {
       background: #32992c;
     }
 
-    .#{flavor}-product-reviews-extended .sa-reviews-aggregation-bar.sa-so-so {
+    ##{flavor}-product-reviews-extended .sa-reviews-aggregation-bar.sa-so-so {
       background: #f68b24;
     }
 
-    .#{flavor}-product-reviews-extended .sa-reviews-aggregation-bar.sa-bad {
+    ##{flavor}-product-reviews-extended .sa-reviews-aggregation-bar.sa-bad {
       background: #dd422d;
     }
 
-    .#{flavor}-product-reviews-extended .sa-sales-wrap {
+    ##{flavor}-product-reviews-extended .sa-sales-wrap {
       width: 100%;
       font-size: 12px;
       color: #3b3b3b;
@@ -1077,7 +1077,7 @@ class PartnerSkuReviews
       margin-top: 25px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-sales-wrap:before {
+    ##{flavor}-product-reviews-extended .sa-sales-wrap:before {
       content: "";
       display: inline-block;
       vertical-align: middle;
@@ -1087,17 +1087,17 @@ class PartnerSkuReviews
       background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MCA4MCI+PHBhdGggZD0iTTY0IDIyLjRoLTUuOXYtM0M1OC4xIDEyIDUxLjggNiA0NCA2Yy0xLjcgMC0zLjMuMy00LjguOC0xLjUtLjUtMy4yLS44LTQuOC0uOC03LjggMC0xNC4yIDYtMTQuMiAxMy40djNoLTUuN2MtMy4zIDAtNS45IDIuNy01LjkgNS45djQxLjNjMCAzLjMgMi43IDUuOSA1LjkgNS45SDY0YzMuMyAwIDUuOS0yLjcgNS45LTUuOVYyOC4zYy4xLTMuMi0yLjYtNS45LTUuOS01Ljl6bS0xMC43LTN2M2gtNC44di0zYzAtMy4yLTEuMi02LjItMy4yLTguNSA0LjUuNiA4IDQuMiA4IDguNXptLTE4LjcgMGMwLTMuMSAxLjgtNS45IDQuNi03LjQgMi43IDEuNSA0LjYgNC4yIDQuNiA3LjR2M2gtOS4xbC0uMS0zem0tOS42IDBjMC00LjMgMy41LTcuOSA4LTguNS0yIDIuMy0zLjIgNS4zLTMuMiA4LjV2M0gyNXYtM3pNMTMuMyA2OS42VjI4LjNjMC0uNi41LTEuMSAxLjEtMS4xaDYuM3YyLjljMCAxIC44IDEuOCAxLjggMS44czEuOC0uOCAxLjgtMS44di0yLjlINDR2Mi45YzAgMSAuOCAxLjggMS44IDEuOHMxLjgtLjggMS44LTEuOHYtMi45SDU2djQzLjVIMTQuNWMtLjcgMC0xLjItLjUtMS4yLTEuMXptNTEuOSAwYzAgLjYtLjUgMS4xLTEuMSAxLjFoLTQuMlYyNy4ySDY0Yy42IDAgMS4xLjUgMS4xIDEuMWwuMSA0MS4zeiIvPjwvc3ZnPg==");
     }
 
-    .#{flavor}-product-reviews-extended .sa-sales-text {
+    ##{flavor}-product-reviews-extended .sa-sales-text {
       display: inline;
       vertical-align: middle;
     }
 
-    .#{flavor}-product-reviews-extended .sa-reviews-list {
+    ##{flavor}-product-reviews-extended .sa-reviews-list {
       list-style: none;
       padding-left: 0;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review {
+    ##{flavor}-product-reviews-extended .sa-review {
       display: block;
       background: #fff;
       border: 1px solid #e8e8e8;
@@ -1106,7 +1106,7 @@ class PartnerSkuReviews
       padding: 15px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-avatar {
+    ##{flavor}-product-reviews-extended .sa-review-avatar {
       float: left;
       overflow: hidden;
       width: 40px;
@@ -1116,37 +1116,37 @@ class PartnerSkuReviews
       border-radius: 50%;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-info {
+    ##{flavor}-product-reviews-extended .sa-review-info {
       display: block;
       margin: 2px 0;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-info > *,
-    .#{flavor}-product-reviews-extended .sa-authorship-info > * {
+    ##{flavor}-product-reviews-extended .sa-review-info > *,
+    ##{flavor}-product-reviews-extended .sa-authorship-info > * {
       display: inline;
       vertical-align: middle;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review .sa-star-rating-wrapper {
+    ##{flavor}-product-reviews-extended .sa-review .sa-star-rating-wrapper {
       width: 70px;
       height: 14px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-usefull-voting {
+    ##{flavor}-product-reviews-extended .sa-review-usefull-voting {
       margin: 3px 0 6px;
       font-size: 11px;
       color: #707070;
       -webkit-text-fill-color: currentColor;
     }
 
-    .#{flavor}-product-reviews-extended .sa-authorship-info {
+    ##{flavor}-product-reviews-extended .sa-authorship-info {
       display: block;
       font-size: 11px;
       color: #707070;
       -webkit-text-fill-color: currentColor;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-author {
+    ##{flavor}-product-reviews-extended .sa-review-author {
       max-width: 60%;
       white-space: nowrap;
       overflow: hidden;
@@ -1157,7 +1157,7 @@ class PartnerSkuReviews
       -webkit-text-fill-color: currentColor;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-text {
+    ##{flavor}-product-reviews-extended .sa-review-text {
       display: block;
       max-width: 60em;
       margin: 20px 0 10px;
@@ -1171,14 +1171,14 @@ class PartnerSkuReviews
       -webkit-text-fill-color: currentColor;
     }
 
-    .#{flavor}-product-reviews-extended .sa-expandable .sa-review-text {
+    ##{flavor}-product-reviews-extended .sa-expandable .sa-review-text {
       position: relative;
       overflow: hidden;
       max-height: 100px;
       margin-bottom: 0;
     }
 
-    .#{flavor}-product-reviews-extended .sa-expandable .sa-review-text:after {
+    ##{flavor}-product-reviews-extended .sa-expandable .sa-review-text:after {
        content: " ";
        position: absolute;
        right: 0;
@@ -1195,11 +1195,11 @@ class PartnerSkuReviews
        background-repeat: repeat-x;
      }
 
-    .#{flavor}-product-reviews-extended .sa-review-expand {
+    ##{flavor}-product-reviews-extended .sa-review-expand {
       display: none;
     }
 
-    .#{flavor}-product-reviews-extended .sa-expandable .sa-review-expand {
+    ##{flavor}-product-reviews-extended .sa-expandable .sa-review-expand {
       display: inline-block;
       padding: 10px 0 5px;
       font-size: 12px;
@@ -1209,18 +1209,18 @@ class PartnerSkuReviews
       cursor: pointer;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-sentiments {
+    ##{flavor}-product-reviews-extended .sa-review-sentiments {
       display: block;
       margin: 10px 0 0;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-sentiment {
+    ##{flavor}-product-reviews-extended .sa-review-sentiment {
       display: block;
       position: relative;
       padding: 0 0 1px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-sentiment:before {
+    ##{flavor}-product-reviews-extended .sa-review-sentiment:before {
       content: "";
       display: inline-block;
       width: 21px;
@@ -1229,19 +1229,19 @@ class PartnerSkuReviews
       vertical-align: middle;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-sentiment.sa-positive:before {
+    ##{flavor}-product-reviews-extended .sa-review-sentiment.sa-positive:before {
       background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MCA4MCI+PGcgZmlsbD0iIzMyOTkyYyI+PGVsbGlwc2UgY3g9IjI2LjQiIGN5PSIzNC43IiByeD0iNCIgcnk9IjQiLz48ZWxsaXBzZSBjeD0iNTQuMyIgY3k9IjM0LjciIHJ4PSI0IiByeT0iNCIvPjxwYXRoIGQ9Ik00MC4xIDUuOWMtMTguNyAwLTM0IDE1LjItMzQgMzQgMCAxOC43IDE1LjIgMzQgMzQgMzRzMzQtMTUuMiAzNC0zNC0xNS4zLTM0LTM0LTM0em0wIDYxLjVjLTE1LjIgMC0yNy41LTEyLjMtMjcuNS0yNy41czEyLjMtMjcuNSAyNy41LTI3LjUgMjcuNSAxMi4zIDI3LjUgMjcuNWMwIDE1LjEtMTIuNCAyNy41LTI3LjUgMjcuNXoiLz48cGF0aCBkPSJNNDguOCA0NC41Yy03LjYgNi4zLTE1LjIgMS4xLTE1LjYuOS0xLjEtLjgtMi42LS41LTMuNC42LS44IDEuMS0uNSAyLjYuNiAzLjQgMi4xIDEuNSA1LjggMy4xIDEwLjIgMy4xIDMuNiAwIDcuNS0xLjEgMTEuMy00LjIgMS0uOSAxLjItMi40LjMtMy40LS45LTEuMi0yLjQtMS4zLTMuNC0uNHoiLz48L2c+PC9zdmc+");
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-sentiment.sa-mediocre:before {
+    ##{flavor}-product-reviews-extended .sa-review-sentiment.sa-mediocre:before {
       background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MCA4MCI+PGcgZmlsbD0iI2VmYTcwNiI+PGNpcmNsZSBjeD0iMjYuNCIgY3k9IjM0LjciIHI9IjQiLz48Y2lyY2xlIGN4PSI1NC4zIiBjeT0iMzQuNyIgcj0iNCIvPjxwYXRoIGQ9Ik00MC4xIDUuOWMtMTguNyAwLTM0IDE1LjItMzQgMzQgMCAxOC43IDE1LjIgMzQgMzQgMzRzMzQtMTUuMiAzNC0zNC0xNS4zLTM0LTM0LTM0em0wIDYxLjVjLTE1LjIgMC0yNy41LTEyLjMtMjcuNS0yNy41czEyLjMtMjcuNSAyNy41LTI3LjUgMjcuNSAxMi4zIDI3LjUgMjcuNWMwIDE1LjEtMTIuNCAyNy41LTI3LjUgMjcuNXoiLz48cGF0aCBkPSJNNDUuNCA0Ni40SDM1LjJjLTMuMiAwLTMuMiA1IDAgNWgxMC4yYzMuMiAwIDMuMi01IDAtNXoiLz48L2c+PC9zdmc+");
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-sentiment.sa-negative:before {
+    ##{flavor}-product-reviews-extended .sa-review-sentiment.sa-negative:before {
       background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MCA4MCI+PGcgZmlsbD0iI2U1M2MzYyI+PGNpcmNsZSBjeD0iMjYuNCIgY3k9IjM0LjciIHI9IjQiLz48Y2lyY2xlIGN4PSI1NC4zIiBjeT0iMzQuNyIgcj0iNCIvPjxwYXRoIGQ9Ik00MC4xIDUuOWMtMTguNyAwLTM0IDE1LjItMzQgMzQgMCAxOC43IDE1LjIgMzQgMzQgMzRzMzQtMTUuMiAzNC0zNC0xNS4zLTM0LTM0LTM0em0wIDYxLjVjLTE1LjIgMC0yNy41LTEyLjMtMjcuNS0yNy41czEyLjMtMjcuNSAyNy41LTI3LjUgMjcuNSAxMi4zIDI3LjUgMjcuNWMwIDE1LjEtMTIuNCAyNy41LTI3LjUgMjcuNXoiLz48cGF0aCBkPSJNNDUuNCA0Ni40SDM1LjJjLTMuMiAwLTMuMiA1IDAgNWgxMC4yYzMuMiAwIDMuMi01IDAtNXoiLz48L2c+PC9zdmc+");
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-feature-sentiment {
+    ##{flavor}-product-reviews-extended .sa-review-feature-sentiment {
       display: inline-block;
       vertical-align: middle;
       font-size: 12px;
@@ -1250,17 +1250,17 @@ class PartnerSkuReviews
       -webkit-text-fill-color: currentColor;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-feature-sentiment:after {
+    ##{flavor}-product-reviews-extended .sa-review-feature-sentiment:after {
       content: ", ";
       display: inline-block;
       margin-right: 3px;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-feature-sentiment:last-of-type:after {
+    ##{flavor}-product-reviews-extended .sa-review-feature-sentiment:last-of-type:after {
       display: none;
     }
 
-    .#{flavor}-product-reviews-extended .sa-show-review-modal {
+    ##{flavor}-product-reviews-extended .sa-show-review-modal {
       background: #FFF;
       display: block;
       color: #707070;
@@ -1273,35 +1273,35 @@ class PartnerSkuReviews
       cursor: pointer;
     }
 
-    .#{flavor}-product-reviews-extended .sa-show-review-modal:hover {
+    ##{flavor}-product-reviews-extended .sa-show-review-modal:hover {
       background: #e8e8e8;
       transition: background 0.2s linear;
     }
 
-    .#{flavor}-product-reviews-extended .sa-show-review-modal:first-letter {
+    ##{flavor}-product-reviews-extended .sa-show-review-modal:first-letter {
       text-transform: uppercase;
     }
 
-    .#{flavor}-product-reviews-extended.sa-white.sa-reviews-extended-root {
+    ##{flavor}-product-reviews-extended.sa-white.sa-reviews-extended-root {
       background: #fff;
     }
 
-    .#{flavor}-product-reviews-extended.sa-white .sa-show-review-modal {
+    ##{flavor}-product-reviews-extended.sa-white .sa-show-review-modal {
       background: #f8f8f8;
     }
 
-    .#{flavor}-product-reviews-extended.sa-white .sa-show-review-modal:hover {
+    ##{flavor}-product-reviews-extended.sa-white .sa-show-review-modal:hover {
       background: #e8e8e8;
     }
 
     /* EXTENDED - NO CONTENT */
 
-    .#{flavor}-product-reviews-extended .sa-review-prompt {
+    ##{flavor}-product-reviews-extended .sa-review-prompt {
       padding: 30px;
       display: block;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-prompt-head {
+    ##{flavor}-product-reviews-extended .sa-review-prompt-head {
       display: block;
       margin: 0 0 10px;
       font-weight: bold;
@@ -1311,7 +1311,7 @@ class PartnerSkuReviews
       line-height: 1.25;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-prompt-motive {
+    ##{flavor}-product-reviews-extended .sa-review-prompt-motive {
       margin: 0 0 20px;
       font-size: 12px;
       color: #000;
@@ -1320,7 +1320,7 @@ class PartnerSkuReviews
       display: block;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-prompt-button {
+    ##{flavor}-product-reviews-extended .sa-review-prompt-button {
       display: inline-block;
       padding: 10px 25px 12px;
       outline: none;
@@ -1335,7 +1335,7 @@ class PartnerSkuReviews
       cursor: pointer;
     }
 
-    .#{flavor}-product-reviews-extended .sa-review-prompt-button:hover {
+    ##{flavor}-product-reviews-extended .sa-review-prompt-button:hover {
       background: #e8760a;
     }
 
