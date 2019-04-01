@@ -990,21 +990,6 @@ class PartnerSkuReviews
     }
 
     ##{flavor}-product-reviews-extended .sa-reviews-aggregation-feature {
-      display: list-item;
-      list-style-type: none;
-    }
-
-    ##{flavor}-product-reviews-extended .sa-reviews-aggregation-feature {
-      display: flex;
-      display: -ms-flexbox;
-      justify-content: space-between;
-      -ms-flex-pack: justify;
-      align-items: center;
-      -ms-flex-align: center;
-      margin-bottom: 6px;
-    }
-
-    ##{flavor}-product-reviews-extended .sa-reviews-aggregation-feature {
       width: 255px;
       display: flex;
       display: -ms-flexbox;
