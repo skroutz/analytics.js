@@ -810,8 +810,8 @@ class PartnerSkuReviews
       display: -ms-flexbox;
       justify-content: space-between;
       -ms-flex-pack: justify;
-      align-items: center;
-      -ms-flex-align: center;
+      align-items: baseline;
+      -ms-flex-align: baseline;
       padding: 15px;
       border-bottom: 1px solid #e3e3e3;
     }
