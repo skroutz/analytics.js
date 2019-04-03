@@ -234,6 +234,7 @@ class ExtendedSkuReviews extends BaseComponent
             </div>
           </div>
           <div class="sa-review-main">
+            #{review.merged_review_notice_html}
             <div class="sa-review-text">#{review.review}</div>
             #{expand_button}
             #{reviewSentiments(review.sentiments)}
@@ -1141,9 +1142,16 @@ class PartnerSkuReviews
       -webkit-text-fill-color: currentColor;
     }
 
+    ##{flavor}-product-reviews-extended .merged-review-info {
+      display: block;
+      margin-top: 15px;
+      color: #999;
+      font-size: 11px;
+    }
+
     ##{flavor}-product-reviews-extended .sa-review-text {
       display: block;
-      margin: 20px 0 10px;
+      margin: 15px 0 10px;
       word-wrap: break-all;
       word-wrap: break-word;
       white-space: pre-wrap;
