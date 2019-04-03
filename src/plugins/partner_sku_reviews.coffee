@@ -547,6 +547,8 @@ class PartnerSkuReviews
       background-position: center;
       background-repeat: no-repeat;
       background-size: contain;
+      margin-bottom: -1px;
+      margin-left: -3px;
     }
 
     ##{flavor}-product-reviews-inline .sa-reviews-count-compact::before,
