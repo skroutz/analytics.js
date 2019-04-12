@@ -4,6 +4,7 @@ describe 'PartnerSkuReviews', ->
   PRODUCT_REVIEWS = {
     'displayable_reviews_id': {
       "sku_id": 14920478,
+      "sku_reviews_url": "http://localhost:9000/product#reviews"
       "title": "Product Name",
       "reviewscore": 4.7082,
       "reviews_count": 1220,
@@ -204,6 +205,8 @@ describe 'PartnerSkuReviews', ->
   PRODUCT_REVIEWS['no_aggregation_id'].reviews_aggregation = []
   PRODUCT_REVIEWS['no_sales_id'] = JSON.parse(JSON.stringify(PRODUCT_REVIEWS['displayable_reviews_id']))
   PRODUCT_REVIEWS['no_sales_id'].sales = null
+  PRODUCT_REVIEWS['no_sku_reviews_url_id'] = JSON.parse(JSON.stringify(PRODUCT_REVIEWS['displayable_reviews_id']))
+  PRODUCT_REVIEWS['no_sku_reviews_url_id'].sku_reviews_url = null
 
   event_listener_args = []
   orginalAddEventListener =parent_doc.addEventListener
@@ -421,6 +424,19 @@ describe 'PartnerSkuReviews', ->
 
       it 'displays "read more button"', ->
         expect(@subject.querySelector('.sa-show-review-modal').innerHTML.trim()).to.not.be.empty
+
+      it 'displays sku title as link', ->
+        sku_reviews_url = PRODUCT_REVIEWS['no_displayable_reviews_id'].sku_reviews_url
+        expect(@subject.querySelector("a.sa-sku-title[href='#{sku_reviews_url}']")).to.exist
+
+      context 'when sku_reviews_url is not available', ->
+        beforeEach (done) ->
+          prepare 'extended', 'no_sku_reviews_url_id', {}, =>
+            @subject = parent_doc.getElementById('@@flavor-product-reviews-extended')
+            done()
+
+        it 'displays sku title as text', ->
+          expect(@subject.querySelector('div.sa-sku-title')).to.exist
 
       context 'when "read more button" is clicked', ->
         beforeEach ->

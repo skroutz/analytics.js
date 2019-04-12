@@ -151,6 +151,12 @@ class InlineSkuReviews extends BaseComponent
 class ExtendedSkuReviews extends BaseComponent
   BIG_REVIEW_LENGTH = 500
 
+  skuTitle = (title, url) ->
+    if url
+      "<a class='sa-sku-title' target='_blank' href='#{url}'>#{title}</a>"
+    else
+      "<div class='sa-sku-title'>#{title}</div>"
+
   skuSales = (sales_text) ->
     return '' unless sales_text
 
@@ -252,7 +258,7 @@ class ExtendedSkuReviews extends BaseComponent
     super(el, assigns)
     @showRatingBreakdown = false
     @application_base = assigns.application_base
-    {@title, @reviewscore, @reviews_count,
+    {@title, @sku_reviews_url, @reviewscore, @reviews_count,
       @rating_breakdown, @reviews_aggregation, @sales, @reviews, @sku_id} = assigns.product_information
 
   template: ->
@@ -269,7 +275,7 @@ class ExtendedSkuReviews extends BaseComponent
     else
       body = """
         <div class="sa-extended-reviews-body">
-          <div class="sa-sku-title">#{@title}</div>
+          #{skuTitle(@title, @sku_reviews_url)}
           <div class="sa-sku-details">
             <div class="sa-rating-full">
               #{starRating(@reviewscore, @reviews_count)}
@@ -513,7 +519,8 @@ class PartnerSkuReviews
     }
 
     ##{flavor}-product-reviews-inline div, ##{flavor}-product-reviews-inline span,
-    ##{flavor}-product-reviews-extended div, ##{flavor}-product-reviews-extended span {
+    ##{flavor}-product-reviews-extended div, ##{flavor}-product-reviews-extended span,
+    ##{flavor}-product-reviews-extended a {
       all: unset;
     }
 
@@ -844,9 +851,11 @@ class PartnerSkuReviews
      }
 
     ##{flavor}-product-reviews-extended .sa-sku-title {
-      display: block;
+      display: inline-block;
       font-size: 16px;
       margin: 1.2em 0;
+      text-decoration: none;
+      cursor: default;
     }
 
     ##{flavor}-product-reviews-extended .sa-sku-details {
