@@ -640,7 +640,7 @@ class PartnerSkuReviews
     }
 
     ##{flavor}-product-reviews-inline .sa-brand-powered-by {
-      font-size: 12px;
+      font-size: 11px;
       vertical-align: middle;
       text-transform: lowercase;
     }
@@ -788,6 +788,7 @@ class PartnerSkuReviews
 
     #{sizedSelector 'medium', '.sa-brand'} {
       height: auto;
+      padding-left: 0;
     }
 
     /* EXTENDED */
@@ -827,7 +828,7 @@ class PartnerSkuReviews
 
     ##{flavor}-product-reviews-extended .sa-brand-powered-by {
       display: inline-block;
-      font-size: 15px;
+      font-size: 11px;
     }
 
     ##{flavor}-product-reviews-extended .sa-extended-reviews-body {
