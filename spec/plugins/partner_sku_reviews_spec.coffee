@@ -329,61 +329,47 @@ describe 'PartnerSkuReviews', ->
         expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
 
     context 'when a reviewable product_id is detected', ->
-      beforeEach (done) ->
-        prepare 'extended', 'no_ratings_id', {}, done
-
-      it 'adds the plugin style to the head', ->
-        expect(parent_doc.getElementById('sa-partner-sku-reviews-style')).to.exist
-
       context 'and it has ratings', ->
         beforeEach (done) ->
           prepare 'inline', 'extended', 'displayable_reviews_id', {}, done
 
-        context 'and it has displayable reviews', ->
-          context 'and inline widget is disabled', ->
+        it 'adds the plugin style to the head', ->
+          expect(parent_doc.getElementById('sa-partner-sku-reviews-style')).to.exist
+
+        describe 'inline widget', ->
+          it 'renders the inline widget', ->
+            expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.not.be.empty
+
+          context 'but inline widget is disabled', ->
             beforeEach (done) ->
-              prepare 'inline', 'extended', 'displayable_reviews_id', { inline_widget_enabled: false }, done
+              prepare 'inline', 'displayable_reviews_id', { inline_widget_enabled: false }, done
 
             it 'does not render the inline widget', ->
               expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.be.empty
 
-          context 'and inline widget is enabled', ->
-            it 'renders the inline widget', ->
-              expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.not.be.empty
-
-        context 'and it doesn\'t have displayable reviews', ->
-          it 'renders the inline widget', ->
-            expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.not.be.empty
-
-        context 'and extended widget is disabled', ->
-          beforeEach (done) ->
-            prepare 'inline', 'extended', 'displayable_reviews_id', { extended_widget_enabled: false }, done
-
-          it 'does not render the extended widget', ->
-            expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
-
-        context 'and extended widget is enabled', ->
+        describe 'extended widget', ->
           it 'renders the extended widget', ->
             expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.not.be.empty
+
+          context 'but extended widget is disabled', ->
+            beforeEach (done) ->
+              prepare 'extended', 'displayable_reviews_id', { extended_widget_enabled: false }, done
+
+            it 'does not render the extended widget', ->
+              expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
 
       context 'and it doesn\'t have ratings', ->
         beforeEach (done) ->
           prepare 'inline', 'extended', 'no_ratings_id', {}, done
 
-        context 'and inline widget is enabled', ->
-          it 'does not render the inline widget', ->
-            expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.be.empty
+        it 'does not add the plugin style to the head', ->
+          expect(parent_doc.getElementById('sa-partner-sku-reviews-style')).to.not.exist
 
-        context 'and extended widget is disabled', ->
-          beforeEach (done) ->
-            prepare 'extended', 'no_ratings_id', { extended_widget_enabled: false }, done
+        it 'does not render the inline widget', ->
+          expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.be.empty
 
-          it 'does not render the extended widget', ->
-            expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
-
-        context 'and extended widget is enabled', ->
-          it 'renders the extended widget', ->
-            expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.not.be.empty
+        it 'does not render the extended widget', ->
+          expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
 
   describe 'inline widget', ->
     beforeEach (done) ->
@@ -599,37 +585,6 @@ describe 'PartnerSkuReviews', ->
 
             it 'doesn\'t display any sentiment', ->
               expect(@subject.querySelectorAll('.sa-review-sentiment').length).to.eq(0)
-
-    context 'when there are no ratings', ->
-      beforeEach (done) ->
-        prepare 'extended', 'no_ratings_id', {}, =>
-          @subject = parent_doc.getElementById('@@flavor-product-reviews-extended')
-          done()
-
-      it 'doesn\'t display rating details', ->
-        expect(@subject.querySelector('.sa-sku-details')).to.not.exist
-
-      it 'displays "add a review" button', ->
-        expect(@subject.querySelector('.sa-review-prompt-button').innerHTML.trim()).to.not.be.empty
-
-      describe '"add a review" button', ->
-        beforeEach ->
-          @subject = parent_doc.querySelector('.sa-review-prompt-button')
-
-        it 'targets a blank browsing context', ->
-          expect(@subject.getAttribute('target')).to.eq('_blank')
-
-        it 'is nofollow', ->
-          expect(@subject.getAttribute('rel')).to.eq('nofollow')
-
-        it 'links to current SKU\'s "write a review" page', ->
-          application_base = window.sa_plugins.settings.url.application_base
-          sku_id = PRODUCT_REVIEWS['no_ratings_id'].sku_id
-
-          expect(@subject.href).to.contain("#{application_base}/account/products/#{sku_id}/reviews/new")
-
-        it 'sets "partner_sku_reviews" as "from" param', ->
-          expect(@subject.href).to.contain("from=partner_sku_reviews")
 
   describe 'modal', ->
     beforeEach (done) ->

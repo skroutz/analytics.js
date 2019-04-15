@@ -262,38 +262,6 @@ class ExtendedSkuReviews extends BaseComponent
       @rating_breakdown, @reviews_aggregation, @sales, @reviews, @sku_id} = assigns.product_information
 
   template: ->
-    if @reviews_count == 0 # no content
-      write_review_link = "#{@application_base}/account/products/#{@sku_id}/reviews/new?from=partner_sku_reviews"
-      body = """
-        <div class="sa-review-prompt">
-          <h4 class="sa-review-prompt-head">@@translations.partner_sku_reviews.share_your_experience</h4>
-          <div class="sa-review-prompt-motive">@@translations.partner_sku_reviews.write_review_for "#{@title}" @@translations.partner_sku_reviews.and_help</div>
-          <a class="sa-review-prompt-button" rel="nofollow" target="_blank"
-             href="#{write_review_link}">@@translations.partner_sku_reviews.review_this</a>
-        </div>
-      """
-    else
-      body = """
-        <div class="sa-extended-reviews-body">
-          #{skuTitle(@title, @sku_reviews_url)}
-          <div class="sa-sku-details">
-            <div class="sa-rating-full">
-              #{starRating(@reviewscore, @reviews_count)}
-              <div class="sa-rating-breakdown-wrap">
-                <div class="sa-rating-arrow"></div>
-                #{ratingBreakdown(@rating_breakdown)}
-              </div>
-            </div>
-            #{reviewsAggregation(@reviews_aggregation)}
-            #{skuSales(@sales)}
-          </div>
-          <div class="sa-reviews">
-            #{userReviews(@reviews)}
-            <div class="sa-show-review-modal">@@translations.partner_sku_reviews.read_more</div>
-          </div>
-        </div>
-      """
-
     """
       <div class="sa-extended-reviews-header">
         <span class="sa-extended-reviews-title">
@@ -301,7 +269,24 @@ class ExtendedSkuReviews extends BaseComponent
         </span>
         #{brandIndicator()}
       </div>
-      #{body}
+      <div class="sa-extended-reviews-body">
+        #{skuTitle(@title, @sku_reviews_url)}
+        <div class="sa-sku-details">
+          <div class="sa-rating-full">
+            #{starRating(@reviewscore, @reviews_count)}
+            <div class="sa-rating-breakdown-wrap">
+              <div class="sa-rating-arrow"></div>
+              #{ratingBreakdown(@rating_breakdown)}
+            </div>
+          </div>
+          #{reviewsAggregation(@reviews_aggregation)}
+          #{skuSales(@sales)}
+        </div>
+        <div class="sa-reviews">
+          #{userReviews(@reviews)}
+          <div class="sa-show-review-modal">@@translations.partner_sku_reviews.read_more</div>
+        </div>
+      </div>
     """
 
   classes: -> ['sa-'+@assigns.configuration.extended_widget_theme,
@@ -409,7 +394,7 @@ class PartnerSkuReviews
     return unless @product_id
 
     @_fetchProductInformation !!extended_el, (product_information) =>
-      return unless product_information.reviewable
+      return unless product_information.reviewable && product_information.reviews_count > 0
 
       review_count_to_show = context().configuration.extended_widget_reviews_count
       if product_information.reviews && review_count_to_show
@@ -426,7 +411,7 @@ class PartnerSkuReviews
         hideModal: () => @modal.hide()
 
       @modal = new SkuReviewsModal(assigns)
-      if inline_el && configuration.inline_widget_enabled && product_information.reviews_count > 0
+      if inline_el && configuration.inline_widget_enabled
         @_beforeWidgetDisplayed()
         new InlineSkuReviews(inline_el, assigns).render()
       if extended_el && configuration.extended_widget_enabled
@@ -655,7 +640,7 @@ class PartnerSkuReviews
     }
 
     ##{flavor}-product-reviews-inline .sa-brand-powered-by {
-      font-size: 12px;
+      font-size: 11px;
       vertical-align: middle;
       text-transform: lowercase;
     }
@@ -803,6 +788,7 @@ class PartnerSkuReviews
 
     #{sizedSelector 'medium', '.sa-brand'} {
       height: auto;
+      padding-left: 0;
     }
 
     /* EXTENDED */
@@ -842,7 +828,7 @@ class PartnerSkuReviews
 
     ##{flavor}-product-reviews-extended .sa-brand-powered-by {
       display: inline-block;
-      font-size: 15px;
+      font-size: 11px;
     }
 
     ##{flavor}-product-reviews-extended .sa-extended-reviews-body {
@@ -1294,51 +1280,6 @@ class PartnerSkuReviews
 
     ##{flavor}-product-reviews-extended.sa-white .sa-show-review-modal:hover {
       background: #e8e8e8;
-    }
-
-    /* EXTENDED - NO CONTENT */
-
-    ##{flavor}-product-reviews-extended .sa-review-prompt {
-      padding: 20px 15px;
-      display: block;
-    }
-
-    ##{flavor}-product-reviews-extended .sa-review-prompt-head {
-      display: block;
-      margin: 0 0 10px;
-      font-weight: bold;
-      font-size: 16px;
-      color: #000;
-      -webkit-text-fill-color: currentColor;
-      line-height: 1.25;
-    }
-
-    ##{flavor}-product-reviews-extended .sa-review-prompt-motive {
-      margin: 0 0 20px;
-      font-size: 12px;
-      color: #000;
-      -webkit-text-fill-color: currentColor;
-      line-height: 1.5;
-      display: block;
-    }
-
-    ##{flavor}-product-reviews-extended .sa-review-prompt-button {
-      display: inline-block;
-      padding: 10px 25px 12px;
-      outline: none;
-      border: 0;
-      border-radius: 3px;
-      font-size: 12px;
-      text-align: center;
-      -webkit-tap-highlight-color: transparent;
-      background: #f68b24;
-      color: #fff;
-      -webkit-text-fill-color: currentColor;
-      cursor: pointer;
-    }
-
-    ##{flavor}-product-reviews-extended .sa-review-prompt-button:hover {
-      background: #e8760a;
     }
 
     /* MODAL */
