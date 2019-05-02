@@ -229,14 +229,18 @@ class ExtendedSkuReviews extends BaseComponent
         <div class="sa-review #{ if expandable then 'sa-expandable' else ''}" data-index='#{index}'>
           <div class="sa-review-header">
             <img class="sa-review-avatar" src="#{user.avatar}" alt="avatar of user #{user.username}"/>
-            <div class="sa-review-info">
-              #{stars(review.rating)}
-              #{helpfulVoting(review.helpful_votes_count, review.votes_count)}
-            </div>
-            <div class="sa-authorship-info">
-              <span class="sa-review-author">#{user.username}</span>
-              <span class="sa-review-at">@@translations.partner_sku_reviews.at</span>
-              <span class="sa-review-date">#{review.created_at}</span>
+            <div class="sa-review-info-wrap">
+              <div class="sa-review-info">
+                #{stars(review.rating)}
+                #{helpfulVoting(review.helpful_votes_count, review.votes_count)}
+              </div>
+              <div class="sa-authorship-info">
+                <span class="sa-review-author">#{user.username}</span>
+                <span class="sa-review-date-wrap">
+                  <span class="sa-review-at">@@translations.partner_sku_reviews.at</span>
+                  <span class="sa-review-date">#{review.created_at}</span>
+                </span>
+              </div>
             </div>
           </div>
           <div class="sa-review-main">
@@ -1088,14 +1092,25 @@ class PartnerSkuReviews
       padding: 15px;
     }
 
+    ##{flavor}-product-reviews-extended .sa-review-header {
+      display: flex;
+      display: -ms-flexbox;
+      flex-direction: row;
+      -ms-flex-direction: row;
+    }
+
     ##{flavor}-product-reviews-extended .sa-review-avatar {
-      float: left;
       overflow: hidden;
-      width: 40px;
+      min-width: 40px;
       height: 40px;
       margin: 0 10px 0 0;
       border: 1px solid #e8e8e8;
       border-radius: 50%;
+    }
+
+    ##{flavor}-product-reviews-extended .sa-review-info-wrap {
+      flex: 1 1 auto;
+      -ms-flex: 1 1 auto;
     }
 
     ##{flavor}-product-reviews-extended .sa-review-info {
@@ -1115,6 +1130,7 @@ class PartnerSkuReviews
     }
 
     ##{flavor}-product-reviews-extended .sa-review-usefull-voting {
+      display: inline-block;
       margin: 3px 0 6px;
       font-size: 11px;
       color: #707070;
@@ -1129,7 +1145,8 @@ class PartnerSkuReviews
     }
 
     ##{flavor}-product-reviews-extended .sa-review-author {
-      max-width: 60%;
+      display: inline-block;
+      max-width: 120px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1137,6 +1154,10 @@ class PartnerSkuReviews
       height: 14px;
       color: #363636;
       -webkit-text-fill-color: currentColor;
+    }
+
+    ##{flavor}-product-reviews-extended .sa-review-date-wrap {
+      display: inline-block;
     }
 
     ##{flavor}-product-reviews-extended .merged-review-info {
@@ -1205,16 +1226,17 @@ class PartnerSkuReviews
     ##{flavor}-product-reviews-extended .sa-review-sentiment {
       display: block;
       position: relative;
-      padding: 0 0 1px;
+      padding: 3px 0 3px 25px;
     }
 
     ##{flavor}-product-reviews-extended .sa-review-sentiment:before {
       content: "";
       display: inline-block;
+      position: absolute;
+      top: 2px;
+      left: 0;
       width: 21px;
       height: 21px;
-      margin-right: 4.2px;
-      vertical-align: middle;
     }
 
     ##{flavor}-product-reviews-extended .sa-review-sentiment.sa-positive:before {
