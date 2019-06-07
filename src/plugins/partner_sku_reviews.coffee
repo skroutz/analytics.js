@@ -31,7 +31,7 @@ stars = (reviewscore, reviews_count, fraction = false) ->
   if reviews_count
     title += " @@translations.partner_sku_reviews.from #{reviews_count} "
     title += if reviews_count == 1
-               ' @@translations.partner_sku_reviews.user_from '
+               '@@translations.partner_sku_reviews.user_from'
              else
                '@@translations.partner_sku_reviews.users_from'
 
@@ -125,19 +125,25 @@ class InlineSkuReviews extends BaseComponent
     super(el, assigns)
     {@reviewscore, @reviews_count} = assigns.product_information
 
-  template: -> """
-    <div class="sa-rating-with-count">
-      #{starRating(@reviewscore, @reviews_count, false)}
-    </div>
-    <div class="sa-inline-separator"></div>
-    <div class="sa-inline-secondary-indicators">
-      <div class="sa-reviews-count-texty">
-        <span class="sa-reviews-count-value">#{@reviews_count}</span>
-        <span class="sa-reviews-count-text">@@translations.partner_sku_reviews.product_reviews</span>
+  template: ->
+    reviews_text = if @reviews_count == 1
+                     '@@translations.partner_sku_reviews.product_review'
+                   else
+                     '@@translations.partner_sku_reviews.product_reviews'
+
+    """
+      <div class="sa-rating-with-count">
+        #{starRating(@reviewscore, @reviews_count, false)}
       </div>
-      #{brandIndicator()}
-    </div>
-  """
+      <div class="sa-inline-separator"></div>
+      <div class="sa-inline-secondary-indicators">
+        <div class="sa-reviews-count-texty">
+          <span class="sa-reviews-count-value">#{@reviews_count}</span>
+          <span class="sa-reviews-count-text">#{reviews_text}</span>
+        </div>
+        #{brandIndicator()}
+      </div>
+    """
 
   classes: -> ['sa-'+@assigns.configuration.inline_widget_theme,
                'sa-reviews-inline-root']
