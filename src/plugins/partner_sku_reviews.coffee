@@ -31,7 +31,7 @@ stars = (reviewscore, reviews_count, fraction = false) ->
   if reviews_count
     title += " @@translations.partner_sku_reviews.from #{reviews_count} "
     title += if reviews_count == 1
-               ' @@translations.partner_sku_reviews.user_from '
+               '@@translations.partner_sku_reviews.user_from'
              else
                '@@translations.partner_sku_reviews.users_from'
 
