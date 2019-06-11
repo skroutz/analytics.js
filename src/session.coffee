@@ -21,6 +21,8 @@ define [
         create: (shop_code, flavor, metadata) ->
           @shop_code = shop_code
 
+          metadata = encodeURIComponent(JSON.stringify(metadata)) if typeof metadata isnt 'string'
+
           @_extractAnalyticsSession('create', shop_code, flavor, metadata)
 
         connect: (shop_code)->
