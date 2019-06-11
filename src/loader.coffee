@@ -6,6 +6,7 @@ utilizes the Friendly iFrames (FiF) technique in order to load the JavaScript
 library without blocking the `window.onload` event.
 
 @see http://goo.gl/VLDc3F More information on FiF technique
+@see https://developer.akamai.com/blog/2012/12/12/non-blocking-script-loader-pattern
 ###
 ((url)->
   try
@@ -37,6 +38,9 @@ library without blocking the `window.onload` event.
   try
     doc = iframe.contentWindow.document
   catch err
+    # In IE < 11 there is an issue if the main page sets document.domain, even
+    # if document.domain is set to itself (document.domain=document.domain).
+    # Solution: https://developer.akamai.com/blog/2012/12/12/non-blocking-script-loader-pattern
     dom = document.domain
     iframe.src = "javascript:var d=document.open();d.domain='#{dom}';void(0);"
     doc = iframe.contentWindow.document
