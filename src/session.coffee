@@ -20,10 +20,9 @@ define [
       session:
         create: (shop_code, flavor, metadata) ->
           @shop_code = shop_code
+          @metadata = metadata
 
-          metadata = encodeURIComponent(JSON.stringify(metadata)) if typeof metadata isnt 'string'
-
-          @_extractAnalyticsSession('create', shop_code, flavor, metadata)
+          @_extractAnalyticsSession('create', shop_code, flavor, encodeURIComponent(JSON.stringify(metadata)))
 
         connect: (shop_code)->
           # connect should be called only once

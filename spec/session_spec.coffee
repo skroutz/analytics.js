@@ -187,7 +187,7 @@ describe 'Session', ->
     @shop_code         = 'shop_code_1'
     @analytics_session = 'dummy_analytics_session_hash'
     @flavor            = 'flavor'
-    @metadata          = JSON.stringify({ app_type: 'web', tags: 'tag1,tag2' })
+    @metadata          = { app_type: 'web', tags: 'tag1,tag2' }
 
     require [
       'promise'
