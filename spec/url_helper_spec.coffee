@@ -9,6 +9,9 @@ describe 'URLHelper', ->
     it 'responds to appendData', ->
       expect(@subject).to.respondTo('appendData')
 
+    it 'responds to replaceParam', ->
+      expect(@subject).to.respondTo('replaceParam')
+
     it 'responds to serialize', ->
       expect(@subject).to.respondTo('serialize')
 
@@ -51,6 +54,43 @@ describe 'URLHelper', ->
 
           expect(@subject.appendData(url, payload))
             .to.equal('http://foo.bar?foo2=bar2#/weird#hash?value')
+
+  describe '.replaceParam', ->
+    context 'when replacing first param', ->
+      it 'replaces the given param', ->
+        url = 'http://foo.bar?foo=xxx&zzz=bar'
+        param = 'foo'
+        new_value = 'yyyy'
+
+        expect(@subject.replaceParam(url, param, new_value))
+          .to.equal('http://foo.bar?foo=yyyy&zzz=bar')
+
+    context 'when replacing non-first param', ->
+      it 'replaces the given param', ->
+        url = 'http://foo.bar?foo=xxx&zzzz=zbar&zzz=bar'
+        param = 'zzz'
+        new_value = 'pub'
+
+        expect(@subject.replaceParam(url, param, new_value))
+          .to.equal('http://foo.bar?foo=xxx&zzzz=zbar&zzz=pub')
+
+    context 'when param name is escaped', ->
+      it 'replaces the given param', ->
+        url = "http://foo.bar?#{encodeURIComponent('ελληνικά')}=xxxx"
+        param = 'ελληνικά'
+        new_value = 'yyyy'
+
+        expect(@subject.replaceParam(url, param, new_value))
+          .to.equal("http://foo.bar?#{encodeURIComponent('ελληνικά')}=yyyy")
+
+    context 'when param name is not escaped and contains non-ascii characters', ->
+      it 'replaces the given param', ->
+        url = "http://foo.bar?ελληνικά=xxxx"
+        param = 'ελληνικά'
+        new_value = 'yyyy'
+
+        expect(@subject.replaceParam(url, param, new_value))
+          .to.equal("http://foo.bar?ελληνικά=yyyy")
 
   describe '.serialize', ->
     beforeEach ->

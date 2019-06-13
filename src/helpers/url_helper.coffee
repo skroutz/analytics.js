@@ -10,6 +10,13 @@ define ['settings'], (Settings)->
       sign = if main_url.indexOf('?') isnt -1 then '&' else '?'
       "#{main_url}#{sign}#{payload}#{hash}"
 
+    replaceParam: (url, name, new_value) ->
+      # Find param escaped or not
+      # Note: param name with regex special characters is not supported
+      regex = new RegExp("(.*[?&;](#{encodeURIComponent(name)}|#{name})=)([^&;]+)(.*)")
+
+      url.replace(regex, "$1#{encodeURIComponent(new_value)}$4") # https://stackoverflow.com/a/3954957
+
     serialize: (object) ->
       return false if !object or typeof object isnt 'object'
       query_string = ''
