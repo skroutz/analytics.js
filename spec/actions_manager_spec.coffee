@@ -1,3 +1,5 @@
+NOW = 1560349833558 # milliseconds
+
 VALID_ORDER_DATA = {
   order_id: '123456',
   revenue:  '1315.25',
@@ -123,7 +125,8 @@ describe 'ActionsManager', ->
         'settings'
         'reporter'
         'promise'
-      ], (Session, PluginsManager, ActionsManager, Settings, Reporter, Promise) =>
+        'helpers/base64_helper'
+      ], (Session, PluginsManager, ActionsManager, Settings, Reporter, Promise, Base64) =>
         @PluginsManager = PluginsManager
         @plugins_manager = new @PluginsManager
 
@@ -136,6 +139,7 @@ describe 'ActionsManager', ->
         @settings = Settings
         @reporter = Reporter
         @promise = Promise
+        @base64 = Base64
         @run_spy = sinon.spy(@actions_manager::, 'run')
 
         done()
@@ -148,7 +152,7 @@ describe 'ActionsManager', ->
     @old_redirect = @settings.redirectTo
     @redirect_stub = sinon.stub()
     @settings.redirectTo = @redirect_stub
-    @clock = sinon.useFakeTimers()
+    @clock = sinon.useFakeTimers(NOW)
 
     @initializeSubject = => @subject = new @actions_manager(@session, @plugins_manager)
 
@@ -316,6 +320,8 @@ describe 'ActionsManager', ->
         context 'when redirect callback is supplied', ->
           beforeEach ->
             @redirect_url = 'http://redirect_url'
+            skr_prm_param_hash = @base64.encodeURI(JSON.stringify([@analytics_session, NOW + 60 * 1000, {}]))
+            @analytics_redirect_url = "http://redirect_url?skr_prm=#{skr_prm_param_hash}"
             @redirect_callback_spy = sinon.spy()
 
             @run = ->
@@ -328,7 +334,7 @@ describe 'ActionsManager', ->
               @run()
               @sendbeacon_promise.resolve()
 
-              expect(@redirect_callback_spy).to.be.calledWith(@redirect_url)
+              expect(@redirect_callback_spy).to.be.calledWith(@analytics_redirect_url)
 
             context 'when redirect callback throws an error', ->
               beforeEach ->
@@ -344,7 +350,7 @@ describe 'ActionsManager', ->
                 return
 
               it 'redirects to redirect_url', ->
-                expect(@settings.redirectTo).to.be.calledWith(@redirect_url)
+                expect(@settings.redirectTo).to.be.calledWith(@analytics_redirect_url)
 
           context 'but redirect_url is not supplied', ->
             beforeEach ->
