@@ -1,37 +1,11 @@
 /*
- *  base64.js
- *
- *  Licensed under the BSD 3-Clause License.
- *    http://opensource.org/licenses/BSD-3-Clause
+ *  Edited version of https://github.com/dankogai/js-base64/tree/2.5.1
  *
  *  References:
  *    http://en.wikipedia.org/wiki/Base64
  */
-;(function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined'
-    ? module.exports = factory(global)
-    : typeof define === 'function' && define.amd
-    ? define(factory) : factory(global)
-}((
-  typeof self !== 'undefined' ? self
-    : typeof window !== 'undefined' ? window
-    : typeof global !== 'undefined' ? global
-      : this
-), function(global) {
+define(function () {
   'use strict';
-  // existing version for noConflict()
-  global = global || {};
-  var _Base64 = global.Base64;
-  var version = "2.5.1";
-  // if node.js and NOT React Native, we use Buffer
-  var buffer;
-  if (typeof module !== 'undefined' && module.exports) {
-    try {
-      buffer = eval("require('buffer').Buffer");
-    } catch (err) {
-      buffer = undefined;
-    }
-  }
   // constants
   var b64chars
     = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
@@ -78,22 +52,10 @@
       ];
     return chars.join('');
   };
-  var btoa = global.btoa ? function(b) {
-    return global.btoa(b);
-  } : function(b) {
+  var btoa = function(b) {
     return b.replace(/[\s\S]{1,3}/g, cb_encode);
   };
-  var _encode = buffer ?
-    buffer.from && Uint8Array && buffer.from !== Uint8Array.from
-      ? function (u) {
-        return (u.constructor === buffer.constructor ? u : buffer.from(u))
-          .toString('base64')
-      }
-      :  function (u) {
-        return (u.constructor === buffer.constructor ? u : new  buffer(u))
-          .toString('base64')
-      }
-    : function (u) { return btoa(utob(u)) }
+  var _encode = function (u) { return btoa(utob(u)) }
   ;
   var encode = function(u, urisafe) {
     return !urisafe
@@ -150,86 +112,22 @@
     chars.length -= [0, 0, 2, 1][padlen];
     return chars.join('');
   };
-  var _atob = global.atob ? function(a) {
-    return global.atob(a);
-  } : function(a){
+  var _atob = function(a){
     return a.replace(/\S{1,4}/g, cb_decode);
   };
-  var atob = function(a) {
-    return _atob(String(a).replace(/[^A-Za-z0-9\+\/]/g, ''));
-  };
-  var _decode = buffer ?
-    buffer.from && Uint8Array && buffer.from !== Uint8Array.from
-      ? function(a) {
-        return (a.constructor === buffer.constructor
-          ? a : buffer.from(a, 'base64')).toString();
-      }
-      : function(a) {
-        return (a.constructor === buffer.constructor
-          ? a : new buffer(a, 'base64')).toString();
-      }
-    : function(a) { return btou(_atob(a)) };
+  var _decode = function(a) { return btou(_atob(a)) };
   var decode = function(a){
     return _decode(
       String(a).replace(/[-_]/g, function(m0) { return m0 == '-' ? '+' : '/' })
         .replace(/[^A-Za-z0-9\+\/]/g, '')
     );
   };
-  var noConflict = function() {
-    var Base64 = global.Base64;
-    global.Base64 = _Base64;
-    return Base64;
-  };
   // export Base64
-  global.Base64 = {
-    VERSION: version,
-    atob: atob,
-    btoa: btoa,
-    fromBase64: decode,
-    toBase64: encode,
-    utob: utob,
+  var Base64 = {
     encode: encode,
     encodeURI: encodeURI,
-    btou: btou,
     decode: decode,
-    noConflict: noConflict,
-    __buffer__: buffer
   };
-  // if ES5 is available, make Base64.extendString() available
-  if (typeof Object.defineProperty === 'function') {
-    var noEnum = function(v){
-      return {value:v,enumerable:false,writable:true,configurable:true};
-    };
-    global.Base64.extendString = function () {
-      Object.defineProperty(
-        String.prototype, 'fromBase64', noEnum(function () {
-          return decode(this)
-        }));
-      Object.defineProperty(
-        String.prototype, 'toBase64', noEnum(function (urisafe) {
-          return encode(this, urisafe)
-        }));
-      Object.defineProperty(
-        String.prototype, 'toBase64URI', noEnum(function () {
-          return encode(this, true)
-        }));
-    };
-  }
-  //
-  // export Base64 to the namespace
-  //
-  if (global['Meteor']) { // Meteor.js
-    Base64 = global.Base64;
-  }
-  // module.exports and AMD are mutually exclusive.
-  // module.exports has precedence.
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports.Base64 = global.Base64;
-  }
-  else if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module.
-    define([], function(){ return global.Base64 });
-  }
-  // that's it!
-  return {Base64: global.Base64}
-}));
+
+  return Base64;
+});
