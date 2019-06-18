@@ -8,7 +8,6 @@ send_auto_pageview: true
 custom_tlds:
   - skroutzstore.gr
 cookies:
-  first_party_enabled: true
   version: 1
   analytics:
     name: "__sa_session"
@@ -38,7 +37,7 @@ api:
 
 url:
   analytics_session:
-    create: "/track/create?shop_code=#{shop_code}&flavor=#{flavor}&metadata=#{metadata}"
+    create: "/track/create?shop_code=#{shop_code}&flavor=#{flavor}&session=#{session}&metadata=#{metadata}"
     connect: "/track/connect?shop_code=#{shop_code}"
   beacon: "/track/actions/create?analytics_session=#{analytics_session}"
 
@@ -48,4 +47,5 @@ params:
   url: 'url'
   referrer: 'referer' # Misspelling of referrer, check https://en.wikipedia.org/wiki/HTTP_referer
   shop_code: 'shop_code'
+  metadata: 'metadata'
   actions: 'actions'

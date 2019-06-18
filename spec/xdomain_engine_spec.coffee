@@ -99,7 +99,7 @@ describe 'XDomain Session Retrieval Engine', ->
 
     context 'when called with type "create"', ->
       beforeEach ->
-        @instance = new @xdomain_engine(@type_create, @shop_code, @flavor, @metadata)
+        @instance = new @xdomain_engine(@type_create, @shop_code, @flavor, @analytics_session, @metadata)
         return
 
       it 'opens "track/create" url', ->

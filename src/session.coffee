@@ -4,14 +4,17 @@ define [
   'runnable'
   'biskoto'
   'session_engines/xdomain_engine'
-], (Settings, Promise, Runnable, Biskoto, XDomainEngine) ->
+  'analytics_url'
+  'domain_extractor'
+], (Settings, Promise, Runnable, Biskoto, XDomainEngine, AnalyticsUrl, DomainExtractor) ->
   class Session
     Session::[key] = method for key, method of Runnable
 
     constructor: (@plugins_manager) ->
       @promise = new Promise()
+      @domain = new DomainExtractor(Settings.url.hostname).get()
       @_cleanUpCookies()
-      @analytics_session = @_getCookieAnalyticsSession()
+      @analytics_session = @_getSessionFromCookie()
 
     then: (success, fail) -> @promise.then(success, fail)
 
@@ -19,58 +22,119 @@ define [
       session:
         create: (shop_code, flavor, metadata) ->
           @shop_code = shop_code
+          @flavor = flavor
           @metadata = metadata
 
-          @_extractAnalyticsSession('create', shop_code, flavor, encodeURIComponent(JSON.stringify(metadata)))
+          @_extractAnalyticsSessionOnCreate()
 
         connect: (shop_code)->
           # connect should be called only once
           return console?.warn?('Connect called multiple times') if @shop_code
 
           @shop_code = shop_code
-          @plugins_manager.session = @
+          @metadata = @_getMetadataFromCookie()
 
+          @plugins_manager.session = @
           @plugins_manager.notify('connect', {})
 
+          skr_prm = new AnalyticsUrl(Settings.url.current).read_params()
+          @_setAnalyticsSession(skr_prm)
+          @_setAnalyticsMetadata(skr_prm)
+
+          @analytics_session ||= @_getSessionFromCacheCookie()
           return @promise.resolve(@) if @analytics_session
 
-          @_extractAnalyticsSession('connect', shop_code)
+          @_extractAnalyticsSessionOnConnect('connect', shop_code)
 
     _cleanUpCookies: ->
       cookie_settings = Settings.cookies
-      cookie_name = cookie_settings.analytics.name
-      cookie_data = Biskoto.get(cookie_name)
-      return unless cookie_data
+      options = { domain: @domain } if @domain
 
-      if cookie_data.version isnt cookie_settings.version or !cookie_settings.first_party_enabled
-        Biskoto.expire(cookie_name)
+      for cookie_name in [cookie_settings.analytics.name, cookie_settings.session.name]
+        cookie_data = Biskoto.get(cookie_name)
+        continue unless cookie_data
 
-    _getCookieAnalyticsSession: ->
+        if cookie_data.version isnt cookie_settings.version
+          Biskoto.expire(cookie_name, options)
+
+    _getSessionFromCacheCookie: ->
       data = Biskoto.get(Settings.cookies.analytics.name)
       if data then data.analytics_session else null
 
-    _extractAnalyticsSession: (type, shop_code, flavor, metadata) ->
-      new XDomainEngine(type, shop_code, flavor, metadata)
-        .then(@_onSessionSuccess, @_onSessionError)
+    _getSessionFromCookie: ->
+      data = Biskoto.get(Settings.cookies.session.name)
+      if data then data.session else null
+
+    _getMetadataFromCookie: ->
+      Biskoto.get(Settings.cookies.meta.name)
+
+    _extractAnalyticsSessionOnCreate: ->
+      new XDomainEngine('create',
+                        @shop_code,
+                        @flavor,
+                        @analytics_session,
+                        encodeURIComponent(JSON.stringify(@metadata)))
+        .then(@_onCreateSessionSuccess, @_onSessionError)
+
+    _extractAnalyticsSessionOnConnect: ->
+      new XDomainEngine('connect', @shop_code)
+        .then(@_onConnectSessionSuccess, @_onSessionError)
 
     _onSessionError: => @promise.reject()
 
-    _onSessionSuccess: (result) =>
-      if analytics_session = result
-        @_createFirstPartyCookie(analytics_session)
-        @analytics_session = analytics_session
+    _onCreateSessionSuccess: (session) =>
+      if session
+        @analytics_session = session
+        @_createSessionCookie()
+
         @promise.resolve(@)
       else
         @promise.reject()
 
-    _createFirstPartyCookie: (analytics_session) ->
-      return unless Settings.cookies.first_party_enabled
+    _onConnectSessionSuccess: (session) =>
+      if session
+        @analytics_session = session
+        @_createSessionCacheCookie(session)
 
+        @promise.resolve(@)
+      else
+        @promise.reject()
+
+    _setAnalyticsSession: (skr_prm) ->
+      return unless skr_prm?.session
+
+      @analytics_session = skr_prm.session
+      @_createSessionCookie()
+
+    _setAnalyticsMetadata: (skr_prm) ->
+      return unless skr_prm?.metadata
+
+      @metadata = skr_prm.metadata
+      @_createMetadataCookie()
+
+    _createSessionCacheCookie: (analytics_session) ->
       cookie_data =
         version: Settings.cookies.version
         analytics_session: analytics_session
 
-      Biskoto.set Settings.cookies.analytics.name, cookie_data,
-        expires: Settings.cookies.analytics.duration
+      options = expires: Settings.cookies.analytics.duration
+      options.domain = @domain if @domain
+
+      Biskoto.set Settings.cookies.analytics.name, cookie_data, options
+
+    _createSessionCookie: ->
+      session_data =
+        version: Settings.cookies.version
+        session: @analytics_session
+
+      options = expires: Settings.cookies.session.duration
+      options.domain = @domain if @domain
+
+      Biskoto.set Settings.cookies.session.name, session_data, options
+
+    _createMetadataCookie: ->
+      options = { domain: @domain } if @domain
+
+      Biskoto.set Settings.cookies.meta.name, @metadata, options
 
   return Session

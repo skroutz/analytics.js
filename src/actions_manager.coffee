@@ -76,6 +76,7 @@ define [
       payload[params.url] = Settings.url.current
       payload[params.referrer] = Settings.url.referrer
       payload[params.shop_code] = @session.shop_code
+      payload[params.metadata] = @session.metadata || ''
       payload[params.actions] = [{
         category: category
         type: type

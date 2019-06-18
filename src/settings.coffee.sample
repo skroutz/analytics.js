@@ -35,13 +35,13 @@ define ->
       url: '@@params.url'
       referrer: '@@params.referrer'
       shop_code: '@@params.shop_code'
+      metadata: '@@params.metadata'
       actions: '@@params.actions'
 
     ###
     Cookies
     ###
     cookies:
-      first_party_enabled: @@cookies.first_party_enabled
       version: @@cookies.version
       analytics:
         name: '@@cookies.analytics.name'
@@ -63,10 +63,11 @@ define ->
         Analytics Tracking Session Creation Endpoint
         @param [String] shop_code Analytics code of the tracked shop
         @param [String] flavor Application name
+        @param [String] session The analytics session extracted from the first party cookie
         @param [String] metadata Additional metadata provided by the base Application
         @return [String] The formatted URL
         ###
-        create: (shop_code, flavor, metadata) ->
+        create: (shop_code, flavor, session, metadata) ->
           "@@analytics_base_url@@url.analytics_session.create"
 
         ###
