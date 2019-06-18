@@ -46,6 +46,11 @@ define ->
       analytics:
         name: '@@cookies.analytics.name'
         duration: @@cookies.analytics.duration
+      session:
+        name: '@@cookies.session.name'
+        duration: @@cookies.session.duration
+      meta:
+        name: '@@cookies.meta.name'
 
     ###
     Backend Endpoints
