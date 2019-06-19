@@ -23,9 +23,9 @@ define [
       yogurt:
         productClick: (data, redirect_callback, redirect_url, url_mode = { type: 'default' }) ->
           clearTimeout @pageview_timeout
-          @_reportAction 'yogurt', 'productClick', data, (analytics_session) =>
+          @_reportAction 'yogurt', 'productClick', data, () =>
             if redirect_callback and redirect_url
-              redirect_url = new AnalyticsUrl(redirect_url).format_params(url_mode, analytics_session, @session.metadata)
+              redirect_url = new AnalyticsUrl(redirect_url).format_params(url_mode, @session.analytics_session, @session.metadata)
 
               try redirect_callback(redirect_url) catch then Settings.redirectTo(redirect_url)
 
@@ -65,8 +65,8 @@ define [
         url = Settings.url.beacon(@session.analytics_session)
         payload = @_buildBeaconPayload(category, type, data)
 
-        ## TODO: THROW ERROR ON REJECT
-        @reporter.sendBeacon(url, payload).then => cb and cb(@session.analytics_session)
+        ## TODO: HANDLE ERROR ON REJECT
+        @reporter.sendBeacon(url, payload).then => cb and cb()
 
     # TODO: implement multiple actions per beacon maybe??
     _buildBeaconPayload: (category, type, data = '{}') ->
