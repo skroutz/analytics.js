@@ -35,6 +35,23 @@ describe 'URLHelper', ->
         expect(@subject.appendData(url, payload))
           .to.equal('http://foo.bar?foo2=bar2')
 
+    context 'when url contains hash', ->
+      context 'and url already contains parameters', ->
+        it 'appends properly the payload using & preserving hash', ->
+          url = 'http://foo.bar?foo=bar#/weird#hash?value'
+          payload = 'foo2=bar2'
+
+          expect(@subject.appendData(url, payload))
+            .to.equal('http://foo.bar?foo=bar&foo2=bar2#/weird#hash?value')
+
+      context 'and url does not contain parameters', ->
+        it 'appends properly the payload using ? preserving hash', ->
+          url = 'http://foo.bar#/weird#hash?value'
+          payload = 'foo2=bar2'
+
+          expect(@subject.appendData(url, payload))
+            .to.equal('http://foo.bar?foo2=bar2#/weird#hash?value')
+
   describe '.serialize', ->
     beforeEach ->
       @o = {

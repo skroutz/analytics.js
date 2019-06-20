@@ -1,8 +1,14 @@
 define ['settings'], (Settings)->
   URLHelper =
     appendData: (url, payload) ->
-      sign = if url.indexOf('?') isnt -1 then '&' else '?'
-      "#{url}#{sign}#{payload}"
+      hash_index = url.indexOf('#')
+      [main_url, hash] = if hash_index isnt -1
+                           [url.substring(0, hash_index), url.substring(hash_index)]
+                         else
+                           [url, '']
+
+      sign = if main_url.indexOf('?') isnt -1 then '&' else '?'
+      "#{main_url}#{sign}#{payload}#{hash}"
 
     serialize: (object) ->
       return false if !object or typeof object isnt 'object'
