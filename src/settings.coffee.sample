@@ -124,6 +124,8 @@ define ->
   # The URL of the previous webpage from which a link was followed
   Settings.url.referrer = Settings.window.document.referrer
 
+  Settings.url.hostname = Settings.window.location.hostname
+
   Settings.custom_tlds = @@custom_tlds
 
   return Settings
