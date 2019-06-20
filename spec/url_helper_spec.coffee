@@ -102,8 +102,13 @@ describe 'URLHelper', ->
   describe '.getParamsFromUrl', ->
     it 'returns the proper JSON object', ->
       url = 'http://foo.bar?foo=bar'
-      o = {
-        foo: 'bar'
-      }
+      params = { foo: 'bar' }
 
-      expect(@subject.getParamsFromUrl(url)).to.deep.equal(o)
+      expect(@subject.getParamsFromUrl(url)).to.deep.equal(params)
+
+    context 'when contains an escaped param name', ->
+      it 'replaces the given param', ->
+        url = "http://foo.bar?#{encodeURIComponent('ελλη=νικά')}=xxxx&foo=bar"
+        params = { 'ελλη=νικά': 'xxxx', foo: 'bar' }
+
+        expect(@subject.getParamsFromUrl(url)).to.deep.equal(params)
