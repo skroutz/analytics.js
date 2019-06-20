@@ -5,6 +5,8 @@ common:
 xdomain_session_timeout: 5000
 auto_pageview_timeout: 1000
 send_auto_pageview: true
+custom_tlds:
+  - skroutzstore.gr
 cookies:
   first_party_enabled: true
   version: 1
