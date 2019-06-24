@@ -52,44 +52,19 @@ session_retrieval_tests = (cookies_enabled = false, cookie_exists = false)->
     @init()
     expect(@xdomain_spy.args[0][1]).to.equal @shop_code
 
-  it 'tries to extract analytics_session from GetParam engine', ->
-    @init()
-    expect(@get_param_spy).to.be.calledOnce
-
-  context 'when only the XDomain engine resolves', ->
+  context 'when the XDomain engine resolves', ->
     beforeEach ->
       @init2 = =>
         @init()
         @xdomain_promise.resolve(@analytics_session)
-        @get_param_promise.reject()
         return
 
     session_creation_tests(cookies_enabled, cookie_exists)
 
-  context 'when only the GetParam engine resolves', ->
-    beforeEach ->
-      @init2 = =>
-        @init()
-        @xdomain_promise.reject()
-        @get_param_promise.resolve(@analytics_session)
-        return
-
-    session_creation_tests(cookies_enabled, cookie_exists)
-
-  context 'when both XDomain and GetParam resolve', ->
-    it 'it uses the value from the XDomain engine', (done)->
-      @init()
-      @xdomain_promise.resolve('asd')
-      @get_param_promise.resolve('dsa')
-      @instance.then (session) =>
-        expect(session.analytics_session).to.equal 'asd'
-        done()
-
-  context 'when both engines reject', ->
+  context 'when the XDomain engine rejects', ->
     beforeEach ->
       @init()
       @xdomain_promise.reject()
-      @get_param_promise.reject()
       return
 
     it 'it rejects the @promise', (done)->
@@ -163,10 +138,6 @@ outside_yogurt_tests = (cookies_enabled = false)->
         @init()
         expect(@xdomain_spy).to.not.be.called
 
-      it 'does not use the GetParam engine to retrieve the "analytics_session"', ->
-        @init()
-        expect(@get_param_spy).to.not.be.called
-
     context 'when a first-party cookie does not exist', ->
       session_retrieval_tests(cookies_enabled, false)
   else
@@ -194,13 +165,6 @@ describe 'Session', ->
     ], (Promise)=>
       @promise  = Promise
 
-      window.__requirejs__.clearRequireState()
-      requirejs.undef 'session_engines/get_param_engine'
-      @get_param_promise = new @promise()
-      @get_param_mock = => return @get_param_promise
-      @get_param_spy = sinon.spy @, 'get_param_mock'
-      define 'session_engines/get_param_engine', [], => @get_param_mock
-
       requirejs.undef 'session_engines/xdomain_engine'
       @xdomain_promise = new @promise()
       @xdomain_mock = => return @xdomain_promise
@@ -222,7 +186,6 @@ describe 'Session', ->
         done()
 
   after ->
-    requirejs.undef 'session_engines/get_param_engine'
     requirejs.undef 'session_engines/xdomain_engine'
     window.__requirejs__.clearRequireState()
 
@@ -230,8 +193,6 @@ describe 'Session', ->
     @plugins_manager = new @PluginsManager()
 
   afterEach ->
-    @get_param_promise = new @promise()
-    @get_param_spy.reset()
     @xdomain_promise = new @promise()
     @xdomain_spy.reset()
 

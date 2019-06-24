@@ -3,9 +3,8 @@ define [
   'promise'
   'runnable'
   'biskoto'
-  'session_engines/get_param_engine'
   'session_engines/xdomain_engine'
-], (Settings, Promise, Runnable, Biskoto, GetParamEngine, XDomainEngine) ->
+], (Settings, Promise, Runnable, Biskoto, XDomainEngine) ->
   class Session
     Session::[key] = method for key, method of Runnable
 
@@ -51,15 +50,13 @@ define [
       if data then data.analytics_session else null
 
     _extractAnalyticsSession: (type, shop_code, flavor, metadata) ->
-      Promise.any([
-        (new XDomainEngine(type, shop_code, flavor, metadata))
-        (new GetParamEngine())
-      ]).then(@_onSessionSuccess, @_onSessionError)
+      new XDomainEngine(type, shop_code, flavor, metadata)
+        .then(@_onSessionSuccess, @_onSessionError)
 
     _onSessionError: => @promise.reject()
 
-    _onSessionSuccess: (results) =>
-      if analytics_session = results[0] or results[1]
+    _onSessionSuccess: (result) =>
+      if analytics_session = result
         @_createFirstPartyCookie(analytics_session)
         @analytics_session = analytics_session
         @promise.resolve(@)
