@@ -4,7 +4,8 @@ define [
   'runnable'
   'helpers/url_helper'
   'validator'
-], (Settings, Reporter, Runnable, URLHelper, Validator) ->
+  'analytics_url'
+], (Settings, Reporter, Runnable, URLHelper, Validator, AnalyticsUrl) ->
   class ActionsManager
     ActionsManager::[key] = method for key, method of Runnable
 
@@ -20,11 +21,11 @@ define [
 
     _commands:
       yogurt:
-        productClick: (data, redirect_callback, redirect_url) ->
+        productClick: (data, redirect_callback, redirect_url, url_mode = { type: 'default' }) ->
           clearTimeout @pageview_timeout
-          @_reportAction 'yogurt', 'productClick', data, (analytics_session) =>
+          @_reportAction 'yogurt', 'productClick', data, () =>
             if redirect_callback and redirect_url
-              redirect_url = @_appendRedirectUrlParams(redirect_url, analytics_session)
+              redirect_url = new AnalyticsUrl(redirect_url).format_params(url_mode, @session.analytics_session, @session.metadata)
 
               try redirect_callback(redirect_url) catch then Settings.redirectTo(redirect_url)
 
@@ -64,13 +65,8 @@ define [
         url = Settings.url.beacon(@session.analytics_session)
         payload = @_buildBeaconPayload(category, type, data)
 
-        ## TODO: THROW ERROR ON REJECT
-        @reporter.sendBeacon(url, payload).then => cb and cb(@session.analytics_session)
-
-    _appendRedirectUrlParams: (url, _analytics_session) ->
-      # TODO: Find a way to safely append analytics session as query param
-      # for GetParamEngine to work, see: 9dd1d57a
-      url
+        ## TODO: HANDLE ERROR ON REJECT
+        @reporter.sendBeacon(url, payload).then => cb and cb()
 
     # TODO: implement multiple actions per beacon maybe??
     _buildBeaconPayload: (category, type, data = '{}') ->

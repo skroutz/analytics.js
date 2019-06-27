@@ -1,8 +1,21 @@
 define ['settings'], (Settings)->
   URLHelper =
     appendData: (url, payload) ->
-      sign = if url.indexOf('?') isnt -1 then '&' else '?'
-      "#{url}#{sign}#{payload}"
+      hash_index = url.indexOf('#')
+      [main_url, hash] = if hash_index isnt -1
+                           [url.substring(0, hash_index), url.substring(hash_index)]
+                         else
+                           [url, '']
+
+      sign = if main_url.indexOf('?') isnt -1 then '&' else '?'
+      "#{main_url}#{sign}#{payload}#{hash}"
+
+    replaceParam: (url, name, new_value) ->
+      # Find param escaped or not
+      # Note: param name with regex special characters is not supported
+      regex = new RegExp("(.*[?&;](#{encodeURIComponent(name)}|#{name})=)([^&;]+)(.*)")
+
+      url.replace(regex, "$1#{encodeURIComponent(new_value)}$4") # https://stackoverflow.com/a/3954957
 
     serialize: (object) ->
       return false if !object or typeof object isnt 'object'
@@ -18,12 +31,13 @@ define ['settings'], (Settings)->
       extracted = URLHelper.getParamsFromUrl(url)
       return extracted[name] or null
 
+    # https://stackoverflow.com/a/1099670/4375736
     getParamsFromUrl: (url = Settings.url.current) ->
       regex  = /[?&;](.+?)=([^&;]+)/g
       params = {}
       if url
         while match = regex.exec(url)
-          params[match[1]] = decodeURIComponent(match[2])
+          params[decodeURIComponent(match[1])] = decodeURIComponent(match[2])
       return params
 
   return URLHelper

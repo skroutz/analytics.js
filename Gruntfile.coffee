@@ -325,6 +325,12 @@ module.exports = (grunt) ->
         command: 'rm -rf compiled dist src/{plugins_,}settings.coffee'
 
     copy:
+      javascripts:
+        expand: true
+        cwd: 'src'
+        src: ['**/*.js']
+        dest: 'compiled'
+
       ymls:
         expand: true
         cwd: 'config/settings'
@@ -372,6 +378,7 @@ module.exports = (grunt) ->
   grunt.registerTask 'build_payload', [
     'clean:payload'
     'create_easyxdm_module'
+    'copy:javascripts'
     'coffee:payload'
     'optimize_rjs'
     'concat:payload'

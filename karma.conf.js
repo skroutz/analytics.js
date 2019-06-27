@@ -26,6 +26,10 @@ module.exports = function(config) {
         included: false
       },
       {
+        pattern: 'src/**/*.js',
+        included: false
+      },
+      {
         pattern: 'compiled/vendor/**/*.js',
         included: false
       },
