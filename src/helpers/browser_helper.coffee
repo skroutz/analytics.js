@@ -1,44 +1,5 @@
-define ['settings', 'promise'], (Settings, Promise)->
+define ['promise'], (Promise)->
   class BrowserHelper
-    @_setUpCallbacks: (base_obj, promise)->
-      base_obj.step1_complete = -> BrowserHelper._createScript(Settings.url.utils.third_party_step2())
-      base_obj.step2_complete = (status)-> promise.resolve(status)
-
-    @_cleanUpCallbacks: (base_obj)->
-      delete base_obj.step1_complete
-      delete base_obj.step2_complete
-
-    @_createScript: (url)->
-      element = document.createElement('script')
-      element.src = url
-
-      sibling = document.getElementsByTagName('script')[0]
-      sibling.parentNode.insertBefore(element, sibling)
-
-    @_firstPartyCookiesEnabled: ->
-      document.cookie = "TemporaryTestCookie=yes;"
-      cookies_enabled = document.cookie.indexOf("TemporaryTestCookie=") isnt -1
-      document.cookie = "TemporaryTestCookie=; expires=Thu, 01 Jan 1970 00:00:00 GMT"
-      return cookies_enabled
-
-    @_thirdPartyCookiesEnabled: ->
-      promise = new Promise()
-
-      BrowserHelper._setUpCallbacks Settings.commands_queue, promise
-      BrowserHelper._createScript Settings.url.utils.third_party_step1()
-
-      promise.then -> BrowserHelper._cleanUpCallbacks Settings.commands_queue
-
-    @checkCookies: ->
-      promise = new Promise()
-
-      BrowserHelper._thirdPartyCookiesEnabled().then (third_enabled)->
-        promise.resolve
-          first: Utils._firstPartyCookiesEnabled()
-          third: third_enabled
-
-      promise
-
     ###
      * IE:
      *  Versions < IE8 do not support inline images.

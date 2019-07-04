@@ -79,11 +79,6 @@ define ->
       beacon: (analytics_session)->
         "@@analytics_base_url@@url.beacon"
 
-      utils:
-        # Helper endpoints to detect whether 3rd party cookies are enabled or not
-        third_party_step1: -> "@@analytics_base_url@@url.utils.third_party_step1"
-        third_party_step2: -> "@@analytics_base_url@@url.utils.third_party_step2"
-
     api:
       settings:
         key: '@@api.settings.key'

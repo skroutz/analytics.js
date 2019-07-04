@@ -34,9 +34,6 @@ url:
     create: "/track/create?shop_code=#{shop_code}&flavor=#{flavor}&metadata=#{metadata}"
     connect: "/track/connect?shop_code=#{shop_code}"
   beacon: "/track/actions/create?analytics_session=#{analytics_session}"
-  utils:
-    third_party_step1: "/track/check/third_party/step_1.js"
-    third_party_step2: "/track/check/third_party/step_2.js"
 
 params:
   analytics_session: "analytics_session"
