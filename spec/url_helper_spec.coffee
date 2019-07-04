@@ -169,3 +169,10 @@ describe 'URLHelper', ->
         params = { 'ελλη=νικά': 'xxxx', foo: 'bar' }
 
         expect(@subject.getParamsFromUrl(url)).to.deep.equal(params)
+
+    context 'when contains hash', ->
+      it 'returns the proper JSON object', ->
+        url = 'http://foo.bar?foo=bar#a_hash'
+        params = { foo: 'bar' }
+
+        expect(@subject.getParamsFromUrl(url)).to.deep.equal(params)

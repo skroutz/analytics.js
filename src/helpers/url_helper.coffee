@@ -33,11 +33,13 @@ define ['settings'], (Settings)->
 
     # https://stackoverflow.com/a/1099670/4375736
     getParamsFromUrl: (url = Settings.url.current) ->
+      url = url.split('#')[0] # drop hash from url, if exists
       regex  = /[?&;](.+?)=([^&;]+)/g
       params = {}
-      if url
-        while match = regex.exec(url)
-          params[decodeURIComponent(match[1])] = decodeURIComponent(match[2])
-      return params
+
+      while match = regex.exec(url)
+        params[decodeURIComponent(match[1])] = decodeURIComponent(match[2])
+
+      params
 
   return URLHelper
