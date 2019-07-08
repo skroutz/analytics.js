@@ -35,17 +35,22 @@ define ->
       url: '@@params.url'
       referrer: '@@params.referrer'
       shop_code: '@@params.shop_code'
+      metadata: '@@params.metadata'
       actions: '@@params.actions'
 
     ###
     Cookies
     ###
     cookies:
-      first_party_enabled: @@cookies.first_party_enabled
       version: @@cookies.version
       analytics:
         name: '@@cookies.analytics.name'
         duration: @@cookies.analytics.duration
+      session:
+        name: '@@cookies.session.name'
+        duration: @@cookies.session.duration
+      meta:
+        name: '@@cookies.meta.name'
 
     ###
     Backend Endpoints
@@ -58,10 +63,11 @@ define ->
         Analytics Tracking Session Creation Endpoint
         @param [String] shop_code Analytics code of the tracked shop
         @param [String] flavor Application name
+        @param [String] session The analytics session extracted from the first party cookie
         @param [String] metadata Additional metadata provided by the base Application
         @return [String] The formatted URL
         ###
-        create: (shop_code, flavor, metadata) ->
+        create: (shop_code, flavor, session, metadata) ->
           "@@analytics_base_url@@url.analytics_session.create"
 
         ###
@@ -78,11 +84,6 @@ define ->
       ###
       beacon: (analytics_session)->
         "@@analytics_base_url@@url.beacon"
-
-      utils:
-        # Helper endpoints to detect whether 3rd party cookies are enabled or not
-        third_party_step1: -> "@@analytics_base_url@@url.utils.third_party_step1"
-        third_party_step2: -> "@@analytics_base_url@@url.utils.third_party_step2"
 
     api:
       settings:
@@ -128,5 +129,9 @@ define ->
 
   # The URL of the previous webpage from which a link was followed
   Settings.url.referrer = Settings.window.document.referrer
+
+  Settings.url.hostname = Settings.window.location.hostname
+
+  Settings.custom_tlds = @@custom_tlds
 
   return Settings

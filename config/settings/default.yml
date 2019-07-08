@@ -5,12 +5,18 @@ common:
 xdomain_session_timeout: 5000
 auto_pageview_timeout: 1000
 send_auto_pageview: true
+custom_tlds:
+  - skroutzstore.gr
 cookies:
-  first_party_enabled: true
   version: 1
   analytics:
     name: "__sa_session"
     duration: 1800 # 30 minutes
+  session:
+    name: "__skr_nltcs_ss"
+    duration: 60*60*24*30 # 30 days
+  meta:
+    name: "__skr_nltcs_mt"
 
 api:
   settings:
@@ -31,12 +37,9 @@ api:
 
 url:
   analytics_session:
-    create: "/track/create?shop_code=#{shop_code}&flavor=#{flavor}&metadata=#{metadata}"
+    create: "/track/create?shop_code=#{shop_code}&flavor=#{flavor}&session=#{session}&metadata=#{metadata}"
     connect: "/track/connect?shop_code=#{shop_code}"
   beacon: "/track/actions/create?analytics_session=#{analytics_session}"
-  utils:
-    third_party_step1: "/track/check/third_party/step_1.js"
-    third_party_step2: "/track/check/third_party/step_2.js"
 
 params:
   analytics_session: "analytics_session"
@@ -44,4 +47,5 @@ params:
   url: 'url'
   referrer: 'referer' # Misspelling of referrer, check https://en.wikipedia.org/wiki/HTTP_referer
   shop_code: 'shop_code'
+  metadata: 'metadata'
   actions: 'actions'
