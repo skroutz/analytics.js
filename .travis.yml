@@ -4,3 +4,6 @@ node_js:
    - "8.11.1"
 script:
   - yarn run test
+notifications:
+  slack:
+    secure: WjAMfg4XM4r3ppsTOxzYNhuWUkBujlQjNm0wQee7jbvVAbCOcim1yqoK5Oc8emuHUVqcB7fr59kd7nf4tOqwlDbW0hWwswsDdUG61uRxj6OL8X6BYI0cmlL2GALNqAnbM/+bI7PieXYXV0fsK+0BlcYwzUcVTgKl30Ey9gCONX4=
