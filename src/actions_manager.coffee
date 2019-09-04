@@ -2,10 +2,9 @@ define [
   'settings'
   'reporter'
   'runnable'
-  'helpers/url_helper'
   'validator'
   'analytics_url'
-], (Settings, Reporter, Runnable, URLHelper, Validator, AnalyticsUrl) ->
+], (Settings, Reporter, Runnable, Validator, AnalyticsUrl) ->
   class ActionsManager
     ActionsManager::[key] = method for key, method of Runnable
 
