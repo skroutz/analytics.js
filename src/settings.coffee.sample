@@ -37,6 +37,7 @@ define ->
       shop_code: '@@params.shop_code'
       metadata: '@@params.metadata'
       actions: '@@params.actions'
+      transaction_id: '@@params.transaction_id'
 
     ###
     Cookies

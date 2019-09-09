@@ -64,9 +64,9 @@ action_reporting_tests = ->
       @run()
       @payload = @sendbeacon_spy.args[0][1]
 
-    it 'has url, shop_code, referrer, metadata and actions keys', ->
+    it 'has transaction_id, url, shop_code, referrer, metadata and actions keys', ->
       p = @settings.params
-      expect(@payload).to.have.keys p.url, p.referrer,
+      expect(@payload).to.have.keys p.transaction_id, p.url, p.referrer,
                                     p.shop_code, p.metadata, p.actions
 
     it 'proper data in url key', ->
