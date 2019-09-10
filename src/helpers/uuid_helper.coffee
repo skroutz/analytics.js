@@ -7,17 +7,15 @@ References:
   https://gist.github.com/jed/982883
 ###
 define ->
-  if window.crypto
-    random = -> window.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967295
-    rng = 'cr'
-  else if window.msCrypto # for IE 11
-    random = -> window.msCrypto.getRandomValues(new Uint32Array(1))[0] / 4294967295
-    rng = 'ms'
+  cryptoObj = window.crypto or window.msCrypto # for IE 11
+
+  if cryptoObj
+    random = ->
+      # Divide a random UInt32 by the maximum value (2^32 -1) to get a result between 0 and 1
+      # https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues
+      cryptoObj.getRandomValues(new Uint32Array(1))[0] / 4294967295
   else
     random = Math.random
-    rng = 'ra'
-
-  UUID_TEMPLATE = "#{rng}-10000000-1000-4000-8000-100000000000"
 
   # algorithm from https://gist.github.com/jed/982883
   UUID =
@@ -32,6 +30,6 @@ define ->
       else
         # or otherwise a template string replacing
         # zeroes, ones, and eights with random hex digits
-        UUID_TEMPLATE.replace(/[018]/g, UUID.generate)
+        '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, UUID.generate)
 
   return UUID
