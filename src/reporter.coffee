@@ -38,13 +38,21 @@ define [
       transport_options.no_images = '' if @transport is 'script'
 
       element = document.createElement(@transport)
-      element.onload = -> promise.resolve()
-      element.onerror = -> promise.reject()
+      element.onload = =>
+        @_removeElement(element)
+        promise.resolve()
+
+      element.onerror = =>
+        @_removeElement(element)
+        promise.reject()
+
       element.src = URLHelper.appendData url, URLHelper.serialize(transport_options)
 
       sibling = document.getElementsByTagName('script')[0]
       sibling.parentNode.insertBefore(element, sibling)
 
       promise
+
+    _removeElement: (elem) -> elem.parentNode.removeChild(elem) if elem && elem.parentNode
 
   return Reporter
