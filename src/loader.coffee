@@ -22,6 +22,7 @@ library without blocking the `window.onload` event.
   iframe = document.createElement('iframe')
   iframe.src = "javascript:false"
   iframe.title = ""
+  iframe.name = "frame-#{new Date().getTime()}" # https://stackoverflow.com/a/26191196/4375736
   # iframe.role = "presentation" # a11y
 
   (iframe.frameElement or iframe).style.cssText =
