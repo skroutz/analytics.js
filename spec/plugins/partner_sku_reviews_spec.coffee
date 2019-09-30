@@ -246,7 +246,8 @@ describe 'PartnerSkuReviews', ->
     if typeof value == 'undefined' then defaultValue else value
 
   setSaPlugins = (defaults, { shop_code, extended_widget_enabled, extended_widget_reviews_count,
-                              extended_widget_theme, inline_widget_enabled, inline_widget_theme, sku_specs_visible }) ->
+                              extended_widget_theme, extended_widget_prompt_enabled,
+                              inline_widget_enabled, inline_widget_theme, sku_specs_visible }) ->
     window.sa_plugins =
       partner_sku_reviews:
         shop_code: shop_code || defaults.shop_code
@@ -257,6 +258,7 @@ describe 'PartnerSkuReviews', ->
           inline_widget_enabled: getDefault(inline_widget_enabled, defaults.inline_widget_enabled)
           inline_widget_theme: getDefault(inline_widget_theme, defaults.inline_widget_theme)
           sku_specs_visible: getDefault(sku_specs_visible, defaults.sku_specs_visible)
+          extended_widget_prompt_enabled: getDefault(extended_widget_prompt_enabled, defaults.extended_widget_prompt_enabled)
         data: {}
 
     window.sa_plugins.settings =
@@ -287,6 +289,7 @@ describe 'PartnerSkuReviews', ->
       inline_widget_enabled: true
       inline_widget_theme: "small-white"
       sku_specs_visible: true
+      extended_widget_prompt_enabled: true
       base: 'http://localhost:9000'
       application_base: 'http://test.skroutz.gr'
 
@@ -362,14 +365,24 @@ describe 'PartnerSkuReviews', ->
         beforeEach (done) ->
           prepare 'inline', 'extended', 'no_ratings_id', {}, done
 
-        it 'does not add the plugin style to the head', ->
-          expect(parent_doc.getElementById('sa-partner-sku-reviews-style')).to.not.exist
+        it 'adds the plugin style to the head', ->
+          expect(parent_doc.getElementById('sa-partner-sku-reviews-style')).to.exist
 
         it 'does not render the inline widget', ->
           expect(parent_doc.getElementById('@@flavor-product-reviews-inline').innerHTML.trim()).to.be.empty
 
-        it 'does not render the extended widget', ->
-          expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
+        it 'renders the extended widget', ->
+          expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.not.be.empty
+
+        context 'and extended widget prompt is disabled', ->
+          beforeEach (done) ->
+            prepare 'inline', 'extended', 'no_ratings_id', { extended_widget_prompt_enabled: false }, done
+
+          it 'does not add the plugin style to the head', ->
+            expect(parent_doc.getElementById('sa-partner-sku-reviews-style')).to.not.exist
+
+          it 'does not render the extended widget', ->
+            expect(parent_doc.getElementById('@@flavor-product-reviews-extended').innerHTML.trim()).to.be.empty
 
   describe 'inline widget', ->
     beforeEach (done) ->
@@ -585,6 +598,37 @@ describe 'PartnerSkuReviews', ->
 
             it 'doesn\'t display any sentiment', ->
               expect(@subject.querySelectorAll('.sa-review-sentiment').length).to.eq(0)
+
+          context 'when there are no ratings', ->
+            beforeEach (done) ->
+              prepare 'extended', 'no_ratings_id', {}, =>
+                @subject = parent_doc.getElementById('@@flavor-product-reviews-extended')
+                done()
+
+            it 'doesn\'t display rating details', ->
+              expect(@subject.querySelector('.sa-sku-details')).to.not.exist
+
+            it 'displays "add a review" button', ->
+              expect(@subject.querySelector('.sa-review-prompt-button').innerHTML.trim()).to.not.be.empty
+
+            describe '"add a review" button', ->
+              beforeEach ->
+                @subject = parent_doc.querySelector('.sa-review-prompt-button')
+
+              it 'targets a blank browsing context', ->
+                expect(@subject.getAttribute('target')).to.eq('_blank')
+
+              it 'is nofollow', ->
+                expect(@subject.getAttribute('rel')).to.eq('nofollow')
+
+              it 'links to current SKU\'s "write a review" page', ->
+                application_base = window.sa_plugins.settings.url.application_base
+                sku_id = PRODUCT_REVIEWS['no_ratings_id'].sku_id
+
+                expect(@subject.href).to.contain("#{application_base}/account/products/#{sku_id}/reviews/new")
+
+              it 'sets "partner_sku_reviews_prompt" as "from" param', ->
+                expect(@subject.href).to.contain("from=partner_sku_reviews_prompt")
 
   describe 'modal', ->
     beforeEach (done) ->
