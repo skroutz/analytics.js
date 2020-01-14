@@ -44,14 +44,24 @@ define ->
     ###
     cookies:
       version: @@cookies.version
-      analytics:
-        name: '@@cookies.analytics.name'
-        duration: @@cookies.analytics.duration
-      session:
-        name: '@@cookies.session.name'
-        duration: @@cookies.session.duration
-      meta:
-        name: '@@cookies.meta.name'
+      basic:
+        analytics:
+          name: '@@cookies.basic.analytics.name'
+          duration: @@cookies.basic.analytics.duration
+        session:
+          name: '@@cookies.basic.session.name'
+          duration: @@cookies.basic.session.duration
+        meta:
+          name: '@@cookies.basic.meta.name'
+      full:
+        analytics:
+          name: '@@cookies.full.analytics.name'
+          duration: @@cookies.full.analytics.duration
+        session:
+          name: '@@cookies.full.session.name'
+          duration: @@cookies.full.session.duration
+        meta:
+          name: '@@cookies.full.meta.name'
 
     ###
     Backend Endpoints

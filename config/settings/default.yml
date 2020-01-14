@@ -9,14 +9,24 @@ custom_tlds:
   - skroutzstore.gr
 cookies:
   version: 1
-  analytics:
-    name: "__sa_session"
-    duration: 1800 # 30 minutes
-  session:
-    name: "__skr_nltcs_ss"
-    duration: 60*60*24*30 # 30 days
-  meta:
-    name: "__skr_nltcs_mt"
+  basic:
+    analytics:
+      name: '__b_sa_session'
+      duration: 1800 # 30 minutes
+    session:
+      name: '__b_skr_nltcs_ss'
+      duration: 60*60*24*7 # 7 days
+    meta:
+      name: '__b_skr_nltcs_mt'
+  full:
+    analytics:
+      name: '__sa_session'
+      duration: 1800 # 30 minutes
+    session:
+      name: '__skr_nltcs_ss'
+      duration: 60*60*24*30 # 30 days
+    meta:
+      name: '__skr_nltcs_mt'
 
 api:
   settings:
