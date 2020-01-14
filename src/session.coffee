@@ -91,6 +91,7 @@ define [
                         @shop_code,
                         @flavor,
                         @analytics_session,
+                        @cookie_policy,
                         encodeURIComponent(JSON.stringify(@metadata)))
         .then(@_onCreateSessionSuccess, @_onSessionError)
 

@@ -47,7 +47,7 @@ api:
 
 url:
   analytics_session:
-    create: "/track/create?shop_code=#{shop_code}&flavor=#{flavor}&session=#{session}&metadata=#{metadata}"
+    create: "/track/create?shop_code=#{shop_code}&flavor=#{flavor}&session=#{session}&cp=#{cookie_policy}&metadata=#{metadata}"
     connect: "/track/connect?shop_code=#{shop_code}"
   beacon: "/track/actions/create?analytics_session=#{analytics_session}"
 

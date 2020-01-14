@@ -75,10 +75,11 @@ define ->
         @param [String] shop_code Analytics code of the tracked shop
         @param [String] flavor Application name
         @param [String] session The analytics session extracted from the first party cookie
+        @param [String] cookie_policy The cookie policy specified in metadata
         @param [String] metadata Additional metadata provided by the base Application
         @return [String] The formatted URL
         ###
-        create: (shop_code, flavor, session, metadata) ->
+        create: (shop_code, flavor, session, cookie_policy, metadata) ->
           "@@analytics_base_url@@url.analytics_session.create"
 
         ###

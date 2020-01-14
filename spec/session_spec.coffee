@@ -53,9 +53,13 @@ on_create_session_retrieval_tests = (cookie_exists = false, session_from_cookie 
     @init()
     expect(@xdomain_spy.args[0][3]).to.equal session_from_cookie
 
+  it 'passes cookie_policy to Xdomain engine', ->
+    @init()
+    expect(@xdomain_spy.args[0][4]).to.equal @cookie_policy
+
   it 'passes metadata to Xdomain engine', ->
     @init()
-    expect(@xdomain_spy.args[0][4]).to.equal encodeURIComponent(JSON.stringify(@metadata))
+    expect(@xdomain_spy.args[0][5]).to.equal encodeURIComponent(JSON.stringify(@metadata))
 
   context 'when the XDomain engine resolves', ->
     beforeEach ->

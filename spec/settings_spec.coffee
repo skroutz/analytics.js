@@ -214,6 +214,7 @@ describe 'Settings', ->
         @shop_code = 'shop_code_1'
         @flavor = 'skroutz'
         @analytics_session = 'analytics_session'
+        @cookie_policy = 'full'
         @metadata = JSON.stringify({ app_type: 'web', tags: 'tag1,tag2' })
 
       describe '.create', ->
@@ -222,10 +223,14 @@ describe 'Settings', ->
                      "?shop_code=#{@shop_code}" +
                      "&flavor=#{@flavor}" +
                      "&session=#{@analytics_session}" +
+                     "&cp=#{@cookie_policy}" +
                      "&metadata=#{@metadata}"
 
-          expect(@settings.url.analytics_session.create(@shop_code, @flavor, @analytics_session, @metadata))
-            .to.equal(endpoint)
+          expect(
+            @settings.url.analytics_session.create(
+              @shop_code, @flavor, @analytics_session, @cookie_policy, @metadata
+            )
+          ).to.equal(endpoint)
 
       describe '.connect', ->
         it 'returns the proper connect endpoint', ->
