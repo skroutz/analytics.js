@@ -15,7 +15,7 @@ define [
       @promise = new Promise()
       @domain = new DomainExtractor(Settings.url.hostname).get()
       @_cleanUpCookies()
-      @analytics_session = @_getSessionFromCookie()
+      [@analytics_session, @cookie_policy] = @_getSessionFromCookie()
       @transaction_id = UUID.generate()
 
     then: (success, fail) -> @promise.then(success, fail)
@@ -23,6 +23,8 @@ define [
     _commands:
       session:
         create: (shop_code, flavor, metadata) ->
+          @cookie_policy = if metadata.cp == 'b' then 'basic' else 'full'
+
           @shop_code = shop_code
           @flavor = flavor
           @metadata = metadata
@@ -34,7 +36,7 @@ define [
           return console?.warn?('Connect called multiple times') if @shop_code
 
           @shop_code = shop_code
-          @metadata = @_getMetadataFromCookie()
+          @metadata = @_getMetadataFromCookie() if @cookie_policy
 
           @plugins_manager.session = @
           @plugins_manager.notify('connect', {})
@@ -43,7 +45,8 @@ define [
           @_setAnalyticsSession(skr_prm)
           @_setAnalyticsMetadata(skr_prm)
 
-          @analytics_session ||= @_getSessionFromCacheCookie()
+          [@analytics_session, @cookie_policy] = @_getSessionFromCacheCookie() unless @analytics_session
+
           return @promise.resolve(@) if @analytics_session
 
           @_extractAnalyticsSessionOnConnect('connect', shop_code)
@@ -52,7 +55,12 @@ define [
       cookie_settings = Settings.cookies
       options = { domain: @domain } if @domain
 
-      for cookie_name in [cookie_settings.analytics.name, cookie_settings.session.name]
+      cookies = [
+        cookie_settings.basic.analytics.name, cookie_settings.basic.session.name
+        cookie_settings.full.analytics.name, cookie_settings.full.session.name
+      ]
+
+      for cookie_name in cookies
         cookie_data = Biskoto.get(cookie_name)
         continue unless cookie_data
 
@@ -60,15 +68,23 @@ define [
           Biskoto.expire(cookie_name, options)
 
     _getSessionFromCacheCookie: ->
-      data = Biskoto.get(Settings.cookies.analytics.name)
-      if data then data.analytics_session else null
+      if data = Biskoto.get(Settings.cookies.full.analytics.name)
+        [data.analytics_session, 'full']
+      else if data = Biskoto.get(Settings.cookies.basic.analytics.name)
+        [data.analytics_session, 'basic']
+      else
+        [null, null]
 
     _getSessionFromCookie: ->
-      data = Biskoto.get(Settings.cookies.session.name)
-      if data then data.session else null
+      if data = Biskoto.get(Settings.cookies.full.session.name)
+        [data.session, 'full']
+      else if data = Biskoto.get(Settings.cookies.basic.session.name)
+        [data.session, 'basic']
+      else
+        [null, null]
 
     _getMetadataFromCookie: ->
-      Biskoto.get(Settings.cookies.meta.name)
+      Biskoto.get(Settings.cookies[@cookie_policy].meta.name)
 
     _extractAnalyticsSessionOnCreate: ->
       new XDomainEngine('create',
@@ -95,8 +111,16 @@ define [
 
     _onConnectSessionSuccess: (session) =>
       if session
-        @analytics_session = session
-        @_createSessionCacheCookie(session)
+        try
+          session = JSON.parse(session)
+
+          @analytics_session = session.session
+          @cookie_policy = session.cookie_policy
+        catch # TODO remove me after successfully transition to new mechanism
+          @analytics_session = session
+          @cookie_policy = 'full'
+
+        @_createSessionCacheCookie(@analytics_session)
 
         @promise.resolve(@)
       else
@@ -106,6 +130,8 @@ define [
       return unless skr_prm?.session
 
       @analytics_session = skr_prm.session
+      @cookie_policy = if skr_prm.metadata.cp == 'b' then 'basic' else 'full'
+
       @_createSessionCookie()
 
     _setAnalyticsMetadata: (skr_prm) ->
@@ -119,24 +145,32 @@ define [
         version: Settings.cookies.version
         analytics_session: analytics_session
 
-      options = expires: Settings.cookies.analytics.duration
+      options = expires: Settings.cookies[@cookie_policy].analytics.duration
       options.domain = @domain if @domain
 
-      Biskoto.set Settings.cookies.analytics.name, cookie_data, options
+      Biskoto.set Settings.cookies[@cookie_policy].analytics.name, cookie_data, options
 
     _createSessionCookie: ->
       session_data =
         version: Settings.cookies.version
         session: @analytics_session
 
-      options = expires: Settings.cookies.session.duration
+      options = expires: Settings.cookies[@cookie_policy].session.duration
       options.domain = @domain if @domain
 
-      Biskoto.set Settings.cookies.session.name, session_data, options
+      Biskoto.set Settings.cookies[@cookie_policy].session.name, session_data, options
+
+      # Delete other's cookie policy's cookie
+      delete_cookie = if @cookie_policy == 'basic' then 'full' else 'basic'
+      Biskoto.expire Settings.cookies[delete_cookie].session.name, options
 
     _createMetadataCookie: ->
       options = { domain: @domain } if @domain
 
-      Biskoto.set Settings.cookies.meta.name, @metadata, options
+      Biskoto.set Settings.cookies[@cookie_policy].meta.name, @metadata, options
+
+      # Delete other's cookie policy's cookie
+      delete_cookie = if @cookie_policy == 'basic' then 'full' else 'basic'
+      Biskoto.expire Settings.cookies[delete_cookie].meta.name, options
 
   return Session
