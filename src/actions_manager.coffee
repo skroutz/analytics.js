@@ -41,7 +41,9 @@ define [
               throw e
 
           @_reportAction 'ecommerce', 'addOrder', data, -> callback() if callback
-          @plugins_manager.notify('order', data)
+
+          # Do not display OrderStash widget fo users that haven't opted in for full experience
+          @plugins_manager.notify('order', data) if @session.cookie_policy == 'full'
 
         addItem: (data, callback) ->
           clearTimeout @pageview_timeout

@@ -398,6 +398,30 @@ describe 'ActionsManager', ->
 
         action_reporting_tests()
 
+        describe 'notify plugin manager', ->
+          beforeEach ->
+            @spy_notify = sinon.spy(@plugins_manager, 'notify')
+
+          afterEach ->
+            @spy_notify.restore()
+            @session.cookie_policy = @cookie_policy # restore initial value
+
+          context 'when cookie_policy is set to full', ->
+            it 'notifies the plugins manager', ->
+              @session.cookie_policy = 'full'
+
+              @run()
+
+              expect(@spy_notify).to.be.calledWithExactly('order', @data)
+
+          context 'when cookie_policy is set to basic', ->
+            it 'does not notify the plugins manager', ->
+              @session.cookie_policy = 'basic'
+
+              @run()
+
+              expect(@spy_notify).to.not.be.called
+
         context 'when callback is supplied', ->
           beforeEach ->
             @callback_spy = sinon.spy()
