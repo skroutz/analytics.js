@@ -38,20 +38,31 @@ define ->
       metadata: '@@params.metadata'
       actions: '@@params.actions'
       transaction_id: '@@params.transaction_id'
+      cookie_policy: '@@params.cookie_policy'
 
     ###
     Cookies
     ###
     cookies:
       version: @@cookies.version
-      analytics:
-        name: '@@cookies.analytics.name'
-        duration: @@cookies.analytics.duration
-      session:
-        name: '@@cookies.session.name'
-        duration: @@cookies.session.duration
-      meta:
-        name: '@@cookies.meta.name'
+      basic:
+        analytics:
+          name: '@@cookies.basic.analytics.name'
+          duration: @@cookies.basic.analytics.duration
+        session:
+          name: '@@cookies.basic.session.name'
+          duration: @@cookies.basic.session.duration
+        meta:
+          name: '@@cookies.basic.meta.name'
+      full:
+        analytics:
+          name: '@@cookies.full.analytics.name'
+          duration: @@cookies.full.analytics.duration
+        session:
+          name: '@@cookies.full.session.name'
+          duration: @@cookies.full.session.duration
+        meta:
+          name: '@@cookies.full.meta.name'
 
     ###
     Backend Endpoints
@@ -65,10 +76,11 @@ define ->
         @param [String] shop_code Analytics code of the tracked shop
         @param [String] flavor Application name
         @param [String] session The analytics session extracted from the first party cookie
+        @param [String] cookie_policy The cookie policy specified in metadata
         @param [String] metadata Additional metadata provided by the base Application
         @return [String] The formatted URL
         ###
-        create: (shop_code, flavor, session, metadata) ->
+        create: (shop_code, flavor, session, cookie_policy, metadata) ->
           "@@analytics_base_url@@url.analytics_session.create"
 
         ###

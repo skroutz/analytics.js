@@ -67,16 +67,20 @@ action_reporting_tests = ->
     it 'has transaction_id, url, shop_code, referrer, metadata and actions keys', ->
       p = @settings.params
       expect(@payload).to.have.keys p.transaction_id, p.url, p.referrer,
-                                    p.shop_code, p.metadata, p.actions
+                                    p.shop_code, p.cookie_policy, p.metadata,
+                                    p.actions
 
-    it 'proper data in url key', ->
+    it 'has proper data in url key', ->
       expect(@payload.url).to.equal @settings.url.current
 
-    it 'proper data in referrer key', ->
+    it 'has proper data in referrer key', ->
       expect(@payload.referer).to.equal @settings.url.referrer
 
-    it 'proper data in shop_code key', ->
+    it 'has proper data in shop_code key', ->
       expect(@payload.shop_code).to.equal @shop_code
+
+    it 'has proper data in cookie_policy key', ->
+      expect(@payload.cp).to.equal @cookie_policy
 
     it 'has an array as value to the actions key', ->
       expect(@payload.actions).to.be.an('array')
@@ -96,6 +100,7 @@ action_reporting_tests = ->
 describe 'ActionsManager', ->
   before (done) ->
     @analytics_session = 'analytics_session'
+    @cookie_policy = 'cookie_policy'
     @shop_code = 'shop_code'
 
     @reset_saq = ->
@@ -132,6 +137,7 @@ describe 'ActionsManager', ->
 
         @session = new Session(@plugins_manager)
         @session.analytics_session = @analytics_session
+        @session.cookie_policy = @cookie_policy
         @session.shop_code = @shop_code
         @plugins_manager.session = @session
 
@@ -391,6 +397,30 @@ describe 'ActionsManager', ->
           @data = VALID_ORDER_DATA_STRINGIFIED
 
         action_reporting_tests()
+
+        describe 'notify plugin manager', ->
+          beforeEach ->
+            @spy_notify = sinon.spy(@plugins_manager, 'notify')
+
+          afterEach ->
+            @spy_notify.restore()
+            @session.cookie_policy = @cookie_policy # restore initial value
+
+          context 'when cookie_policy is set to full', ->
+            it 'notifies the plugins manager', ->
+              @session.cookie_policy = 'full'
+
+              @run()
+
+              expect(@spy_notify).to.be.calledWithExactly('order', @data)
+
+          context 'when cookie_policy is set to basic', ->
+            it 'does not notify the plugins manager', ->
+              @session.cookie_policy = 'basic'
+
+              @run()
+
+              expect(@spy_notify).to.not.be.called
 
         context 'when callback is supplied', ->
           beforeEach ->

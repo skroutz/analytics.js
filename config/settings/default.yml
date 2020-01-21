@@ -9,14 +9,24 @@ custom_tlds:
   - skroutzstore.gr
 cookies:
   version: 1
-  analytics:
-    name: "__sa_session"
-    duration: 1800 # 30 minutes
-  session:
-    name: "__skr_nltcs_ss"
-    duration: 60*60*24*30 # 30 days
-  meta:
-    name: "__skr_nltcs_mt"
+  basic:
+    analytics:
+      name: '__b_sa_session'
+      duration: 1800 # 30 minutes
+    session:
+      name: '__b_skr_nltcs_ss'
+      duration: 60*60*24*7 # 7 days
+    meta:
+      name: '__b_skr_nltcs_mt'
+  full:
+    analytics:
+      name: '__sa_session'
+      duration: 1800 # 30 minutes
+    session:
+      name: '__skr_nltcs_ss'
+      duration: 60*60*24*30 # 30 days
+    meta:
+      name: '__skr_nltcs_mt'
 
 api:
   settings:
@@ -37,7 +47,7 @@ api:
 
 url:
   analytics_session:
-    create: "/track/create?shop_code=#{shop_code}&flavor=#{flavor}&session=#{session}&metadata=#{metadata}"
+    create: "/track/create?shop_code=#{shop_code}&flavor=#{flavor}&session=#{session}&cp=#{cookie_policy}&metadata=#{metadata}"
     connect: "/track/connect?shop_code=#{shop_code}"
   beacon: "/track/actions/create?analytics_session=#{analytics_session}"
 
@@ -50,3 +60,4 @@ params:
   metadata: 'metadata'
   actions: 'actions'
   transaction_id: 'transaction_id'
+  cookie_policy: 'cp'

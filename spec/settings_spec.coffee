@@ -132,17 +132,67 @@ describe 'Settings', ->
         .that.equals('transaction_id')
 
   describe '.cookies', ->
-    it 'has proper .analytics.name', ->
-      expect(@settings)
-        .to.have.deep.property('cookies.analytics.name')
-        .that.is.a('string')
-        .that.equals('__sa_session')
+    describe '.basic', ->
+      it 'has proper .analytics.name', ->
+        expect(@settings)
+          .to.have.deep.property('cookies.basic.analytics.name')
+          .that.is.a('string')
+          .that.equals('__b_sa_session')
 
-    it 'has proper .analytics.duration', ->
-      expect(@settings)
-        .to.have.deep.property('cookies.analytics.duration')
-        .that.is.an('number')
-        .that.equals( (60 * 30) )
+      it 'has proper .analytics.duration', ->
+        expect(@settings)
+          .to.have.deep.property('cookies.basic.analytics.duration')
+          .that.is.an('number')
+          .that.equals(60 * 30)
+
+      it 'has proper .session.name', ->
+        expect(@settings)
+          .to.have.deep.property('cookies.basic.session.name')
+          .that.is.a('string')
+          .that.equals('__b_skr_nltcs_ss')
+
+      it 'has proper .session.duration', ->
+        expect(@settings)
+          .to.have.deep.property('cookies.basic.session.duration')
+          .that.is.an('number')
+          .that.equals(60*60*24*7)
+
+      it 'has proper .meta.name', ->
+        expect(@settings)
+          .to.have.deep.property('cookies.basic.meta.name')
+          .that.is.a('string')
+          .that.equals('__b_skr_nltcs_mt')
+
+    describe '.full', ->
+      it 'has proper .analytics.name', ->
+        expect(@settings)
+          .to.have.deep.property('cookies.full.analytics.name')
+          .that.is.a('string')
+          .that.equals('__sa_session')
+
+      it 'has proper .analytics.duration', ->
+        expect(@settings)
+          .to.have.deep.property('cookies.full.analytics.duration')
+          .that.is.an('number')
+          .that.equals(60 * 30)
+
+      it 'has proper .session.name', ->
+        expect(@settings)
+          .to.have.deep.property('cookies.full.session.name')
+          .that.is.a('string')
+          .that.equals('__skr_nltcs_ss')
+
+      it 'has proper .session.duration', ->
+        expect(@settings)
+          .to.have.deep.property('cookies.full.session.duration')
+          .that.is.an('number')
+          .that.equals(60*60*24*30)
+
+      it 'has proper .meta.name', ->
+        expect(@settings)
+          .to.have.deep.property('cookies.full.meta.name')
+          .that.is.a('string')
+          .that.equals('__skr_nltcs_mt')
 
   describe '.url', ->
     it 'has proper .base', ->
@@ -164,6 +214,7 @@ describe 'Settings', ->
         @shop_code = 'shop_code_1'
         @flavor = 'skroutz'
         @analytics_session = 'analytics_session'
+        @cookie_policy = 'full'
         @metadata = JSON.stringify({ app_type: 'web', tags: 'tag1,tag2' })
 
       describe '.create', ->
@@ -172,10 +223,14 @@ describe 'Settings', ->
                      "?shop_code=#{@shop_code}" +
                      "&flavor=#{@flavor}" +
                      "&session=#{@analytics_session}" +
+                     "&cp=#{@cookie_policy}" +
                      "&metadata=#{@metadata}"
 
-          expect(@settings.url.analytics_session.create(@shop_code, @flavor, @analytics_session, @metadata))
-            .to.equal(endpoint)
+          expect(
+            @settings.url.analytics_session.create(
+              @shop_code, @flavor, @analytics_session, @cookie_policy, @metadata
+            )
+          ).to.equal(endpoint)
 
       describe '.connect', ->
         it 'returns the proper connect endpoint', ->

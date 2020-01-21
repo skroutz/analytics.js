@@ -41,7 +41,9 @@ define [
               throw e
 
           @_reportAction 'ecommerce', 'addOrder', data, -> callback() if callback
-          @plugins_manager.notify('order', data)
+
+          # Do not display OrderStash widget fo users that haven't opted in for full experience
+          @plugins_manager.notify('order', data) if @session.cookie_policy == 'full'
 
         addItem: (data, callback) ->
           clearTimeout @pageview_timeout
@@ -77,6 +79,7 @@ define [
       payload[params.referrer] = Settings.url.referrer
       payload[params.shop_code] = @session.shop_code
       payload[params.metadata] = @session.metadata || ''
+      payload[params.cookie_policy] = @session.cookie_policy
       payload[params.actions] = [{
         category: category
         type: type

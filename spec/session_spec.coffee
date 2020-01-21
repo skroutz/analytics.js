@@ -53,9 +53,13 @@ on_create_session_retrieval_tests = (cookie_exists = false, session_from_cookie 
     @init()
     expect(@xdomain_spy.args[0][3]).to.equal session_from_cookie
 
+  it 'passes cookie_policy to Xdomain engine', ->
+    @init()
+    expect(@xdomain_spy.args[0][4]).to.equal @cookie_policy
+
   it 'passes metadata to Xdomain engine', ->
     @init()
-    expect(@xdomain_spy.args[0][4]).to.equal encodeURIComponent(JSON.stringify(@metadata))
+    expect(@xdomain_spy.args[0][5]).to.equal encodeURIComponent(JSON.stringify(@metadata))
 
   context 'when the XDomain engine resolves', ->
     beforeEach ->
@@ -88,9 +92,11 @@ describe 'Session', ->
     @type_connect      = 'connect'
     @shop_code         = 'shop_code_1'
     @analytics_session = 'dummy_analytics_session_hash'
+    @cookie_policy     = 'full'
+    @cookie_policy_prm = 'f'
     @transaction_id    = 'dummy_transaction_id'
     @flavor            = 'flavor'
-    @metadata          = { app_type: 'web', tags: 'tag1,tag2' }
+    @metadata          = { app_type: 'web', cp: @cookie_policy_prm, tags: 'tag1,tag2' }
 
     require [
       'promise'
@@ -188,21 +194,21 @@ describe 'Session', ->
 
       @prev_cookies_version = @settings.cookies.version
 
-      @sa_cookie_name = @settings.cookies.analytics.name
+      @sa_cookie_name = @settings.cookies.full.analytics.name
       @sa_cookie_data =
         version: 1
         analytics_session: @analytics_session
       @sa_cookie_options =
-        expires: @settings.cookies.analytics.duration
+        expires: @settings.cookies.full.analytics.duration
 
-      @session_cookie_name = @settings.cookies.session.name
+      @session_cookie_name = @settings.cookies.full.session.name
       @session_cookie_data =
         version: 2
         session: 'another_dummy_session'
       @session_cookie_options =
-        expires: @settings.cookies.session.duration
+        expires: @settings.cookies.full.session.duration
 
-      @meta_cookie_name = @settings.cookies.meta.name
+      @meta_cookie_name = @settings.cookies.full.meta.name
       @meta_cookie_data = { app_type: 'mobile', tags: 'tag3, tag4' }
 
     afterEach ->
@@ -210,10 +216,6 @@ describe 'Session', ->
 
     context 'on session create', ->
       beforeEach ->
-        @parsed_settings =
-          shop_code: @shop_code
-          flavor: @flavor
-          metadata: @metadata
         @type = @type_create
         @init = =>
           sa('session', 'create', @shop_code, @flavor, @metadata)
@@ -226,6 +228,10 @@ describe 'Session', ->
         it 'initializes @analytics_session to the session first-party cookie\'s value', ->
           @init()
           expect(@instance.analytics_session).to.equal 'asd'
+
+        it 'initializes @cookie_policy to the value extracted from metadata', ->
+          @init()
+          expect(@instance.cookie_policy).to.equal 'full'
 
         context 'when cookie version has changed', ->
           beforeEach ->
@@ -246,8 +252,6 @@ describe 'Session', ->
 
     context 'on session connect', ->
       beforeEach ->
-        @parsed_settings =
-          shop_code: @shop_code
         @type = @type_connect
         @init = =>
           sa('session', 'connect', @shop_code)
@@ -294,250 +298,115 @@ describe 'Session', ->
           expect(spy_notify).to.have.been.calledOnce
 
       context 'when the skr_prm is present', ->
-        context 'and the session is present', ->
+        beforeEach ->
+          @default_params = { session: @analytics_session, metadata: @metadata }
+
+          @stub_params = (params = @default_params) =>
+            @read_params_stub = sinon.stub(@AnalyticsUrl.prototype, 'read_params').returns(params)
+
+        afterEach -> @read_params_stub.restore()
+
+        it 'it assigns the analytics session found in the skr_prm to @analytics_session', ->
+          @stub_params()
+          @init()
+
+          expect(@instance.analytics_session).to.equal @analytics_session
+
+        it 'resolves the @promise with the analytics session found in the skr_prm', (done) ->
+          @stub_params()
+          @init()
+          @instance.then (session) =>
+            expect(session.analytics_session).to.equal @analytics_session
+            done()
+
+        it 'does not use the XDomain engine to retrieve the analytics session', ->
+          @stub_params()
+          @init()
+
+          expect(@xdomain_spy).to.not.be.called
+
+        it 'does not retrieve the analytics session from the cached cookie', ->
+          @stub_params()
+          @init_no_run()
+          spy_cached_cookie = sinon.spy(@instance, '_getSessionFromCacheCookie')
+
+          @instance.run()
+
+          expect(spy_cached_cookie).to.not.be.called
+
+        it 'does not set the sa first-party cookie', ->
+          @stub_params()
+          @init()
+
+          expect(@biskoto.get(@sa_cookie_name)).to.be.null
+
+        it 'sets the session first-party cookie value', ->
+          @stub_params()
+          @init()
+
+          expect(@biskoto.get(@session_cookie_name).session).to.equal @analytics_session
+
+        it 'sets the session first-party cookie version', ->
+          @stub_params()
+          @init()
+
+          expect(@biskoto.get(@session_cookie_name).version).to.equal @settings.cookies.version
+
+        it 'it assigns the metadata found in the skr_prm to @metadata', ->
+          @stub_params({ session: @analytics_session, metadata: @metadata })
+          @init()
+
+          expect(@instance.metadata).to.deep.equal @metadata
+
+        it 'sets the metadata first-party cookie value', ->
+          @stub_params({ session: @analytics_session, metadata: @metadata })
+          @init()
+
+          expect(@biskoto.get(@meta_cookie_name)).to.deep.equal @metadata
+
+        context 'and the metadata first-party cookie already exists', ->
+          beforeEach -> @biskoto.set @meta_cookie_name, @meta_cookie_data
+
+          it 'updates the metadata first-party cookie value', ->
+            @stub_params({ session: @analytics_session, metadata: @metadata })
+            @init()
+
+            expect(@biskoto.get(@meta_cookie_name)).to.deep.equal @metadata
+
+        context 'and the session first-party cookie already exists', ->
           beforeEach ->
-            @default_params = { session: @analytics_session }
+            @biskoto.set @session_cookie_name, @session_cookie_data, @session_cookie_options
 
-            @stub_params = (params = @default_params) =>
-              @read_params_stub = sinon.stub(@AnalyticsUrl.prototype, 'read_params').returns(params)
-
-          afterEach -> @read_params_stub.restore()
-
-          it 'it assigns the analytics session found in the skr_prm to @analytics_session', ->
-            @stub_params()
-            @init()
-
-            expect(@instance.analytics_session).to.equal @analytics_session
-
-          it 'resolves the @promise with the analytics session found in the skr_prm', (done) ->
-            @stub_params()
-            @init()
-            @instance.then (session) =>
-              expect(session.analytics_session).to.equal @analytics_session
-              done()
-
-          it 'does not use the XDomain engine to retrieve the analytics session', ->
-            @stub_params()
-            @init()
-
-            expect(@xdomain_spy).to.not.be.called
-
-          it 'does not retrieve the analytics session from the cached cookie', ->
-            @stub_params()
-            @init_no_run()
-            spy_cached_cookie = sinon.spy(@instance, '_getSessionFromCacheCookie')
-
-            @instance.run()
-
-            expect(spy_cached_cookie).to.not.be.called
-
-          it 'does not set the sa first-party cookie', ->
-            @stub_params()
-            @init()
-
-            expect(@biskoto.get(@sa_cookie_name)).to.be.null
-
-          it 'sets the session first-party cookie value', ->
+          it 'updates the session first-party cookie value', ->
             @stub_params()
             @init()
 
             expect(@biskoto.get(@session_cookie_name).session).to.equal @analytics_session
 
-          it 'sets the session first-party cookie version', ->
+          it 'updates the session first-party cookie version', ->
             @stub_params()
             @init()
 
             expect(@biskoto.get(@session_cookie_name).version).to.equal @settings.cookies.version
 
-          context 'and the session first-party cookie already exists', ->
-            beforeEach ->
-              @biskoto.set @session_cookie_name, @session_cookie_data, @session_cookie_options
+        context 'and cookie_policy is specified as basic', ->
+          it 'sets the session first-party basic cookie value', ->
+            basic_session_cookie_name = @settings.cookies.basic.session.name
+            metadata = { app_type: @metadata.app_type, cp: 'b', tags: @metadata.tags }
+            @stub_params({ session: @analytics_session, metadata: metadata })
 
-            it 'updates the session first-party cookie value', ->
-              @stub_params()
-              @init()
-
-              expect(@biskoto.get(@session_cookie_name).session).to.equal @analytics_session
-
-            it 'updates the session first-party cookie version', ->
-              @stub_params()
-              @init()
-
-              expect(@biskoto.get(@session_cookie_name).version).to.equal @settings.cookies.version
-
-          context 'and the metadata are present', ->
-            it 'it assigns the metadata found in the skr_prm to @metadata', ->
-              @stub_params({ session: @analytics_session, metadata: @metadata })
-              @init()
-
-              expect(@instance.metadata).to.deep.equal @metadata
-
-            it 'sets the metadata first-party cookie value', ->
-              @stub_params({ session: @analytics_session, metadata: @metadata })
-              @init()
-
-              expect(@biskoto.get(@meta_cookie_name)).to.deep.equal @metadata
-
-            context 'and the metadata first-party cookie already exists', ->
-              beforeEach -> @biskoto.set @meta_cookie_name, @meta_cookie_data
-
-              it 'updates the metadata first-party cookie value', ->
-                @stub_params({ session: @analytics_session, metadata: @metadata })
-                @init()
-
-                expect(@biskoto.get(@meta_cookie_name)).to.deep.equal @metadata
-
-          context 'and the metadata are not present', ->
-            it 'it does not assign the @metadata', ->
-              @stub_params({ session: @analytics_session })
-              @init()
-
-              expect(@instance.metadata).to.be.null
-
-            it 'does not set the metadata first-party cookie value', ->
-              @stub_params({ session: @analytics_session })
-              @init()
-
-              expect(@biskoto.get(@meta_cookie_name)).to.be.null
-
-        context 'and the session is not present', ->
-          beforeEach ->
-            @default_params = { whateverparam: 'whatever'  }
-
-            @stub_params = (params = @default_params) =>
-              @read_params_stub = sinon.stub(@AnalyticsUrl.prototype, 'read_params').returns(params)
-
-          afterEach -> @read_params_stub.restore()
-
-          it 'does not set the session first-party cookie', ->
-            @stub_params()
             @init()
 
-            expect(@biskoto.get(@session_cookie_name)).to.be.null
+            expect(@biskoto.get(basic_session_cookie_name).session).to.equal @analytics_session
 
-          context 'and the metadata are not present', ->
-            it 'it does not assign the @metadata', ->
-              @stub_params()
-              @init()
+          it 'sets the metadata first-party basic cookie value', ->
+            basic_meta_cookie_name = @settings.cookies.basic.meta.name
+            metadata = { app_type: @metadata.app_type, cp: 'b', tags: @metadata.tags }
+            @stub_params({ session: @analytics_session, metadata: metadata })
 
-              expect(@instance.metadata).to.be.null
+            @init()
 
-            it 'does not set the metadata first-party cookie value', ->
-              @stub_params()
-              @init()
-
-              expect(@biskoto.get(@meta_cookie_name)).to.be.null
-
-          context 'and the metadata are present', ->
-            it 'it assigns the metadata found in the skr_prm to @metadata', ->
-              @stub_params({ metadata: @metadata })
-              @init()
-
-              expect(@instance.metadata).to.equal @metadata
-
-            it 'sets the metadata first-party cookie value', ->
-              @stub_params({ metadata: @metadata })
-              @init()
-
-              expect(@biskoto.get(@meta_cookie_name)).to.deep.equal @metadata
-
-          context 'and the sa first-party cookie exists', ->
-            beforeEach ->
-              @biskoto.set @sa_cookie_name, {version:1, analytics_session: 'cached_session'}, @sa_cookie_options
-
-            it 'it assigns the analytics session found in the sa first-party cookie to @analytics_session', ->
-              @stub_params()
-              @init()
-
-              expect(@instance.analytics_session).to.equal 'cached_session'
-
-            it 'retrieves the analytics session from the sa first-party cookie', ->
-              @stub_params()
-              @init_no_run()
-              spy_cached_cookie = sinon.spy(@instance, '_getSessionFromCacheCookie')
-
-              @instance.run()
-
-              expect(spy_cached_cookie).to.be.called.once
-
-            it 'resolves the @promise with the analytics session found in the sa first-party cookie', (done) ->
-              @stub_params()
-              @init()
-              @instance.then (session) =>
-                expect(session.analytics_session).to.equal 'cached_session'
-                done()
-
-            it 'does not use the XDomain engine to retrieve the analytics session', ->
-              @stub_params()
-              @init()
-
-              expect(@xdomain_spy).to.not.be.called
-
-          context 'and the sa first-party cookie does not exist', ->
-            it 'tries to extract analytics session from Xdomain engine', ->
-              @stub_params()
-              @init()
-
-              expect(@xdomain_spy).to.be.calledOnce
-
-            it 'passes type to Xdomain engine', ->
-              @stub_params()
-              @init()
-
-              expect(@xdomain_spy.args[0][0]).to.equal @type
-
-            it 'passes shop_code to Xdomain engine', ->
-              @stub_params()
-              @init()
-
-              expect(@xdomain_spy.args[0][1]).to.equal @shop_code
-
-            context 'and the XDomain engine rejects', ->
-              beforeEach ->
-                @stub_params()
-                @init()
-                @xdomain_promise.reject()
-                return
-
-              it 'it rejects the @promise', (done)->
-                resolve = ->
-                  assert.fail()
-                  done()
-                reject = ->
-                  assert.ok(true)
-                  done()
-
-                @instance.then(resolve, reject)
-
-            context 'and the XDomain engine resolves', ->
-              beforeEach ->
-                @init2 = =>
-                  @stub_params()
-                  @init()
-                  @xdomain_promise.resolve(@analytics_session)
-                  return
-
-              it 'it registers that value to @analytics_session', ->
-                @init2()
-                expect(@instance.analytics_session).to.equal @analytics_session
-
-              it 'it resolves promise with the @analytics_session value', (done) ->
-                @init2()
-                @instance.then (session) =>
-                  expect(session.analytics_session).to.equal @analytics_session
-                  done()
-
-              it 'creates the sa first-party cookie with that value', (done) ->
-                  @init2()
-                  @instance.then =>
-                    expect(@biskoto.get(@sa_cookie_name).analytics_session).to.equal @analytics_session
-                    done()
-
-              it 'creates the sa first-party cookie with proper version', (done) ->
-                @init2()
-                @instance.then =>
-                    expect(@biskoto.get(@sa_cookie_name).version).to.equal @settings.cookies.version
-                    done()
+            expect(@biskoto.get(basic_meta_cookie_name)).to.deep.equal metadata
 
       context 'when the skr_prm is not present', ->
         beforeEach ->
@@ -568,6 +437,12 @@ describe 'Session', ->
 
             expect(@instance.analytics_session).to.equal 'cached_session'
 
+          it 'it assigns cookie policy value extracted from the name of session cookie', ->
+            @stub_params()
+            @init()
+
+            expect(@instance.cookie_policy).to.equal 'full'
+
           it 'retrieves the analytics session from the sa first-party cookie', ->
             @stub_params()
             @init_no_run()
@@ -589,6 +464,27 @@ describe 'Session', ->
             @init()
 
             expect(@xdomain_spy).to.not.be.called
+
+        context 'and the sa first-party basic cookie exists', ->
+          beforeEach ->
+            basic_sa_cookie_name = @settings.cookies.basic.analytics.name
+            basic_sa_cookie_options = expires: @settings.cookies.basic.analytics.duration
+
+            @biskoto.set basic_sa_cookie_name,
+                         { version:1, analytics_session: 'basic_cached_session' },
+                         basic_sa_cookie_options
+
+          it 'it assigns the analytics session found in the sa first-party cookie to @analytics_session', ->
+            @stub_params()
+            @init()
+
+            expect(@instance.analytics_session).to.equal 'basic_cached_session'
+
+          it 'it assigns cookie policy value extracted from the name of session cookie', ->
+            @stub_params()
+            @init()
+
+            expect(@instance.cookie_policy).to.equal 'basic'
 
         context 'and the sa first-party cookie does not exist', ->
           it 'tries to extract analytics session from Xdomain engine', ->
@@ -626,17 +522,21 @@ describe 'Session', ->
 
               @instance.then(resolve, reject)
 
-          context 'and the XDomain engine resolves', ->
+          context 'and the XDomain engine resolves with full cookie_policy', ->
             beforeEach ->
               @init2 = =>
                 @stub_params()
                 @init()
-                @xdomain_promise.resolve(@analytics_session)
+                @xdomain_promise.resolve(JSON.stringify({ cookie_policy: 'full', session: @analytics_session }))
                 return
 
-            it 'it registers that value to @analytics_session', ->
+            it 'it assigns session\'s value to @analytics_session', ->
               @init2()
               expect(@instance.analytics_session).to.equal @analytics_session
+
+            it 'it assigns cookie_policy\'s value to @cookie_policy', ->
+              @init2()
+              expect(@instance.cookie_policy).to.equal 'full'
 
             it 'it resolves promise with the @analytics_session value', (done) ->
               @init2()
@@ -644,14 +544,50 @@ describe 'Session', ->
                 expect(session.analytics_session).to.equal @analytics_session
                 done()
 
-            it 'creates the sa first-party cookie with that value', (done)->
-                @init2()
-                @instance.then =>
-                  expect(@biskoto.get(@sa_cookie_name).analytics_session).to.equal @analytics_session
-                  done()
+            it 'creates the sa first-party cookie with session\'s value', (done) ->
+              @init2()
+              @instance.then =>
+                expect(@biskoto.get(@sa_cookie_name).analytics_session).to.equal @analytics_session
+                done()
 
             it 'creates the sa first-party cookie with proper version', (done) ->
               @init2()
               @instance.then =>
                   expect(@biskoto.get(@sa_cookie_name).version).to.equal @settings.cookies.version
+                  done()
+
+          context 'and the XDomain engine resolves with basic cookie_policy', ->
+            beforeEach ->
+              @init2 = =>
+                @basic_sa_cookie_name = @settings.cookies.basic.analytics.name
+
+                @stub_params()
+                @init()
+                @xdomain_promise.resolve(JSON.stringify({ cookie_policy: 'basic', session: @analytics_session }))
+                return
+
+            it 'it assigns session\'s value to @analytics_session', ->
+              @init2()
+              expect(@instance.analytics_session).to.equal @analytics_session
+
+            it 'it assigns cookie_policy\'s value to @cookie_policy', ->
+              @init2()
+              expect(@instance.cookie_policy).to.equal 'basic'
+
+            it 'it resolves promise with the @analytics_session value', (done) ->
+              @init2()
+              @instance.then (session) =>
+                expect(session.analytics_session).to.equal @analytics_session
+                done()
+
+            it 'creates the basic sa first-party cookie with session\'s value', (done) ->
+              @init2()
+              @instance.then =>
+                expect(@biskoto.get(@basic_sa_cookie_name).analytics_session).to.equal @analytics_session
+                done()
+
+            it 'creates the basic sa first-party cookie with proper version', (done) ->
+              @init2()
+              @instance.then =>
+                  expect(@biskoto.get(@basic_sa_cookie_name).version).to.equal @settings.cookies.version
                   done()
