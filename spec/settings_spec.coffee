@@ -155,7 +155,7 @@ describe 'Settings', ->
         expect(@settings)
           .to.have.deep.property('cookies.basic.session.duration')
           .that.is.an('number')
-          .that.equals(60*60*24*7)
+          .that.equals(60*60*24*30)
 
       it 'has proper .meta.name', ->
         expect(@settings)
