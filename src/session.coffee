@@ -112,14 +112,10 @@ define [
 
     _onConnectSessionSuccess: (session) =>
       if session
-        try
-          session = JSON.parse(session)
+        session = JSON.parse(session)
 
-          @analytics_session = session.session
-          @cookie_policy = session.cookie_policy
-        catch # TODO remove me after successfully transition to new mechanism
-          @analytics_session = session
-          @cookie_policy = 'full'
+        @analytics_session = session.session
+        @cookie_policy = session.cookie_policy
 
         @_createSessionCacheCookie(@analytics_session)
 
