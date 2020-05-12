@@ -64,6 +64,7 @@ describe 'PartnerSkuReviews', ->
           "review": "Κάτοχος του κινητού γύρω στον 1 μήνα , ",
           "merged_review_notice_html": '<div class="merged-review-info">Η αξιολόγηση αφορά <span>μνήμη:</span> 64 GB, <span>ram:</span> 4 GB</div>',
           "rating": 5,
+          "purchased": true,
           "created_at": "01/07/2018",
           "votes_count": 110,
           "helpful_votes_count": 108,
@@ -89,6 +90,7 @@ describe 'PartnerSkuReviews', ->
           "review": "Μετά από άλλες 20 ημέρες χρήσης να προσθέσω και τα παρακάτω:",
           "merged_review_notice_html": '',
           "rating": 5,
+          "purchased": false,
           "created_at": "21/05/2018",
           "votes_count": 202,
           "helpful_votes_count": 196,
@@ -108,6 +110,7 @@ describe 'PartnerSkuReviews', ->
           "review": "Καποιος μας κανει πλακα...α δεν ειναι ενας ειναι πολλοι.    Αν το φοβαστε σαν εταιρια δωστε 400-600 ευρω σε αλλη μαρκα να νοιωσετε \"σιγουρια\".  Το παιρνεις 160-170 ευρω ,βαζεις και το MUIU 10 που βγηκε και επισημα και εχεις ενα Αι-Phone των 500++ ευρω. Το συστηνεις ανετα,δεν εχει περιττα προγραμαμτα μεσα με το ετσι θελω ,δεν κολλαει ,4g γρηγορο wifi διπλες αποστασεις ,δεν το λυπασαι,δεν μασαει, τρεχει ,τρεχει, αναβαθμηζεται,ομορφο,ωραια ξεκουραστη και αταραχη οθονη,καμερα ανωτερη απο πολλα σε βραδυ .\r\nΤο μεγαλο μειονεκτημα του ειναι η τιμη , που οταν την αναφερεις θα κλαις τα χρηματα που εδωσες σε παλιοτερα κινητα.",
           "merged_review_notice_html": '',
           "rating": 5,
+          "purchased": false,
           "created_at": "08/08/2018",
           "votes_count": 91,
           "helpful_votes_count": 88,
@@ -127,6 +130,7 @@ describe 'PartnerSkuReviews', ->
           "review": "Πριν ξεκινήσω να καταγράψω",
           "merged_review_notice_html": '',
           "rating": 5,
+          "purchased": false,
           "created_at": "11/08/2018",
           "votes_count": 76,
           "helpful_votes_count": 74,
@@ -146,6 +150,7 @@ describe 'PartnerSkuReviews', ->
           "review": "Μετά από χρήση μίας εβδομάδας (4gb/64gb)",
           "merged_review_notice_html": '',
           "rating": 5,
+          "purchased": false,
           "created_at": "29/05/2018",
           "votes_count": 55,
           "helpful_votes_count": 53,
@@ -534,6 +539,20 @@ describe 'PartnerSkuReviews', ->
 
           it 'displays rating stars', ->
             expect(@subject.querySelector('.sa-star-rating').innerHTML.trim()).to.not.be.empty
+
+          context 'when review is associated with a purchased product', ->
+            beforeEach ->
+              @subject = parent_doc.querySelectorAll('#\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')[0]
+
+            it 'displays the verification mark', ->
+              expect(@subject.querySelector('.sa-verification-mark').innerHTML.trim()).to.not.be.empty
+
+          context 'when review is not associated with a purchased product', ->
+            beforeEach ->
+              @subject = parent_doc.querySelectorAll('#\\@\\@flavor-product-reviews-extended .sa-reviews-list .sa-review')[1]
+
+            it 'does not display the verification mark', ->
+              expect(@subject.querySelector('.sa-verification-mark')).to.not.exist
 
           context 'when review belongs to another variation product', ->
             beforeEach ->
