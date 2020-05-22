@@ -223,6 +223,16 @@ class ExtendedSkuReviews extends BaseComponent
       </div>
     """
 
+  # verification mark
+  verificationMark = (purchased) ->
+    return '' unless purchased
+    
+    """
+      <div class="sa-verification-mark">
+        @@translations.partner_sku_reviews.verified_purchase
+      </div>
+    """
+
   userReviews = (reviews) ->
     review_elements = reviews.map (review, index) ->
       user = review.user
@@ -237,16 +247,19 @@ class ExtendedSkuReviews extends BaseComponent
             <img class="sa-review-avatar" src="#{user.avatar}" alt="avatar of user #{user.username}"/>
             <div class="sa-review-info-wrap">
               <div class="sa-review-info">
-                #{stars(review.rating)}
-                #{helpfulVoting(review.helpful_votes_count, review.votes_count)}
+                <div class="sa-review-voting-info">
+                  #{stars(review.rating)}
+                  #{helpfulVoting(review.helpful_votes_count, review.votes_count)}
+                </div>
+                <div class="sa-authorship-info">
+                  <span class="sa-review-author">#{user.username}</span>
+                  <span class="sa-review-date-wrap">
+                    <span class="sa-review-at">@@translations.partner_sku_reviews.at</span>
+                    <span class="sa-review-date">#{review.created_at}</span>
+                  </span>
+                </div>
               </div>
-              <div class="sa-authorship-info">
-                <span class="sa-review-author">#{user.username}</span>
-                <span class="sa-review-date-wrap">
-                  <span class="sa-review-at">@@translations.partner_sku_reviews.at</span>
-                  <span class="sa-review-date">#{review.created_at}</span>
-                </span>
-              </div>
+              #{verificationMark(review.purchased)}
             </div>
           </div>
           <div class="sa-review-main">
@@ -1135,19 +1148,44 @@ class PartnerSkuReviews
     }
 
     ##{flavor}-product-reviews-extended .sa-review-info-wrap {
+      display: flex;
+      flex-wrap: wrap;
       flex: 1 1 auto;
       -ms-flex: 1 1 auto;
+      /* We use a negative margin-top as an alternative to row-gap. A feature of flex box that has not been implemented yet. */
+      margin-top: -5px;
     }
 
-    ##{flavor}-product-reviews-extended .sa-review-info {
+    ##{flavor}-product-reviews-extended .sa-review-info-wrap > * {
+      margin-top: 5px;
+    }
+
+    ##{flavor}-product-reviews-extended .sa-review-voting-info {
       display: block;
       margin: 2px 0;
     }
 
-    ##{flavor}-product-reviews-extended .sa-review-info > *,
+    ##{flavor}-product-reviews-extended .sa-verification-mark {
+      font-size: 11px;
+      line-height: 20px;
+      color: #707070;
+    }
+
+    ##{flavor}-product-reviews-extended .sa-verification-mark:before {
+      content: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMTQiIHZpZXdCb3g9IjAgMCA4MCA4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSIjNWNiODVjIj48cGF0aCBkPSJNMjUuNiAzMy44bC01LjUgNS44IDE1LjQgMTQuNSA0MS4xLTM5LjItNS41LTUuOC0zNS42IDM0eiIvPjxwYXRoIGQ9Ik02NC44IDM1Yy40IDEuOC42IDMuNi42IDUuNSAwIDE0LjctMTEuOSAyNi42LTI2LjYgMjYuNlMxMi4xIDU1LjIgMTIuMSA0MC41IDI0IDEzLjkgMzguNyAxMy45YzUuMyAwIDEwLjMgMS42IDE0LjUgNC4zbDUuNi01LjljLTUuNy00LTEyLjYtNi40LTIwLjEtNi40LTE5LjEgMC0zNC42IDE1LjUtMzQuNiAzNC42czE1LjUgMzQuNiAzNC42IDM0LjYgMzQuNi0xNS41IDM0LjYtMzQuNmMwLTQuMy0uOC04LjQtMi4yLTEyLjJMNjQuOCAzNXoiLz48L2c+PC9zdmc+");
+      vertical-align: text-top;
+    }
+
+    ##{flavor}-product-reviews-extended .sa-review-voting-info > *,
     ##{flavor}-product-reviews-extended .sa-authorship-info > * {
       display: inline;
       vertical-align: middle;
+    }
+
+    ##{flavor}-product-reviews-extended .sa-review-info {
+      flex: 1 1 auto;
+      -ms-flex: 1 1 auto;
+      margin-right: 100px;
     }
 
     ##{flavor}-product-reviews-extended .sa-review .sa-star-rating-wrapper {
