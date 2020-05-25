@@ -226,7 +226,7 @@ class ExtendedSkuReviews extends BaseComponent
   # verification mark
   verificationMark = (purchased) ->
     return '' unless purchased
-    
+
     """
       <div class="sa-verification-mark">
         @@translations.partner_sku_reviews.verified_purchase
@@ -1141,7 +1141,7 @@ class PartnerSkuReviews
     ##{flavor}-product-reviews-extended .sa-review-avatar {
       overflow: hidden;
       min-width: 40px;
-      height: 40px;
+      height: 40px !important;
       margin: 0 10px 0 0;
       border: 1px solid #e8e8e8;
       border-radius: 50%;
