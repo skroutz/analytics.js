@@ -1,5 +1,6 @@
 .ruby-gemset
 .ruby-version
+log
 compiled
 config/deploy.rb
 config/deploy/

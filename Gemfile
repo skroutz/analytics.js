@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
 group :development, :test do
-  gem 'capistrano', '~> 3.2.1', require: false
+  gem 'capistrano', '~> 3.14.0', require: false
 end
 
