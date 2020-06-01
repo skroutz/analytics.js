@@ -1,5 +1,7 @@
-FROM node:8.11.1
+FROM node:10.19.0
 LABEL maintainer="analytics@skroutz.gr"
 RUN apt-get -qq update
-RUN npm -g install yarn@1.3.2 && chmod +x /usr/local/lib/node_modules/yarn/bin/yarn.js # https://github.com/nodejs/docker-node/issues/661
+RUN rm /usr/local/bin/yarn && \
+    rm /usr/local/bin/yarnpkg && \
+    npm -g install yarn@1.13.0
 WORKDIR /analytics.js
