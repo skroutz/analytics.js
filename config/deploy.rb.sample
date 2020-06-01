@@ -1,4 +1,4 @@
-lock '3.2.1'
+lock '3.14.0'
 
 set :application, 'client'
 set :repo_url, 'git@github.com:skroutz/analytics.js.git'
