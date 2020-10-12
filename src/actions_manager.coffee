@@ -11,6 +11,7 @@ define [
     constructor: (@session, @plugins_manager) ->
       @reporter = new Reporter()
       @pageview_timeout = null
+      @reported_line_items = 0
 
       @_setPageViewTimeout() if Settings.send_auto_pageview
 
@@ -49,13 +50,14 @@ define [
           clearTimeout @pageview_timeout
 
           try
-            new Validator(data, 'addItem').present('order_id', 'product_id')
+            data = new Validator(data, 'addItem').present('order_id', 'product_id').data
           catch e
             if e.name == 'ValidationError'
               return console?.error? "#{Settings.flavor}Analytics | #{e.message}"
             else
               throw e
 
+          data.rpos = @reported_line_items++ # line item reported position
           @_reportAction 'ecommerce', 'addItem', data, -> callback() if callback
 
       site:
