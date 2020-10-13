@@ -42,7 +42,7 @@ define [
 
           @_reportAction 'ecommerce', 'addOrder', data, -> callback() if callback
 
-          # Do not display OrderStash widget fo users that haven't opted in for full experience
+          # Do not display OrderStash widget for users that haven't opted in for full experience
           @plugins_manager.notify('order', data) if @session.cookie_policy == 'full'
 
         addItem: (data, callback) ->
