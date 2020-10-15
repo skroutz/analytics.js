@@ -49,7 +49,7 @@ api_session_promise_tests = ->
     it 'rejects @promise', ->
       expect(@instance.promise.state).to.equal('rejected')
 
-action_reporting_tests = ->
+action_reporting_tests = (reported_position) ->
   it 'reports an action', ->
     @run()
     expect(@sendbeacon_spy).to.be.called
@@ -92,10 +92,13 @@ action_reporting_tests = ->
       expect(@payload.actions[0]).to.be.an('object')
 
     it 'has proper data in the action\'s object', ->
+      data = JSON.parse(@data)
+      data.rpos = reported_position if reported_position != undefined
+
       expect(@payload.actions[0]).to.eql
         category: @category
         type: @type
-        data: @data
+        data: JSON.stringify(data)
 
 describe 'ActionsManager', ->
   before (done) ->
@@ -523,7 +526,7 @@ describe 'ActionsManager', ->
           @type = 'addItem'
           @data = VALID_LINE_ITEM_DATA_1_STRINGIFIED
 
-        action_reporting_tests()
+        action_reporting_tests(0)
 
         context 'when callback is supplied', ->
           beforeEach ->
@@ -562,7 +565,11 @@ describe 'ActionsManager', ->
 
           it 'stringifies the data before reporting', ->
             payload = @sendbeacon_spy.args[0][1]
-            expect(payload.actions[0].data).to.eql VALID_LINE_ITEM_DATA_1_STRINGIFIED
+
+            data = JSON.parse(VALID_LINE_ITEM_DATA_1_STRINGIFIED)
+            data.rpos = 0
+
+            expect(payload.actions[0].data).to.eql JSON.stringify(data)
 
         context 'when order_id is integer', ->
           beforeEach ->
