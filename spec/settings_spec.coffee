@@ -125,12 +125,6 @@ describe 'Settings', ->
         .that.is.a('string')
         .that.equals('shop_code')
 
-    it 'has property .transaction_id', ->
-      expect(@settings.params)
-        .to.have.property('transaction_id')
-        .that.is.a('string')
-        .that.equals('transaction_id')
-
   describe '.cookies', ->
     describe '.basic', ->
       it 'has proper .analytics.name', ->

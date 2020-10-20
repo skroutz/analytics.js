@@ -76,7 +76,6 @@ define [
       data = JSON.stringify data if typeof data != 'string'
       payload = {}
       params = Settings.params
-      payload[params.transaction_id] = @session.transaction_id
       payload[params.url] = Settings.url.current
       payload[params.referrer] = Settings.url.referrer
       payload[params.shop_code] = @session.shop_code

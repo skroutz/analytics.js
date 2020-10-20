@@ -59,5 +59,4 @@ params:
   shop_code: 'shop_code'
   metadata: 'metadata'
   actions: 'actions'
-  transaction_id: 'transaction_id'
   cookie_policy: 'cp'
