@@ -63,7 +63,6 @@ define ->
         bth[buf[i++]], bth[buf[i++]]
         bth[buf[i++]], bth[buf[i++]]
         bth[buf[i++]], bth[buf[i++]]
-        '|', new Date().getTime()
       ].join ''
 
     # generate() was taken from:
