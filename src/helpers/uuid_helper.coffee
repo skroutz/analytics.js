@@ -54,7 +54,6 @@ define ->
       bth = UUID._byteToHex
       # join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
       [
-        'ke-'
         bth[buf[i++]], bth[buf[i++]]
         bth[buf[i++]], bth[buf[i++]], '-'
         bth[buf[i++]], bth[buf[i++]], '-'
