@@ -6,8 +6,7 @@ define [
   'session_engines/xdomain_engine'
   'analytics_url'
   'domain_extractor'
-  'helpers/uuid_helper'
-], (Settings, Promise, Runnable, Biskoto, XDomainEngine, AnalyticsUrl, DomainExtractor, UUID) ->
+], (Settings, Promise, Runnable, Biskoto, XDomainEngine, AnalyticsUrl, DomainExtractor) ->
   class Session
     Session::[key] = method for key, method of Runnable
 
@@ -16,7 +15,6 @@ define [
       @domain = new DomainExtractor(Settings.url.hostname).get()
       @_cleanUpCookies()
       [@analytics_session, @cookie_policy] = @_getSessionFromCookie()
-      @transaction_id = UUID.generate()
 
     then: (success, fail) -> @promise.then(success, fail)
 
