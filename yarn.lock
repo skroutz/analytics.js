@@ -6,9 +6,9 @@
   version "0.0.0"
   resolved "https://codeload.github.com/oyvindkinsey/easyxdm/tar.gz/9c3203b0047d816a88982ec44399395215df4a9b"
 
-"@bower_components/json2@douglascrockford/JSON-js#*":
+"@bower_components/json2@douglascrockford/JSON-js#031b1d9e6971bd4c433ca85e216cc853f5a867bd":
   version "0.0.0"
-  resolved "https://codeload.github.com/douglascrockford/JSON-js/tar.gz/594c8fa5f8e3fb38b0977f1ff8a87e9d709e7db1"
+  resolved "https://codeload.github.com/douglascrockford/JSON-js/tar.gz/031b1d9e6971bd4c433ca85e216cc853f5a867bd"
 
 abbrev@1:
   version "1.1.1"

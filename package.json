@@ -31,7 +31,7 @@
     "load-grunt-tasks": "~3.5.2",
     "requirejs": "~2.3.3",
     "@bower_components/easyxdm": "oyvindkinsey/easyxdm#~2.4.19",
-    "@bower_components/json2": "douglascrockford/JSON-js#*"
+    "@bower_components/json2": "douglascrockford/JSON-js#031b1d9e6971bd4c433ca85e216cc853f5a867bd"
   },
   "devDependencies": {
     "grunt-bump": "^0.8.0",
