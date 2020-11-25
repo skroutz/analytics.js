@@ -16,7 +16,9 @@
   },
   "author": "Skroutz",
   "dependencies": {
+    "JSON-js": "douglascrockford/JSON-js#031b1d9e6971bd4c433ca85e216cc853f5a867bd",
     "coffee-script": "~1.12.4",
+    "easyxdm": "oyvindkinsey/easyxdm#~2.4.19",
     "grunt": "~1.0.1",
     "grunt-cli": "~1.2.0",
     "grunt-contrib-coffee": "~1.0.0",
@@ -29,9 +31,7 @@
     "grunt-replace": "~1.0.1",
     "grunt-shell": "~2.1.0",
     "load-grunt-tasks": "~3.5.2",
-    "requirejs": "~2.3.3",
-    "@bower_components/easyxdm": "oyvindkinsey/easyxdm#~2.4.19",
-    "@bower_components/json2": "douglascrockford/JSON-js#031b1d9e6971bd4c433ca85e216cc853f5a867bd"
+    "requirejs": "~2.3.3"
   },
   "devDependencies": {
     "grunt-bump": "^0.8.0",

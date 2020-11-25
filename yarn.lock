@@ -2,11 +2,7 @@
 # yarn lockfile v1
 
 
-"@bower_components/easyxdm@oyvindkinsey/easyxdm#~2.4.19":
-  version "0.0.0"
-  resolved "https://codeload.github.com/oyvindkinsey/easyxdm/tar.gz/9c3203b0047d816a88982ec44399395215df4a9b"
-
-"@bower_components/json2@douglascrockford/JSON-js#031b1d9e6971bd4c433ca85e216cc853f5a867bd":
+JSON-js@douglascrockford/JSON-js#031b1d9e6971bd4c433ca85e216cc853f5a867bd:
   version "0.0.0"
   resolved "https://codeload.github.com/douglascrockford/JSON-js/tar.gz/031b1d9e6971bd4c433ca85e216cc853f5a867bd"
 
@@ -995,6 +991,10 @@ dom-serialize@^2.2.0:
     ent "~2.2.0"
     extend "^3.0.0"
     void-elements "^2.0.0"
+
+easyxdm@oyvindkinsey/easyxdm#~2.4.19:
+  version "0.0.0"
+  resolved "https://codeload.github.com/oyvindkinsey/easyxdm/tar.gz/9c3203b0047d816a88982ec44399395215df4a9b"
 
 ecc-jsbn@~0.1.1:
   version "0.1.2"
