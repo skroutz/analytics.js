@@ -582,7 +582,7 @@ class PartnerSkuReviews
       background-position: center;
       background-repeat: no-repeat;
       background-size: contain;
-      margin-bottom: -4px;
+      margin-bottom: -3px;
       margin-left: -3px;
     }
 
@@ -645,7 +645,7 @@ class PartnerSkuReviews
     }
 
     ##{flavor}-product-reviews-inline .sa-rating-value {
-      font-size: 19px;
+      font-size: 17px;
       font-weight: bold;
       margin-right: 3px;
     }
@@ -653,7 +653,7 @@ class PartnerSkuReviews
     ##{flavor}-product-reviews-inline .sa-reviews-count-compact {
       font-size: 10px;
       color: #909090;
-      margin-top: 2px;
+      margin-top: 3px;
       -webkit-text-fill-color: currentColor;
     }
 
@@ -823,7 +823,7 @@ class PartnerSkuReviews
     }
 
     #{sizedSelector 'medium', '.sa-reviews-count-texty'} {
-      font-size: 12.5px;
+      font-size: 11.5px;
       margin-bottom: 5px;
       padding: 0 3px 3px 3px;
     }
@@ -881,7 +881,7 @@ class PartnerSkuReviews
 
     ##{flavor}-product-reviews-extended .sa-brand-powered-by {
       display: inline-block;
-      font-size: 13.5px;
+      font-size: 13px;
       text-transform: lowercase;
     }
 

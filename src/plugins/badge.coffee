@@ -183,7 +183,7 @@ class Badge
 
     font-family: Verdana, Arial, sans-serif !important;
     font-weight: bold;
-    font-size: 15.5px !important;
+    font-size: 14px !important;
     color: #{switch configuration.theme
                when 'white' then '#000000'
                when 'black' then '#ffffff'};
