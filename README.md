@@ -228,12 +228,15 @@ The above command is useful when in development and it will just:
 
 ## Authors
 
-- Kostas Diamantis (*[kosdiamantis](https://github.com/kosdiamantis)*)
-- Dimitris Karteris (*[dkart](https://github.com/dkart)*)
 - Harris Kokkinos (*[harrisred](https://github.com/harrisred)*)
+- Christos Melas (*[mrwhizzy](https://github.com/mrwhizzy)*)
+- Christos Gkoumas (*[MrGoumX](https://github.com/mrgoumx)*)
+- Ioannis Tholoenos (*[itholoenos](https://github.com/itholoenos)*)
 
 **Alumni**
 
+- Kostas Diamantis (*[kosdiamantis](https://github.com/kosdiamantis)*)
+- Dimitris Karteris (*[dkart](https://github.com/dkart)*)
 - Bill Trikalinos (*[billtrik](https://github.com/billtrik)*)
 - Chrisovalantis Kefalidis (*[cvkef](https://github.com/cvkef)*)
 - Fotos Georgiadis (*[fotos](https://github.com/fotos)*)
