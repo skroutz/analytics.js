@@ -39,3 +39,12 @@ describe 'Runnable', ->
       it 'does not discard the command from the queue', ->
         @subject.run()
         expect(@settings.window.sa.q).to.not.be.empty
+
+    context 'when the commands array is undefined', ->
+      before ->
+        @subject._commands = ecommerce: { addItem: sinon.spy() }
+
+      it 'does not run the command', ->
+        @settings.window.sa.q = undefined
+        @subject.run()
+        expect(@subject._commands.ecommerce.addItem).to.not.be.called
