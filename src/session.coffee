@@ -30,6 +30,8 @@ define [
           @_extractAnalyticsSessionOnCreate()
 
         connect: (shop_code)->
+          return console?.warn?('Connect called without a shop code') unless shop_code
+
           # connect should be called only once
           return console?.warn?('Connect called multiple times') if @shop_code
 
