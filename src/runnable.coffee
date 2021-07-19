@@ -10,12 +10,15 @@ define ['settings'], (Settings) ->
     then discards it.
     ###
     @run: ->
-      for _, cmd of Settings.window[Settings.command_queue_name].q.slice()
+      queue = Settings.window[Settings.command_queue_name].q
+      return @ unless queue
+
+      for _, cmd of queue.slice()
         [category, type, args...] = cmd
 
         if @_commands[category]?[type]?
           @_commands[category][type].apply(@, args)
-          Settings.window[Settings.command_queue_name].q.splice(Settings.window[Settings.command_queue_name].q.indexOf(cmd), 1)
+          queue.splice(queue.indexOf(cmd), 1)
 
       return @
 
