@@ -579,3 +579,21 @@ describe 'Session', ->
               @instance.then =>
                   expect(@biskoto.get(@basic_sa_cookie_name).version).to.equal @settings.cookies.version
                   done()
+
+      context 'when the shop_code is not present', ->
+        beforeEach ->
+          @init = =>
+            sa('session', 'connect', '')
+            @instance = new @session(@plugins_manager).run()
+
+        it 'does not call XDomainEngine', ->
+          @init()
+
+          expect(@xdomain_spy).to.not.be.called
+
+        it 'does not notify the PluginManager', ->
+          spy_notify = sinon.spy(@plugins_manager, 'notify')
+
+          @init()
+
+          expect(spy_notify).to.not.be.called
