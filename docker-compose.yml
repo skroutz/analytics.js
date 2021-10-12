@@ -1,4 +1,8 @@
-builder:
-  build: .
-  volumes:
-    - .:/analytics.js
+version: "3.5"
+
+services:
+  builder:
+    build: ./docker
+    entrypoint: ./docker/entrypoint.sh
+    volumes:
+      - .:/analytics.js
