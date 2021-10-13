@@ -6,6 +6,7 @@ define [
 ], (Settings, Session, PluginsManager, ActionsManager) ->
   class Analytics
     constructor: ->
+      console.log('Kokolala2')
       @plugins_manager = new PluginsManager
       @session = new Session(@plugins_manager)
       @actions = null
