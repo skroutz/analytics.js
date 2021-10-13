@@ -1,4 +1,4 @@
-# Analytics Client [![Build Status](https://travis-ci.org/skroutz/analytics.js.svg?branch=master)](https://travis-ci.org/skroutz/analytics.js)
+# Analytics Client [![Build Status](https://api.travis-ci.com/skroutz/analytics.js.svg?branch=master)](https://app.travis-ci.com/github/skroutz/analytics.js)
 
 Minimal cross-domain user tracking library to measure user interaction
 across Skroutz and partners' websites or web applications.
@@ -231,10 +231,11 @@ The above command is useful when in development and it will just:
 - Harris Kokkinos (*[harrisred](https://github.com/harrisred)*)
 - Christos Melas (*[mrwhizzy](https://github.com/mrwhizzy)*)
 - Christos Gkoumas (*[MrGoumX](https://github.com/mrgoumx)*)
-- Ioannis Tholoenos (*[itholoenos](https://github.com/itholoenos)*)
+- Alex Kyriakou (*[alexunder193](https://github.com/alexunder193)*)
 
 **Alumni**
 
+- Ioannis Tholoenos (*[itholoenos](https://github.com/itholoenos)*)
 - Kostas Diamantis (*[kosdiamantis](https://github.com/kosdiamantis)*)
 - Dimitris Karteris (*[dkart](https://github.com/dkart)*)
 - Bill Trikalinos (*[billtrik](https://github.com/billtrik)*)
