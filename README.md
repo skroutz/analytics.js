@@ -116,7 +116,7 @@ and then configure `config/settings/production.yml` as follows:
 
 ```
 skroutz:
-  analytics_base_url: "https://analytics.skroutz.gr"
+  analytics_base_url: "https://skroutza.skroutz.gr"
   application_base_url: "https://www.skroutz.gr"
 ```
 
@@ -140,6 +140,10 @@ So, the contents of the `dist` directory should look like this:
     ├── analytics.js.gz
     ├── analytics.min.js
     ├── analytics.min.js.gz
+    ├── skroutza.js
+    ├── skroutza.js.gz
+    ├── skroutza.min.js
+    ├── skroutza.min.js.gz
     └── js
         ├── easyXDM.min.js
         ├── easyXDM.min.js.gz

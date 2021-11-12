@@ -356,6 +356,14 @@ module.exports = (grunt) ->
         src: 'plugins/*'
         dest: '.tmp/js'
 
+      services:
+        expand: true
+        cwd: '.tmp/'
+        src: 'analytics.*'
+        dest: '.tmp/'
+        rename: (dest, src) ->
+          return dest + src.replace('analytics', 'skroutza')
+
       tmp:
         expand: true
         cwd: '.tmp/'
@@ -430,6 +438,7 @@ module.exports = (grunt) ->
       'copy:ymls'
       'create_env_settings'
       'build_dist'
+      'copy:services'
       'compress'
       'copy:tmp'
       'clean:tmp'

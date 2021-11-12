@@ -1,7 +1,7 @@
 ###
 Analytics Payload Loader
 
-This is the `analytics.js` file that loads the actual Analytics payload.
+This is the `skroutza.js` file that loads the actual Analytics payload.
 ###
 ((url)->
   try
