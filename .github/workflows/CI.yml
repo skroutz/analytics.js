@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  # manual trigger for every branch
+  workflow_dispatch:
+  # push on master and PR merge on master
+  push:
+    branches: [ master ]
+  # PRs (first and subsequent pushes)
+  pull_request:
+
+jobs:
+  test-suite:
+    runs-on: ubuntu-latest
+    steps:
+      # ===== slack start =====
+      - name: Slack tests started
+        uses: slackapi/slack-github-action@v1.16.0
+        with:
+          payload: "{\"text\": \":test_tube: ${{ github.repository }} - Tests started \",\"blocks\": [{\"type\": \"section\",\"text\": {\"type\": \"mrkdwn\",\"text\": \":test_tube: *${{ github.repository }}* - Tests <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.run_number }}> started by *${{ github.actor }}* on branch *${{ github.ref }}*\"}}]}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      # ===== checkout repos =====
+      - name: Checkout analytics.js
+        uses: actions/checkout@v2
+        with:
+          repository: skroutz/analytics.js
+          path: analytics.js
+      # ===== run tests =====
+      - name: Run tests
+        working-directory: ./analytics.js
+        run: docker-compose run --entrypoint docker/entrypoint-ci.sh builder
+      # ===== cleanup =====
+      - name: Clean analytics.js containers
+        working-directory: ./analytics.js
+        run: docker-compose down -v
+        if: ${{ always() }}
+      # ===== slack report =====
+      - name: Slack success-message
+        uses: slackapi/slack-github-action@v1.16.0
+        if: ${{ success() }}
+        with:
+          payload: "{\"text\": \":white_check_mark: ${{ github.repository }} - Tests succeeded \",\"blocks\": [{\"type\": \"section\",\"text\": {\"type\": \"mrkdwn\",\"text\": \":white_check_mark: *${{ github.repository }}* - Tests <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.run_number }}> successful by *${{ github.actor }}* on branch *${{ github.ref }}*\"}}]}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      - name: Slack fail-message
+        uses: slackapi/slack-github-action@v1.16.0
+        if: ${{ failure() }}
+        with:
+          payload: "{\"text\": \":x: ${{ github.repository }} - Tests failed \",\"blocks\": [{\"type\": \"section\",\"text\": {\"type\": \"mrkdwn\",\"text\": \":x: *${{ github.repository }}* - Tests <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.run_id }}> failed by *${{ github.actor }}* on branch *${{ github.ref }}*\"}}]}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      - name: Slack cancel-message
+        uses: slackapi/slack-github-action@v1.16.0
+        if: ${{ cancelled() }}
+        with:
+          payload: "{\"text\": \":heavy_multiplication_x: ${{ github.repository }} - Tests canceled \",\"blocks\": [{\"type\": \"section\",\"text\": {\"type\": \"mrkdwn\",\"text\": \":heavy_multiplication_x: *${{ github.repository }}* - Tests <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.run_number }}> cancelled by *${{ github.actor }}* on branch *${{ github.ref }}*\"}}]}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
