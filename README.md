@@ -1,4 +1,4 @@
-# Analytics Client [![Build Status](https://api.travis-ci.com/skroutz/analytics.js.svg?branch=master)](https://app.travis-ci.com/github/skroutz/analytics.js)
+# Analytics Client [![Build Status](https://github.com/skroutz/analytics.js/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/skroutz/analytics.js/actions/workflows/CI.yml/badge.svg)
 
 Minimal cross-domain user tracking library to measure user interaction
 across Skroutz and partners' websites or web applications.
