@@ -116,7 +116,7 @@ and then configure `config/settings/production.yml` as follows:
 
 ```
 skroutz:
-  analytics_base_url: "https://analytics.skroutz.gr"
+  analytics_base_url: "https://skroutza.skroutz.gr"
   application_base_url: "https://www.skroutz.gr"
 ```
 
@@ -136,30 +136,50 @@ So, the contents of the `dist` directory should look like this:
 ```bash
 # dist directory
 └── skroutz
-    ├── analytics.js
-    ├── analytics.js.gz
-    ├── analytics.min.js
-    ├── analytics.min.js.gz
-    └── js
-        ├── easyXDM.min.js
-        ├── easyXDM.min.js.gz
-        ├── payload.3175ee7a.js
-        ├── payload.3175ee7a.js.gz
-        ├── payload.3175ee7a.min.js
-        ├── payload.3175ee7a.min.js.gz
-        ├── payload.js
-        ├── payload.js.gz
-        ├── payload.min.js
-        ├── payload.min.js.gz
-        └── plugins
-            ├── order_stash.3c2ba10f.js
-            ├── order_stash.3c2ba10f.js.gz
-            ├── order_stash.3c2ba10f.min.js
-            ├── order_stash.3c2ba10f.min.js.gz
-            ├── order_stash.js
-            ├── order_stash.js.gz
-            ├── order_stash.min.js
-            └── order_stash.min.js.gz
+    ├── analytics.js
+    ├── analytics.js.gz
+    ├── analytics.min.js
+    ├── analytics.min.js.gz
+    ├── js
+    │   ├── easyXDM.min.js
+    │   ├── easyXDM.min.js.gz
+    │   ├── payload.1c9ad7e9.js
+    │   ├── payload.1c9ad7e9.js.gz
+    │   ├── payload.1c9ad7e9.min.js
+    │   ├── payload.1c9ad7e9.min.js.gz
+    │   ├── payload.js
+    │   ├── payload.js.gz
+    │   ├── payload.min.js
+    │   ├── payload.min.js.gz
+    │   └── plugins
+    │       ├── badge.d35279ba.js
+    │       ├── badge.d35279ba.js.gz
+    │       ├── badge.d35279ba.min.js
+    │       ├── badge.d35279ba.min.js.gz
+    │       ├── badge.js
+    │       ├── badge.js.gz
+    │       ├── badge.min.js
+    │       ├── badge.min.js.gz
+    │       ├── order_stash.cb5fbb30.js
+    │       ├── order_stash.cb5fbb30.js.gz
+    │       ├── order_stash.cb5fbb30.min.js
+    │       ├── order_stash.cb5fbb30.min.js.gz
+    │       ├── order_stash.js
+    │       ├── order_stash.js.gz
+    │       ├── order_stash.min.js
+    │       ├── order_stash.min.js.gz
+    │       ├── partner_sku_reviews.6ef6564d.js
+    │       ├── partner_sku_reviews.6ef6564d.js.gz
+    │       ├── partner_sku_reviews.6ef6564d.min.js
+    │       ├── partner_sku_reviews.6ef6564d.min.js.gz
+    │       ├── partner_sku_reviews.js
+    │       ├── partner_sku_reviews.js.gz
+    │       ├── partner_sku_reviews.min.js
+    │       └── partner_sku_reviews.min.js.gz
+    ├── skroutza.js
+    ├── skroutza.js.gz
+    ├── skroutza.min.js
+    └── skroutza.min.js.gz
 ```
 
 ## Watch and rebuild changes
