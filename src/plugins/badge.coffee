@@ -595,7 +595,12 @@ class Badge
 
   _head: -> @parent_doc.head || @parent_doc.getElementsByTagName('head')[0]
 
-  _setParentDoc: -> @parent_doc = window.parent.document
+  _setParentDoc: ->
+    @plugin_window = if window.parent?.document
+                       window.parent
+                     else
+                       window.top
+    @parent_doc = @plugin_window.document
 
   _ratingToStars: (rating = 0, limit = 5) ->
     return [] if @_noStars(rating)
@@ -633,11 +638,11 @@ class Badge
     "#{settings.url.application_base}/badge/shop_reviews?#{serialized_params}"
 
   _initHideOnScroll: (badge) =>
-    past_scroll = window.parent.pageYOffset
+    past_scroll = @plugin_window.pageYOffset
     return unless past_scroll? # pageYOffset is not supported for IE < 9
 
     @_attachEvent @parent_doc, 'scroll', (_event) =>
-      current_scroll = window.parent.pageYOffset
+      current_scroll = @plugin_window.pageYOffset
 
       return if current_scroll == past_scroll # Ignore horizontal scrolling
       return if @_outOfBound(current_scroll) # Ignore OSX bounce
@@ -667,7 +672,7 @@ class Badge
              @parent_doc.body.clientHeight, @parent_doc.documentElement.clientHeight
 
   _vieport: ->
-    width: window.parent.innerWidth || @parent_doc.documentElement.clientWidth || parent_doc.body.clientWidth
-    height: window.parent.innerHeight || @parent_doc.documentElement.clientHeight || parent_doc.body.clientHeight
+    width: @plugin_window.innerWidth || @parent_doc.documentElement.clientWidth || parent_doc.body.clientWidth
+    height: @plugin_window.innerHeight || @parent_doc.documentElement.clientHeight || parent_doc.body.clientHeight
 
 new Badge

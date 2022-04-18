@@ -397,7 +397,11 @@ class OrderStash
   _head: -> @parent_doc.head || @parent_doc.getElementsByTagName('head')[0]
   _animationSupport: -> @$el.style.animation?
 
-  _setParentDoc: -> @parent_doc = window.parent.document
+  _setParentDoc: ->
+    @parent_doc = if window.parent?.document
+                    window.parent.document
+                  else
+                    window.top.document
 
   _endpoint: ->
     params =
