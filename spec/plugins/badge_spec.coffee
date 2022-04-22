@@ -1,11 +1,13 @@
 describe 'Badge', ->
   event_listener_args = []
-  orginalAddEventListener = window.parent.document.addEventListener
+  originalWindow = window.parent
+  pluginWindow = window.parent
+  orginalAddEventListener = pluginWindow.document.addEventListener
 
   removeListeners = ->
     while event_listener_args.length > 0
       args = event_listener_args.pop()
-      window.parent.document.removeEventListener args.event, args.func
+      pluginWindow.document.removeEventListener args.event, args.func
 
 
   cleanupDom = ->
@@ -13,11 +15,11 @@ describe 'Badge', ->
 
     # Cleanup rendered plugins and stylesheets
     selector = '#sa-badge-floating-plugin, #sa-badge-style, #sa-badge-modal'
-    [].forEach.call window.parent.document.querySelectorAll(selector), (e) ->
+    [].forEach.call pluginWindow.document.querySelectorAll(selector), (e) ->
       e.parentNode.removeChild e
 
     # Cleanup innerHTML of embedded badge
-    window.parent.document.getElementById('sa-badge-embedded-plugin')?.innerHTML = ''
+    pluginWindow.document.getElementById('sa-badge-embedded-plugin')?.innerHTML = ''
 
   renderPlugin = (done, cb) ->
     cleanupDom()
@@ -48,7 +50,7 @@ describe 'Badge', ->
           url: 'url'
 
   before ->
-    window.parent.document.addEventListener = ->
+    pluginWindow.document.addEventListener = ->
       event_listener_args.push({ event: arguments[0], func: arguments[1] })
 
       orginalAddEventListener.apply this, arguments
@@ -64,7 +66,7 @@ describe 'Badge', ->
       application_base: 'http://test.skroutz.gr'
       hide_onscroll: false
 
-  after -> window.parent.document.addEventListener = orginalAddEventListener
+  after -> pluginWindow.document.addEventListener = orginalAddEventListener
 
   afterEach ->
     cleanupDom()
@@ -77,21 +79,36 @@ describe 'Badge', ->
 
       setSaPlugins(@default_settings, {})
       renderPlugin done, =>
-        @subject = window.parent.document.getElementById('sa-badge-floating-plugin')
+        @subject = pluginWindow.document.getElementById('sa-badge-floating-plugin')
 
     describe '.constructor', ->
       it 'adds the plugin style to the head', ->
-        expect(window.parent.document.getElementById('sa-badge-style')).to.exist
+        expect(pluginWindow.document.getElementById('sa-badge-style')).to.exist
 
       it 'adds the plugin markup to the body', ->
-        expect(window.parent.document.getElementById('sa-badge-floating-plugin')).to.exist
+        expect(pluginWindow.document.getElementById('sa-badge-floating-plugin')).to.exist
+
+      context 'when window.parent.document is missing', ->
+        beforeEach (done) ->
+          window.parent = null
+
+          setSaPlugins(@default_settings, rating: 0)
+
+          renderPlugin done, =>
+            @subject = window.top.document.getElementById('sa-badge-floating-plugin')
+
+        afterEach ->
+          window.parent = originalWindow
+
+        it 'adds the plugin style to the head', ->
+          expect(@subject).to.exist
 
       context 'when rating is 0', ->
         beforeEach (done) ->
           setSaPlugins(@default_settings, rating: 0)
 
           renderPlugin done, =>
-            @subject = window.parent.document.getElementById('sa-badge-floating-plugin')
+            @subject = pluginWindow.document.getElementById('sa-badge-floating-plugin')
 
         it 'adds no stars class to container', ->
           expect(@subject.className).to.include('sa-badge-no-stars')
@@ -100,13 +117,13 @@ describe 'Badge', ->
       beforeEach -> click_element @subject
 
       it 'displays the badge modal', ->
-        expect(window.parent.document.getElementById('sa-badge-modal')).to.exist
+        expect(pluginWindow.document.getElementById('sa-badge-modal')).to.exist
 
       it 'displays the iframe', ->
-        expect(window.parent.document.getElementById('sa-badge-modal-iframe')).to.exist
+        expect(pluginWindow.document.getElementById('sa-badge-modal-iframe')).to.exist
 
       it 'displays the iframe with proper src', ->
-        expect(window.parent.document.getElementById('sa-badge-modal-iframe').src)
+        expect(pluginWindow.document.getElementById('sa-badge-modal-iframe').src)
           .to.eq(["#{@default_settings.application_base}",
                   "/badge/shop_reviews?shop_code=#{@default_settings.shop_code}",
                   "&badge_display=#{@default_settings.display}",
@@ -116,23 +133,23 @@ describe 'Badge', ->
 
       context 'when click outside of iframe', ->
         beforeEach ->
-          click_element window.parent.document.getElementById('sa-badge-modal')
+          click_element pluginWindow.document.getElementById('sa-badge-modal')
 
         it 'destroys the modal', ->
-          expect(window.parent.document.getElementById('sa-badge-modal')).to.not.exist
+          expect(pluginWindow.document.getElementById('sa-badge-modal')).to.not.exist
 
       context 'when click modal close button', ->
         beforeEach ->
-          click_element window.parent.document.getElementById('sa-badge-modal-close-button')
+          click_element pluginWindow.document.getElementById('sa-badge-modal-close-button')
 
         it 'destroys the modal', ->
-          expect(window.parent.document.getElementById('sa-badge-modal')).to.not.exist
+          expect(pluginWindow.document.getElementById('sa-badge-modal')).to.not.exist
 
       context 'when press ESC key', ->
         it 'destroys the modal', ->
-          trigger_keyboard_event(27, window.parent.document)
+          trigger_keyboard_event(27, pluginWindow.document)
 
-          expect(window.parent.document.getElementById('sa-badge-modal')).to.not.exist
+          expect(pluginWindow.document.getElementById('sa-badge-modal')).to.not.exist
 
     describe 'rating', ->
       context 'when rating is 0', ->
@@ -140,7 +157,7 @@ describe 'Badge', ->
           setSaPlugins(@default_settings, rating: 0)
 
           renderPlugin done, =>
-            @subject = window.parent.document.getElementById('sa-badge-floating-stars-container')
+            @subject = pluginWindow.document.getElementById('sa-badge-floating-stars-container')
 
         it 'does not show stars', ->
           expect(@subject).to.not.exist
@@ -150,7 +167,7 @@ describe 'Badge', ->
           setSaPlugins(@default_settings, rating: 5)
 
           renderPlugin done, =>
-            @subject = window.parent.document.getElementsByClassName('sa-badge-full-star')
+            @subject = pluginWindow.document.getElementsByClassName('sa-badge-full-star')
 
         it 'shows 5 full stars', ->
           expect(@subject.length).to.eql(5)
@@ -161,9 +178,9 @@ describe 'Badge', ->
 
           renderPlugin done, =>
             @subject =
-              full_stars: window.parent.document.getElementsByClassName('sa-badge-full-star').length
-              half_stars: window.parent.document.getElementsByClassName('sa-badge-half-star').length
-              empty_stars: window.parent.document.getElementsByClassName('sa-badge-empty-star').length
+              full_stars: pluginWindow.document.getElementsByClassName('sa-badge-full-star').length
+              half_stars: pluginWindow.document.getElementsByClassName('sa-badge-half-star').length
+              empty_stars: pluginWindow.document.getElementsByClassName('sa-badge-empty-star').length
 
         it 'shows full stars equal to the integer part, followed by empty stars up to a maximum of 5 stars', ->
           expect(@subject).to.eql(full_stars: 4, half_stars: 0, empty_stars: 1)
@@ -174,9 +191,9 @@ describe 'Badge', ->
 
           renderPlugin done, =>
             @subject =
-              full_stars: window.parent.document.getElementsByClassName('sa-badge-full-star').length
-              half_stars: window.parent.document.getElementsByClassName('sa-badge-half-star').length
-              empty_stars: window.parent.document.getElementsByClassName('sa-badge-empty-star').length
+              full_stars: pluginWindow.document.getElementsByClassName('sa-badge-full-star').length
+              half_stars: pluginWindow.document.getElementsByClassName('sa-badge-half-star').length
+              empty_stars: pluginWindow.document.getElementsByClassName('sa-badge-empty-star').length
 
         it 'shows full stars equal to the integer part, followed by a half star, followed by empty stars up to a maximum of 5 stars', ->
           expect(@subject).to.eql(full_stars: 3, half_stars: 1, empty_stars: 1)
@@ -188,9 +205,9 @@ describe 'Badge', ->
 
             renderPlugin done, =>
               @subject =
-                full_stars: window.parent.document.getElementsByClassName('sa-badge-full-star').length
-                half_stars: window.parent.document.getElementsByClassName('sa-badge-half-star').length
-                empty_stars: window.parent.document.getElementsByClassName('sa-badge-empty-star').length
+                full_stars: pluginWindow.document.getElementsByClassName('sa-badge-full-star').length
+                half_stars: pluginWindow.document.getElementsByClassName('sa-badge-half-star').length
+                empty_stars: pluginWindow.document.getElementsByClassName('sa-badge-empty-star').length
 
           it 'shows full stars equal to the integer part plus 1, followed by empty stars up to a maximum of 5 stars', ->
             expect(@subject).to.eql(full_stars: 3, half_stars: 0, empty_stars: 2)
@@ -201,9 +218,9 @@ describe 'Badge', ->
 
             renderPlugin done, =>
               @subject =
-                full_stars: window.parent.document.getElementsByClassName('sa-badge-full-star').length
-                half_stars: window.parent.document.getElementsByClassName('sa-badge-half-star').length
-                empty_stars: window.parent.document.getElementsByClassName('sa-badge-empty-star').length
+                full_stars: pluginWindow.document.getElementsByClassName('sa-badge-full-star').length
+                half_stars: pluginWindow.document.getElementsByClassName('sa-badge-half-star').length
+                empty_stars: pluginWindow.document.getElementsByClassName('sa-badge-empty-star').length
 
           it 'shows full stars equal to the integer part, followed by empty stars up to a maximum of 5 stars', ->
             expect(@subject).to.eql(full_stars: 4, half_stars: 0, empty_stars: 1)
@@ -214,52 +231,52 @@ describe 'Badge', ->
 
           renderPlugin done, =>
             @subject =
-              full_stars: window.parent.document.getElementsByClassName('sa-badge-full-star').length
-              half_stars: window.parent.document.getElementsByClassName('sa-badge-half-star').length
-              empty_stars: window.parent.document.getElementsByClassName('sa-badge-empty-star').length
+              full_stars: pluginWindow.document.getElementsByClassName('sa-badge-full-star').length
+              half_stars: pluginWindow.document.getElementsByClassName('sa-badge-half-star').length
+              empty_stars: pluginWindow.document.getElementsByClassName('sa-badge-empty-star').length
 
         it 'shows full stars equal to the integer part, followed by a half star, followed by empty stars up to a maximum of 5 stars', ->
           expect(@subject).to.eql(full_stars: 3, half_stars: 1, empty_stars: 1)
 
     describe 'show/hide onscroll', ->
       beforeEach ->
-        @original_body_height = window.parent.document.body.style.height
-        @original_body_width = window.parent.document.body.style.width
-        window.parent.document.body.style.height = '10000px'
-        window.parent.document.body.style.width = '10000px'
+        @original_body_height = pluginWindow.document.body.style.height
+        @original_body_width = pluginWindow.document.body.style.width
+        pluginWindow.document.body.style.height = '10000px'
+        pluginWindow.document.body.style.width = '10000px'
 
       afterEach ->
-        window.parent.document.body.style.height = @original_body_height
-        window.parent.document.body.style.width = @original_body_width
+        pluginWindow.document.body.style.height = @original_body_height
+        pluginWindow.document.body.style.width = @original_body_width
 
       context 'when hide_onscroll set to true', ->
         beforeEach -> setSaPlugins(@default_settings, hide_onscroll: true)
 
         context 'on small screen', ->
           beforeEach (done) ->
-            @original_viewport_width = window.parent.innerWidth
-            window.parent.innerWidth = 768
+            @original_viewport_width = pluginWindow.innerWidth
+            pluginWindow.innerWidth = 768
 
             renderPlugin done, =>
-              @subject = window.parent.document.getElementById('sa-badge-floating-plugin')
+              @subject = pluginWindow.document.getElementById('sa-badge-floating-plugin')
 
           afterEach ->
-            window.parent.document.onscroll = null
-            window.parent.innerWidth = @original_viewport_width
+            pluginWindow.document.onscroll = null
+            pluginWindow.innerWidth = @original_viewport_width
 
           it 'hides floating badge on scroll down', (done) ->
-            window.parent.document.onscroll = =>
+            pluginWindow.document.onscroll = =>
               expect(@subject.classList.contains('sa-badge-floating-hidden')).to.eq(true)
               expect(@subject.classList.contains('sa-badge-floating-visible')).to.eq(false)
 
               done()
 
-            window.parent.scrollBy(0, 100)
+            pluginWindow.scrollBy(0, 100)
 
           it 'shows floating badge on scroll up', (done) ->
             scroll_count = 0
 
-            window.parent.document.onscroll = =>
+            pluginWindow.document.onscroll = =>
               if scroll_count == 1
                 expect(@subject.classList.contains('sa-badge-floating-hidden')).to.eq(false)
                 expect(@subject.classList.contains('sa-badge-floating-visible')).to.eq(true)
@@ -268,85 +285,85 @@ describe 'Badge', ->
               else
                 scroll_count += 1
 
-                window.parent.scroll(0, 0)
+                pluginWindow.scroll(0, 0)
 
-            window.parent.scrollBy(0, 100)
+            pluginWindow.scrollBy(0, 100)
 
           context 'when scoll horizontally', ->
             it 'does not change badge visibility', (done) ->
-              window.parent.document.onscroll = =>
+              pluginWindow.document.onscroll = =>
                 expect(@subject.classList.contains('sa-badge-floating-hidden')).to.eq(false)
                 expect(@subject.classList.contains('sa-badge-floating-visible')).to.eq(true)
 
                 done()
 
-              window.parent.scrollBy(100, 0)
+              pluginWindow.scrollBy(100, 0)
 
         context 'on big screen', ->
           beforeEach (done) ->
-            @original_viewport_width = window.parent.innerWidth
-            window.parent.innerWidth = 769
+            @original_viewport_width = pluginWindow.innerWidth
+            pluginWindow.innerWidth = 769
 
             renderPlugin done, =>
-              @subject = window.parent.document.getElementById('sa-badge-floating-plugin')
+              @subject = pluginWindow.document.getElementById('sa-badge-floating-plugin')
 
           afterEach ->
-            window.parent.document.onscroll = null
-            window.parent.innerWidth = @original_viewport_width
+            pluginWindow.document.onscroll = null
+            pluginWindow.innerWidth = @original_viewport_width
 
           it 'does not change badge visibility', (done) ->
-            window.parent.document.onscroll = =>
+            pluginWindow.document.onscroll = =>
               expect(@subject.classList.contains('sa-badge-floating-hidden')).to.eq(false)
               expect(@subject.classList.contains('sa-badge-floating-visible')).to.eq(true)
 
               done()
 
-            window.parent.scrollBy(0, 100)
+            pluginWindow.scrollBy(0, 100)
 
       context 'when hide_onscroll set to false', ->
         beforeEach -> setSaPlugins(@default_settings, hide_onscroll: false)
 
         context 'on small screen', ->
           beforeEach (done) ->
-            @original_viewport_width = window.parent.innerWidth
-            window.parent.innerWidth = 768
+            @original_viewport_width = pluginWindow.innerWidth
+            pluginWindow.innerWidth = 768
 
             renderPlugin done, =>
-              @subject = window.parent.document.getElementById('sa-badge-floating-plugin')
+              @subject = pluginWindow.document.getElementById('sa-badge-floating-plugin')
 
           afterEach ->
-            window.parent.document.onscroll = null
-            window.parent.innerWidth = @original_viewport_width
+            pluginWindow.document.onscroll = null
+            pluginWindow.innerWidth = @original_viewport_width
 
           it 'does not change badge visibility', (done) ->
-            window.parent.document.onscroll = =>
+            pluginWindow.document.onscroll = =>
               expect(@subject.classList.contains('sa-badge-floating-hidden')).to.eq(false)
               expect(@subject.classList.contains('sa-badge-floating-visible')).to.eq(true)
 
               done()
 
-            window.parent.scrollBy(0, 100)
+            pluginWindow.scrollBy(0, 100)
 
         context 'on big screen', ->
           beforeEach (done) ->
-            @original_viewport_width = window.parent.innerWidth
-            window.parent.innerWidth = 769
+            @original_viewport_width = pluginWindow.innerWidth
+            pluginWindow.innerWidth = 769
 
             renderPlugin done, =>
-              @subject = window.parent.document.getElementById('sa-badge-floating-plugin')
+              @subject = pluginWindow.document.getElementById('sa-badge-floating-plugin')
 
           afterEach ->
-            window.parent.document.onscroll = null
-            window.parent.innerWidth = @original_viewport_width
+            pluginWindow.document.onscroll = null
+            pluginWindow.innerWidth = @original_viewport_width
 
           it 'does not change badge visibility', (done) ->
-            window.parent.document.onscroll = =>
+            pluginWindow.document.onscroll = =>
               expect(@subject.classList.contains('sa-badge-floating-hidden')).to.eq(false)
               expect(@subject.classList.contains('sa-badge-floating-visible')).to.eq(true)
 
               done()
 
-            window.parent.scrollBy(0, 100)
+            pluginWindow.scrollBy(0, 100)
 
   describe 'embedded', ->
     beforeEach (done) ->
@@ -354,12 +371,12 @@ describe 'Badge', ->
 
       setSaPlugins(@default_settings, {})
 
-      @embedded_badge = window.parent.document.createElement('div')
+      @embedded_badge = pluginWindow.document.createElement('div')
       @embedded_badge.id = 'sa-badge-embedded-plugin'
-      window.parent.document.body.appendChild(@embedded_badge)
+      pluginWindow.document.body.appendChild(@embedded_badge)
 
       renderPlugin done, =>
-        @subject = window.parent.document.getElementById('sa-badge-embedded-plugin')
+        @subject = pluginWindow.document.getElementById('sa-badge-embedded-plugin')
 
     afterEach ->
       try
@@ -369,27 +386,27 @@ describe 'Badge', ->
 
     describe '.constructor', ->
       it 'adds the plugin style to the head', ->
-        expect(window.parent.document.getElementById('sa-badge-style')).to.exist
+        expect(pluginWindow.document.getElementById('sa-badge-style')).to.exist
 
       it 'adds the plugin markup to the embedded badge container', ->
-        expect(window.parent.document.getElementById('sa-badge-embedded-plugin').innerHTML).to.not.be.empty
+        expect(pluginWindow.document.getElementById('sa-badge-embedded-plugin').innerHTML).to.not.be.empty
 
       context 'when embedded badge container is missing', ->
         beforeEach (done) ->
           @embedded_badge.parentNode.removeChild(@embedded_badge)
 
           renderPlugin done, =>
-            @subject = window.parent.document.getElementById('sa-badge-embedded-plugin')
+            @subject = pluginWindow.document.getElementById('sa-badge-embedded-plugin')
 
         it 'does not add the plugin markup to the embedded badge container', ->
-          expect(window.parent.document.getElementById('sa-badge-embedded-plugin')).to.not.exist
+          expect(pluginWindow.document.getElementById('sa-badge-embedded-plugin')).to.not.exist
 
       context 'when rating is 0', ->
         beforeEach (done) ->
           setSaPlugins(@default_settings, rating: 0)
 
           renderPlugin done, =>
-            @subject = window.parent.document.getElementById('sa-badge-embedded-plugin')
+            @subject = pluginWindow.document.getElementById('sa-badge-embedded-plugin')
 
         it 'adds no stars class to container', ->
           expect(@subject.className).to.include('sa-badge-no-stars')
@@ -398,13 +415,13 @@ describe 'Badge', ->
       beforeEach -> click_element @subject
 
       it 'displays the badge modal', ->
-        expect(window.parent.document.getElementById('sa-badge-modal')).to.exist
+        expect(pluginWindow.document.getElementById('sa-badge-modal')).to.exist
 
       it 'displays the iframe', ->
-        expect(window.parent.document.getElementById('sa-badge-modal-iframe')).to.exist
+        expect(pluginWindow.document.getElementById('sa-badge-modal-iframe')).to.exist
 
       it 'displays the iframe with proper src', ->
-        expect(window.parent.document.getElementById('sa-badge-modal-iframe').src)
+        expect(pluginWindow.document.getElementById('sa-badge-modal-iframe').src)
           .to.eq(["#{@default_settings.application_base}",
                   "/badge/shop_reviews?shop_code=#{@default_settings.shop_code}",
                   "&badge_display=#{@default_settings.display}",
@@ -414,23 +431,23 @@ describe 'Badge', ->
 
       context 'when click outside of iframe', ->
         beforeEach ->
-          click_element window.parent.document.getElementById('sa-badge-modal')
+          click_element pluginWindow.document.getElementById('sa-badge-modal')
 
         it 'destroys the modal', ->
-          expect(window.parent.document.getElementById('sa-badge-modal')).to.not.exist
+          expect(pluginWindow.document.getElementById('sa-badge-modal')).to.not.exist
 
       context 'when click modal close button', ->
         beforeEach ->
-          click_element window.parent.document.getElementById('sa-badge-modal-close-button')
+          click_element pluginWindow.document.getElementById('sa-badge-modal-close-button')
 
         it 'destroys the modal', ->
-          expect(window.parent.document.getElementById('sa-badge-modal')).to.not.exist
+          expect(pluginWindow.document.getElementById('sa-badge-modal')).to.not.exist
 
       context 'when press ESC key', ->
         it 'destroys the modal', ->
-          trigger_keyboard_event(27, window.parent.document)
+          trigger_keyboard_event(27, pluginWindow.document)
 
-          expect(window.parent.document.getElementById('sa-badge-modal')).to.not.exist
+          expect(pluginWindow.document.getElementById('sa-badge-modal')).to.not.exist
 
     describe 'rating', ->
       describe 'number', ->
@@ -439,7 +456,7 @@ describe 'Badge', ->
 
           renderPlugin done, =>
             @subject =
-              window.parent
+              pluginWindow
                     .document
                     .querySelectorAll('#sa-badge-embedded-rating-container .sa-badge-embedded-rating-number span')[0]
                     .textContent
@@ -452,7 +469,7 @@ describe 'Badge', ->
           setSaPlugins(@default_settings, rating: 0)
 
           renderPlugin done, =>
-            @subject = window.parent.document.getElementById('sa-badge-embedded-rating-container')
+            @subject = pluginWindow.document.getElementById('sa-badge-embedded-rating-container')
 
         it 'does not show either stars or rating number', ->
           expect(@subject).to.not.exist
@@ -462,7 +479,7 @@ describe 'Badge', ->
           setSaPlugins(@default_settings, rating: 5)
 
           renderPlugin done, =>
-            @subject = window.parent.document.getElementsByClassName('sa-badge-full-star')
+            @subject = pluginWindow.document.getElementsByClassName('sa-badge-full-star')
 
         it 'shows 5 full stars', ->
           expect(@subject.length).to.eql(5)
@@ -473,9 +490,9 @@ describe 'Badge', ->
 
           renderPlugin done, =>
             @subject =
-              full_stars: window.parent.document.getElementsByClassName('sa-badge-full-star').length
-              half_stars: window.parent.document.getElementsByClassName('sa-badge-half-star').length
-              empty_stars: window.parent.document.getElementsByClassName('sa-badge-empty-star').length
+              full_stars: pluginWindow.document.getElementsByClassName('sa-badge-full-star').length
+              half_stars: pluginWindow.document.getElementsByClassName('sa-badge-half-star').length
+              empty_stars: pluginWindow.document.getElementsByClassName('sa-badge-empty-star').length
 
         it 'shows full stars equal to the integer part, followed by empty stars up to a maximum of 5 stars', ->
           expect(@subject).to.eql(full_stars: 4, half_stars: 0, empty_stars: 1)
@@ -486,9 +503,9 @@ describe 'Badge', ->
 
           renderPlugin done, =>
             @subject =
-              full_stars: window.parent.document.getElementsByClassName('sa-badge-full-star').length
-              half_stars: window.parent.document.getElementsByClassName('sa-badge-half-star').length
-              empty_stars: window.parent.document.getElementsByClassName('sa-badge-empty-star').length
+              full_stars: pluginWindow.document.getElementsByClassName('sa-badge-full-star').length
+              half_stars: pluginWindow.document.getElementsByClassName('sa-badge-half-star').length
+              empty_stars: pluginWindow.document.getElementsByClassName('sa-badge-empty-star').length
 
         it 'shows full stars equal to the integer part, followed by a half star, followed by empty stars up to a maximum of 5 stars', ->
           expect(@subject).to.eql(full_stars: 3, half_stars: 1, empty_stars: 1)
@@ -500,9 +517,9 @@ describe 'Badge', ->
 
             renderPlugin done, =>
               @subject =
-                full_stars: window.parent.document.getElementsByClassName('sa-badge-full-star').length
-                half_stars: window.parent.document.getElementsByClassName('sa-badge-half-star').length
-                empty_stars: window.parent.document.getElementsByClassName('sa-badge-empty-star').length
+                full_stars: pluginWindow.document.getElementsByClassName('sa-badge-full-star').length
+                half_stars: pluginWindow.document.getElementsByClassName('sa-badge-half-star').length
+                empty_stars: pluginWindow.document.getElementsByClassName('sa-badge-empty-star').length
 
           it 'shows full stars equal to the integer part plus 1, followed by empty stars up to a maximum of 5 stars', ->
             expect(@subject).to.eql(full_stars: 3, half_stars: 0, empty_stars: 2)
@@ -513,9 +530,9 @@ describe 'Badge', ->
 
             renderPlugin done, =>
               @subject =
-                full_stars: window.parent.document.getElementsByClassName('sa-badge-full-star').length
-                half_stars: window.parent.document.getElementsByClassName('sa-badge-half-star').length
-                empty_stars: window.parent.document.getElementsByClassName('sa-badge-empty-star').length
+                full_stars: pluginWindow.document.getElementsByClassName('sa-badge-full-star').length
+                half_stars: pluginWindow.document.getElementsByClassName('sa-badge-half-star').length
+                empty_stars: pluginWindow.document.getElementsByClassName('sa-badge-empty-star').length
 
           it 'shows full stars equal to the integer part, followed by empty stars up to a maximum of 5 stars', ->
             expect(@subject).to.eql(full_stars: 4, half_stars: 0, empty_stars: 1)
@@ -526,9 +543,9 @@ describe 'Badge', ->
 
           renderPlugin done, =>
             @subject =
-              full_stars: window.parent.document.getElementsByClassName('sa-badge-full-star').length
-              half_stars: window.parent.document.getElementsByClassName('sa-badge-half-star').length
-              empty_stars: window.parent.document.getElementsByClassName('sa-badge-empty-star').length
+              full_stars: pluginWindow.document.getElementsByClassName('sa-badge-full-star').length
+              half_stars: pluginWindow.document.getElementsByClassName('sa-badge-half-star').length
+              empty_stars: pluginWindow.document.getElementsByClassName('sa-badge-empty-star').length
 
         it 'shows full stars equal to the integer part, followed by a half star, followed by empty stars up to a maximum of 5 stars', ->
           expect(@subject).to.eql(full_stars: 3, half_stars: 1, empty_stars: 1)
