@@ -91,6 +91,12 @@ action_reporting_tests = (reported_position) ->
     it 'places a single object to the actions array', ->
       expect(@payload.actions[0]).to.be.an('object')
 
+    it 'has a metadata object', ->
+      expect(@payload.metadata).to.be.an('object')
+
+    it 'has the proper keys in metadata', ->
+      expect(@payload.metadata).to.have.keys 'app_type', 'cp', 'tags'
+
     it 'has proper data in the action\'s object', ->
       data = JSON.parse(@data)
       data.rpos = reported_position if reported_position != undefined
@@ -105,6 +111,7 @@ describe 'ActionsManager', ->
     @analytics_session = 'analytics_session'
     @cookie_policy = 'cookie_policy'
     @shop_code = 'shop_code'
+    @metadata = { app_type: 'web', cp: 'f', tags: '' }
 
     @reset_saq = ->
       @settings.window.sa = =>
@@ -142,6 +149,7 @@ describe 'ActionsManager', ->
         @session.analytics_session = @analytics_session
         @session.cookie_policy = @cookie_policy
         @session.shop_code = @shop_code
+        @session.metadata = @metadata
         @plugins_manager.session = @session
 
         @actions_manager = ActionsManager
@@ -329,7 +337,8 @@ describe 'ActionsManager', ->
         context 'when redirect callback is supplied', ->
           beforeEach ->
             @redirect_url = 'http://redirect_url'
-            skr_prm_param_hash = @base64.encodeURI(JSON.stringify([@analytics_session, NOW + 60 * 1000, {}]))
+            metadata = { app_type: 'web', cp: 'f', tags: '' }
+            skr_prm_param_hash = @base64.encodeURI(JSON.stringify([@analytics_session, NOW + 60 * 1000, metadata]))
             @analytics_redirect_url = "http://redirect_url?skr_prm=#{skr_prm_param_hash}"
             @redirect_callback_spy = sinon.spy()
 
@@ -383,6 +392,23 @@ describe 'ActionsManager', ->
 
             it 'does not execute redirect callback', ->
               expect(@redirect_callback_spy).to.not.be.called
+
+        context 'when the sbm param exists', ->
+          beforeEach ->
+            @data = JSON.stringify({ sbm: false })
+            @run()
+            @payload = @sendbeacon_spy.args[0][1]
+
+          it 'should not include the sbm tag in the metadata tags', ->
+            expect(@payload.metadata.tags).to.equal ''
+
+          context 'when the sbm param is true', ->
+            beforeEach ->
+              @data = JSON.stringify({ sbm: true })
+              @run()
+
+            it 'should include the sbm tag in the metadata tags', ->
+              expect(@payload.metadata.tags).to.contain 'sbm'
 
     describe 'ecommerce', ->
       beforeEach ->
