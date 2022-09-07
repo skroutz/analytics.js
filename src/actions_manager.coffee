@@ -79,7 +79,7 @@ define [
       payload[params.url] = Settings.url.current
       payload[params.referrer] = Settings.url.referrer
       payload[params.shop_code] = @session.shop_code
-      payload[params.metadata] = @session.metadata || ''
+      payload[params.metadata] = @_buildMetadata(JSON.parse(data).sbm)
       payload[params.cookie_policy] = @session.cookie_policy
       payload[params.actions] = [{
         category: category
@@ -88,5 +88,17 @@ define [
       }]
 
       payload
+
+    _buildMetadata: (sbm) ->
+      meta = @session.metadata
+
+      # When using 3rd-party cookies, metadata will be undefined
+      # In this case, the server will fallback to using the meta cookie
+      return '' unless meta
+      return meta unless sbm
+
+      @session.metadata.tags = if meta.tags then meta.tags + ',sbm' else 'sbm'
+
+      @session.metadata
 
   return ActionsManager
