@@ -337,8 +337,7 @@ describe 'ActionsManager', ->
         context 'when redirect callback is supplied', ->
           beforeEach ->
             @redirect_url = 'http://redirect_url'
-            metadata = { app_type: 'web', cp: 'f', tags: '' }
-            skr_prm_param_hash = @base64.encodeURI(JSON.stringify([@analytics_session, NOW + 60 * 1000, metadata]))
+            skr_prm_param_hash = @base64.encodeURI(JSON.stringify([@analytics_session, NOW + 60 * 1000, @metadata]))
             @analytics_redirect_url = "http://redirect_url?skr_prm=#{skr_prm_param_hash}"
             @redirect_callback_spy = sinon.spy()
 
@@ -394,7 +393,7 @@ describe 'ActionsManager', ->
               expect(@redirect_callback_spy).to.not.be.called
 
         context 'when the sbm param exists', ->
-          beforeEach ->
+          before ->
             @data = JSON.stringify({ sbm: false })
             @run()
             @payload = @sendbeacon_spy.args[0][1]
@@ -403,9 +402,10 @@ describe 'ActionsManager', ->
             expect(@payload.metadata.tags).to.equal ''
 
           context 'when the sbm param is true', ->
-            beforeEach ->
+            before ->
               @data = JSON.stringify({ sbm: true })
               @run()
+              @payload = @sendbeacon_spy.args[0][1]
 
             it 'should include the sbm tag in the metadata tags', ->
               expect(@payload.metadata.tags).to.contain 'sbm'

@@ -90,15 +90,14 @@ define [
       payload
 
     _buildMetadata: (sbm) ->
-      meta = @session.metadata
-
       # When using 3rd-party cookies, metadata will be undefined
       # In this case, the server will fallback to using the meta cookie
-      return '' unless meta
-      return meta unless sbm
+      return '' unless @session.metadata
+      return @session.metadata unless sbm
 
-      @session.metadata.tags = if meta.tags then meta.tags + ',sbm' else 'sbm'
+      meta = JSON.parse(JSON.stringify(@session.metadata)) # clone
+      meta.tags = if meta.tags then meta.tags + ',sbm' else 'sbm'
 
-      @session.metadata
+      meta
 
   return ActionsManager
