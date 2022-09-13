@@ -93,10 +93,23 @@ define [
       # When using 3rd-party cookies, metadata will be undefined
       # In this case, the server will fallback to using the meta cookie
       return '' unless @session.metadata
+
+      # Return metadata as is if sbm is not present
       return @session.metadata unless sbm
 
-      meta = JSON.parse(JSON.stringify(@session.metadata)) # clone
-      meta.tags = if meta.tags then meta.tags + ',sbm' else 'sbm'
+      # Clone
+      meta = JSON.parse(JSON.stringify(@session.metadata))
+
+      # If no tags are present, return a single sbm tag
+      unless meta.tags
+        meta.tags = 'sbm'
+        return meta
+
+      # Return metadata as is if sbm is already present
+      return meta if 'sbm' in meta.tags.split(',')
+
+      # Otherwise, append the sbm tag
+      meta.tags = meta.tags + ',sbm'
 
       meta
 
