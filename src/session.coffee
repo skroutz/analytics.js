@@ -84,7 +84,10 @@ define [
         [null, null]
 
     _getMetadataFromCookie: ->
-      Biskoto.get(Settings.cookies[@cookie_policy].meta.name)
+      if data = Biskoto.get(Settings.cookies.full.meta.name)
+        data
+      else
+        Biskoto.get(Settings.cookies.basic.meta.name)
 
     _extractAnalyticsSessionOnCreate: ->
       new XDomainEngine('create',
@@ -142,32 +145,40 @@ define [
         version: Settings.cookies.version
         analytics_session: analytics_session
 
-      options = expires: Settings.cookies[@cookie_policy].analytics.duration
-      options.domain = @domain if @domain
+      basic_options = expires: Settings.cookies.basic.analytics.duration
+      basic_options.domain = @domain if @domain
+      Biskoto.set Settings.cookies.basic.analytics.name, cookie_data, basic_options
 
-      Biskoto.set Settings.cookies[@cookie_policy].analytics.name, cookie_data, options
+      if @cookie_policy == 'full'
+        full_options = expires: Settings.cookies.full.analytics.duration
+        full_options.domain = @domain if @domain
+        Biskoto.set Settings.cookies.full.analytics.name, cookie_data, full_options
 
     _createSessionCookie: ->
       session_data =
         version: Settings.cookies.version
         session: @analytics_session
 
-      options = expires: Settings.cookies[@cookie_policy].session.duration
-      options.domain = @domain if @domain
+      basic_options = expires: Settings.cookies.basic.session.duration
+      basic_options.domain = @domain if @domain
+      Biskoto.set Settings.cookies.basic.session.name, session_data, basic_options
 
-      Biskoto.set Settings.cookies[@cookie_policy].session.name, session_data, options
+      full_options = expires: Settings.cookies.full.session.duration
+      full_options.domain = @domain if @domain
+      Biskoto.set Settings.cookies.full.session.name, session_data, full_options if @cookie_policy == 'full'
 
-      # Delete other's cookie policy's cookie
-      delete_cookie = if @cookie_policy == 'basic' then 'full' else 'basic'
-      Biskoto.expire Settings.cookies[delete_cookie].session.name, options
+      # Delete full cookie if user changed preferences
+      full_cookie = Biskoto.get Settings.cookies.full.session.name
+      Biskoto.expire Settings.cookies.full.session.name, full_options if full_cookie && @cookie_policy == 'basic'
 
     _createMetadataCookie: ->
       options = { domain: @domain } if @domain
 
-      Biskoto.set Settings.cookies[@cookie_policy].meta.name, @metadata, options
+      Biskoto.set Settings.cookies.basic.meta.name, @metadata, options
+      Biskoto.set Settings.cookies.full.meta.name, @metadata, options if @cookie_policy == 'full'
 
-      # Delete other's cookie policy's cookie
-      delete_cookie = if @cookie_policy == 'basic' then 'full' else 'basic'
-      Biskoto.expire Settings.cookies[delete_cookie].meta.name, options
+      # Delete full cookie if user changed preferences
+      full_cookie = Biskoto.get Settings.cookies.full.meta.name
+      Biskoto.expire Settings.cookies.full.meta.name, options if full_cookie && @cookie_policy == 'basic'
 
   return Session
