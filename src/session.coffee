@@ -9,6 +9,7 @@ define [
 ], (Settings, Promise, Runnable, Biskoto, XDomainEngine, AnalyticsUrl, DomainExtractor) ->
   class Session
     Session::[key] = method for key, method of Runnable
+    SHOP_COOKIE_OPTIONS = ['full', 'basic']
 
     constructor: (@plugins_manager) ->
       @promise = new Promise()
@@ -26,17 +27,21 @@ define [
           @shop_code = shop_code
           @flavor = flavor
           @metadata = metadata
+          @shop_cookie_policy = 'full'
 
           @_extractAnalyticsSessionOnCreate()
 
-        connect: (shop_code)->
+        connect: (shop_code, shop_cookie_policy = 'full')->
           return console?.warn?('Connect called without a shop code') unless shop_code
 
           # connect should be called only once
           return console?.warn?('Connect called multiple times') if @shop_code
 
           @shop_code = shop_code
+          @shop_cookie_policy = if shop_cookie_policy in SHOP_COOKIE_OPTIONS then shop_cookie_policy else 'full'
           @metadata = @_getMetadataFromCookie() if @cookie_policy
+
+          @_unsetFullCookies() if @shop_cookie_policy == 'basic'
 
           @plugins_manager.session = @
           @plugins_manager.notify('connect', {})
@@ -149,7 +154,7 @@ define [
       basic_options.domain = @domain if @domain
       Biskoto.set Settings.cookies.basic.analytics.name, cookie_data, basic_options
 
-      if @cookie_policy == 'full'
+      if @cookie_policy == 'full' && @shop_cookie_policy == 'full'
         full_options = expires: Settings.cookies.full.analytics.duration
         full_options.domain = @domain if @domain
         Biskoto.set Settings.cookies.full.analytics.name, cookie_data, full_options
@@ -165,20 +170,41 @@ define [
 
       full_options = expires: Settings.cookies.full.session.duration
       full_options.domain = @domain if @domain
-      Biskoto.set Settings.cookies.full.session.name, session_data, full_options if @cookie_policy == 'full'
+      if @cookie_policy == 'full' && @shop_cookie_policy == 'full'
+        Biskoto.set Settings.cookies.full.session.name, session_data, full_options
 
       # Delete full cookie if user changed preferences
       full_cookie = Biskoto.get Settings.cookies.full.session.name
-      Biskoto.expire Settings.cookies.full.session.name, full_options if full_cookie && @cookie_policy == 'basic'
+      if full_cookie && (@cookie_policy == 'basic' || @shop_cookie_policy == 'basic')
+        Biskoto.expire Settings.cookies.full.session.name, full_options
 
     _createMetadataCookie: ->
       options = { domain: @domain } if @domain
 
       Biskoto.set Settings.cookies.basic.meta.name, @metadata, options
-      Biskoto.set Settings.cookies.full.meta.name, @metadata, options if @cookie_policy == 'full'
+      if @cookie_policy == 'full' && @shop_cookie_policy == 'full'
+        Biskoto.set Settings.cookies.full.meta.name, @metadata, options
 
       # Delete full cookie if user changed preferences
       full_cookie = Biskoto.get Settings.cookies.full.meta.name
-      Biskoto.expire Settings.cookies.full.meta.name, options if full_cookie && @cookie_policy == 'basic'
+      if full_cookie && (@cookie_policy == 'basic' || @shop_cookie_policy == 'basic')
+        Biskoto.expire Settings.cookies.full.meta.name, options
+
+    _unsetFullCookies: ->
+      if @analytics_session
+        options = expires: Settings.cookies.full.session.duration
+        options.domain = @domain if @domain
+        session_cookie = Biskoto.get Settings.cookies.full.session.name
+        Biskoto.expire Settings.cookies.full.session.name, options if session_cookie
+
+      if @metadata
+        options = { domain: @domain } if @domain
+        metadata_cookie = Biskoto.get Settings.cookies.full.meta.name
+        Biskoto.expire Settings.cookies.full.meta.name, options if metadata_cookie
+
+      options = expires: Settings.cookies.full.analytics.duration
+      options.domain = @domain if @domain
+      cache_cookie = Biskoto.get(Settings.cookies.full.analytics.name)
+      Biskoto.expire Settings.cookies.full.analytics.name, options if cache_cookie
 
   return Session

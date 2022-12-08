@@ -508,6 +508,181 @@ describe 'Session', ->
 
             expect(@biskoto.get(@basic_meta_cookie_name)).to.deep.equal metadata
 
+        describe 'shop_cookie_policy', ->
+          beforeEach ->
+            @init = (shop_cookie_policy) =>
+              sa('session', 'connect', @shop_code, shop_cookie_policy)
+              @instance = new @session(@plugins_manager).run()
+            @init_no_run = (shop_cookie_policy) =>
+              sa('session', 'connect', @shop_code, shop_cookie_policy)
+              @instance = new @session(@plugins_manager)
+
+          context 'and shop_cookie_policy is specified as basic', ->
+            it 'sets the session first-party basic cookie value', ->
+              metadata = { app_type: @metadata.app_type, cp: 'f', tags: @metadata.tags }
+              @stub_params({ session: @analytics_session, metadata: metadata })
+
+              @init('basic')
+
+              expect(@biskoto.get(@basic_session_cookie_name).session).to.equal @analytics_session
+
+            it 'sets the metadata first-party basic cookie value', ->
+              metadata = { app_type: @metadata.app_type, cp: 'f', tags: @metadata.tags }
+              @stub_params({ session: @analytics_session, metadata: metadata })
+
+              @init('basic')
+
+              expect(@biskoto.get(@basic_meta_cookie_name)).to.deep.equal metadata
+
+            it 'does not set the session first-party full cookie value', ->
+              metadata = { app_type: @metadata.app_type, cp: 'f', tags: @metadata.tags }
+              @stub_params({ session: @analytics_session, metadata: metadata })
+
+              @init('basic')
+
+              expect(@biskoto.get(@session_cookie_name)).to.be.null
+
+            it 'does not set the metadata first-party full cookie value', ->
+              metadata = { app_type: @metadata.app_type, cp: 'f', tags: @metadata.tags }
+              @stub_params({ session: @analytics_session, metadata: metadata })
+
+              @init('basic')
+
+              expect(@biskoto.get(@meta_cookie_name)).to.be.null
+
+          context 'and shop_cookie_policy is specified as something invalid', ->
+            it 'should set shop_cookie_policy to full', ->
+              metadata = { app_type: @metadata.app_type, cp: 'f', tags: @metadata.tags }
+              @stub_params({ session: @analytics_session, metadata: metadata })
+
+              @init('kokolala')
+
+              expect(@instance.shop_cookie_policy).to.equal('full')
+
+            it 'sets the session first-party basic cookie value', ->
+              metadata = { app_type: @metadata.app_type, cp: 'f', tags: @metadata.tags }
+              @stub_params({ session: @analytics_session, metadata: metadata })
+
+              @init('kokolala')
+
+              expect(@biskoto.get(@basic_session_cookie_name).session).to.equal @analytics_session
+
+            it 'sets the metadata first-party basic cookie value', ->
+              metadata = { app_type: @metadata.app_type, cp: 'f', tags: @metadata.tags }
+              @stub_params({ session: @analytics_session, metadata: metadata })
+
+              @init('kokolala')
+
+              expect(@biskoto.get(@basic_meta_cookie_name)).to.deep.equal metadata
+
+            it 'sets the session first-party full cookie value', ->
+              metadata = { app_type: @metadata.app_type, cp: 'f', tags: @metadata.tags }
+              @stub_params({ session: @analytics_session, metadata: metadata })
+
+              @init('kokolala')
+
+              expect(@biskoto.get(@session_cookie_name).session).to.equal @analytics_session
+
+            it 'sets the metadata first-party full cookie value', ->
+              metadata = { app_type: @metadata.app_type, cp: 'f', tags: @metadata.tags }
+              @stub_params({ session: @analytics_session, metadata: metadata })
+
+              @init('kokolala')
+
+              expect(@biskoto.get(@meta_cookie_name)).to.deep.equal metadata
+
+          context 'and first party cookies already exist', ->
+            beforeEach ->
+              @biskoto.set @session_cookie_name, @session_cookie_data, @session_cookie_options
+              @biskoto.set @basic_session_cookie_name, @basic_session_cookie_data, @basic_session_cookie_options
+              @biskoto.set @meta_cookie_name, @meta_cookie_data
+              @biskoto.set @basic_meta_cookie_name, @basic_meta_cookie_data
+
+            context 'and the shop_cookie_policy is full', ->
+              it 'does not call _unsetFullCookies', ->
+                @stub_params()
+                @init_no_run('full')
+                spy_unset_full_cookies =
+                  sinon.spy(@instance, '_unsetFullCookies')
+
+                @instance.run()
+
+                expect(spy_unset_full_cookies).to.not.be.called
+
+            context 'and the shop_cookie_policy is basic', ->
+              it 'calls _unsetFullCookies', ->
+                @stub_params()
+                @init_no_run('basic')
+                spy_unset_full_cookies =
+                  sinon.spy(@instance, '_unsetFullCookies')
+
+                @instance.run()
+
+                expect(spy_unset_full_cookies).to.be.calledOnce
+
+              it 'unsets the full session cookie', ->
+                @stub_params()
+                @init('basic')
+
+                expect(@biskoto.get(@session_cookie_name)).to.be.null
+
+              it 'unsets the full metadata cookie', ->
+                @stub_params()
+                @init('basic')
+
+                expect(@biskoto.get(@meta_cookie_name)).to.be.null
+
+              it 'does not unset the basic session cookie', ->
+                @stub_params()
+                @init('basic')
+
+                expect(@biskoto.get(@basic_session_cookie_name)).to.be.an('object')
+
+              it 'does not unset the basic metadata cookie', ->
+                @stub_params()
+                @init('basic')
+
+                expect(@biskoto.get(@basic_meta_cookie_name)).to.be.an('object')
+
+          context 'and first party cache cookie already exist', ->
+            beforeEach ->
+              @biskoto.set @sa_cookie_name, {version:1, analytics_session: 'cached_session'}, @sa_cookie_options
+              @biskoto.set @basic_sa_cookie_name, {version:1, analytics_session: 'cached_session'}, @basic_sa_cookie_options
+
+            context 'and the shop_cookie_policy is full', ->
+              it 'does not call _unsetFullCookies', ->
+                @stub_params()
+                @init_no_run('full')
+                spy_unset_full_cookies =
+                  sinon.spy(@instance, '_unsetFullCookies')
+
+                @instance.run()
+
+                expect(spy_unset_full_cookies).to.not.be.called
+
+            context 'and the shop_cookie_policy is basic', ->
+              it 'calls _unsetFullCookies', ->
+                @stub_params()
+                @init_no_run('basic')
+                spy_unset_full_cookies =
+                  sinon.spy(@instance, '_unsetFullCookies')
+
+                @instance.run()
+
+                expect(spy_unset_full_cookies).to.be.calledOnce
+
+              it 'unsets the full session cache cookie', ->
+                @stub_params()
+                @init('basic')
+
+                expect(@biskoto.get(@sa_cookie_name)).to.be.null
+
+              it 'does not unset the basic session cache cookie', ->
+                @stub_params()
+                @init('basic')
+
+                expect(@biskoto.get(@basic_sa_cookie_name)).to.be.an('object')
+
       context 'when the skr_prm is not present', ->
         beforeEach ->
           @stub_params = ->
@@ -679,6 +854,27 @@ describe 'Session', ->
               @init2()
               @instance.then =>
                   expect(@biskoto.get(@sa_cookie_name).version).to.equal @settings.cookies.version
+                  done()
+
+            context 'and shop_cookie_policy is basic', ->
+              beforeEach ->
+                @init3 = (shop_cookie_policy = 'full') =>
+                  @stub_params()
+                  sa('session', 'connect', @shop_code, shop_cookie_policy)
+                  @instance = new @session(@plugins_manager).run()
+                  @xdomain_promise.resolve(JSON.stringify({ cookie_policy: 'full', session: @analytics_session }))
+                  return
+
+              it 'should create the basic session cache cookie', (done) ->
+                @init3('basic')
+                @instance.then =>
+                  expect(@biskoto.get(@basic_sa_cookie_name)).to.be.an('object')
+                  done()
+
+              it 'does not create the full session cache cookie', (done) ->
+                @init3('basic')
+                @instance.then =>
+                  expect(@biskoto.get(@sa_cookie_name)).to.be.null
                   done()
 
           context 'and the XDomain engine resolves with basic cookie_policy', ->
