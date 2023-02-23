@@ -34,7 +34,7 @@ define ['settings'], (Settings)->
     # https://stackoverflow.com/a/1099670/4375736
     getParamsFromUrl: (url = Settings.url.current) ->
       url = url.split('#')[0] # drop hash from url, if exists
-      regex  = /[?&;](.+?)=([^&;]+)/g
+      regex  = /[?&;](.*?)=([^&;]*)/g
       params = {}
 
       while match = regex.exec(url)
