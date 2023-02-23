@@ -163,6 +163,44 @@ describe 'URLHelper', ->
 
       expect(@subject.getParamsFromUrl(url)).to.deep.equal(params)
 
+    context 'when contains a malformed param without a key', ->
+      it 'returns the proper JSON object', ->
+        url = "http://foo.bar?foo=bar&=xxxx&baz=qux"
+        params = { '': 'xxxx', foo: 'bar', baz: 'qux' }
+
+        expect(@subject.getParamsFromUrl(url)).to.deep.equal(params)
+
+      it 'returns the proper JSON object', ->
+        url = "http://foo.bar?=bar&=xxxx&foo=bar"
+        params = { '': 'xxxx', foo: 'bar' }
+
+        expect(@subject.getParamsFromUrl(url)).to.deep.equal(params)
+
+      it 'returns the proper JSON object', ->
+        url = "http://foo.bar?foo=bar&=xxxx&=zzzz"
+        params = { '': 'zzzz', foo: 'bar' }
+
+        expect(@subject.getParamsFromUrl(url)).to.deep.equal(params)
+
+    context 'when contains a malformed param without a value', ->
+      it 'returns the proper JSON object', ->
+        url = "http://foo.bar?foo=bar&xxxx=&baz=qux"
+        params = { xxxx: '', foo: 'bar', baz: 'qux' }
+
+        expect(@subject.getParamsFromUrl(url)).to.deep.equal(params)
+
+      it 'returns the proper JSON object', ->
+        url = "http://foo.bar?xxxx=&zzzz=&foo=bar"
+        params = { xxxx: '', zzzz: '', foo: 'bar' }
+
+        expect(@subject.getParamsFromUrl(url)).to.deep.equal(params)
+
+      it 'returns the proper JSON object', ->
+        url = "http://foo.bar?foo=bar&xxxx=&zzzz="
+        params = { xxxx: '', zzzz: '', foo: 'bar' }
+
+        expect(@subject.getParamsFromUrl(url)).to.deep.equal(params)
+
     context 'when contains an escaped param name', ->
       it 'replaces the given param', ->
         url = "http://foo.bar?#{encodeURIComponent('ελλη=νικά')}=xxxx&foo=bar"
