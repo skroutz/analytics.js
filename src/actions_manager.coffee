@@ -79,7 +79,7 @@ define [
       payload[params.url] = Settings.url.current
       payload[params.referrer] = Settings.url.referrer
       payload[params.shop_code] = @session.shop_code
-      payload[params.metadata] = @_buildMetadata(JSON.parse(data).sbm)
+      payload[params.metadata] = @_buildMetadata(JSON.parse(data))
       payload[params.cookie_policy] = @session.cookie_policy
       payload[params.actions] = [{
         category: category
@@ -89,27 +89,26 @@ define [
 
       payload
 
-    _buildMetadata: (sbm) ->
+    _buildMetadata: (data) ->
       # When using 3rd-party cookies, metadata will be undefined
       # In this case, the server will fallback to using the meta cookie
       return '' unless @session.metadata
 
+      sbm = data.sbm
+      sbm_tag = data.sbm_tag
+
       # Return metadata as is if sbm is not present
-      return @session.metadata unless sbm
+      return @session.metadata unless sbm || sbm_tag
 
       # Clone
       meta = JSON.parse(JSON.stringify(@session.metadata))
 
-      # If no tags are present, return a single sbm tag
-      unless meta.tags
-        meta.tags = 'sbm'
-        return meta
+      tags = if meta.tags then meta.tags.split(',') else []
+      if sbm || sbm_tag
+        tags.push('sbm') if sbm && !('sbm' in tags)
+        tags.push(sbm_tag) if sbm_tag && !(sbm_tag in tags)
 
-      # Return metadata as is if sbm is already present
-      return meta if 'sbm' in meta.tags.split(',')
-
-      # Otherwise, append the sbm tag
-      meta.tags = meta.tags + ',sbm'
+      meta.tags = tags.join() if tags
 
       meta
 
