@@ -392,13 +392,13 @@ describe 'ActionsManager', ->
             it 'does not execute redirect callback', ->
               expect(@redirect_callback_spy).to.not.be.called
 
-        context 'when the sbm param is not set', ->
+        context 'when the sbm params are not set', ->
           before ->
             @data = JSON.stringify({})
             @run()
             @payload = @sendbeacon_spy.args[0][1]
 
-          it 'should not include the sbm tag in the metadata tags', ->
+          it 'should not include sbm tags in the metadata tags', ->
             expect(@payload.metadata.tags).to.equal ''
 
         context 'when the sbm param is set', ->
@@ -410,15 +410,33 @@ describe 'ActionsManager', ->
           it 'should include the sbm tag in the metadata tags', ->
             expect(@payload.metadata.tags).to.equal 'sbm'
 
+        context 'when an sbm_tag param is set', ->
+          before ->
+            @data = JSON.stringify({ sbm_tag: 'foo' })
+            @run()
+            @payload = @sendbeacon_spy.args[0][1]
+
+          it 'should include the respective sbm tag in the metadata tags', ->
+            expect(@payload.metadata.tags).to.equal 'foo'
+
+        context 'when both sbm and sbm_tag params are set', ->
+          before ->
+            @data = JSON.stringify({ sbm: true, sbm_tag: 'foo' })
+            @run()
+            @payload = @sendbeacon_spy.args[0][1]
+
+          it 'should include the sbm tags in the metadata tags', ->
+            expect(@payload.metadata.tags).to.equal 'sbm,foo'
+
         context 'when additional tags exist in the metadata tags', ->
-          context 'when the sbm param is not set', ->
+          context 'when the sbm params are not set', ->
             before ->
               @data = JSON.stringify({})
               @session.metadata = { app_type: 'web', cp: 'f', tags: 'not_sbm' }
               @run()
               @payload = @sendbeacon_spy.args[0][1]
 
-            it 'should include the sbm tag in the metadata tags', ->
+            it 'should not include sbm tags in the metadata tags', ->
               expect(@payload.metadata.tags).to.equal 'not_sbm'
 
           context 'when the sbm param is set', ->
@@ -431,15 +449,35 @@ describe 'ActionsManager', ->
             it 'should include the sbm tag in the metadata tags', ->
               expect(@payload.metadata.tags).to.equal 'not_sbm,sbm'
 
-        context 'when an sbm tag already exists in metadata tags', ->
-          context 'when the sbm param is not set', ->
+          context 'when an sbm_tag param is set', ->
+            before ->
+              @data = JSON.stringify({ sbm_tag: 'foo' })
+              @session.metadata = { app_type: 'web', cp: 'f', tags: 'not_sbm' }
+              @run()
+              @payload = @sendbeacon_spy.args[0][1]
+
+            it 'should include the respective sbm tag in the metadata tags', ->
+              expect(@payload.metadata.tags).to.equal 'not_sbm,foo'
+
+          context 'when both sbm and sbm_tag params are set', ->
+            before ->
+              @data = JSON.stringify({ sbm: true, sbm_tag: 'foo' })
+              @session.metadata = { app_type: 'web', cp: 'f', tags: 'not_sbm' }
+              @run()
+              @payload = @sendbeacon_spy.args[0][1]
+
+            it 'should include the sbm tags in the metadata tags', ->
+              expect(@payload.metadata.tags).to.equal 'not_sbm,sbm,foo'
+
+        context 'when the sbm tag already exists in metadata tags', ->
+          context 'when the sbm params are not set', ->
             before ->
               @data = JSON.stringify({})
               @session.metadata = { app_type: 'web', cp: 'f', tags: 'sbm' }
               @run()
               @payload = @sendbeacon_spy.args[0][1]
 
-            it 'should include the sbm tag in the metadata tags', ->
+            it 'should not include sbm tags in the metadata tags', ->
               expect(@payload.metadata.tags).to.equal 'sbm'
 
           context 'when the sbm param is set', ->
@@ -449,8 +487,69 @@ describe 'ActionsManager', ->
               @run()
               @payload = @sendbeacon_spy.args[0][1]
 
-            it 'should include the sbm tag in the metadata tags', ->
+            it 'should include the sbm tag in the metadata tags only once', ->
               expect(@payload.metadata.tags).to.equal 'sbm'
+
+          context 'when an sbm_tag param is set', ->
+            before ->
+              @data = JSON.stringify({ sbm_tag: 'foo' })
+              @session.metadata = { app_type: 'web', cp: 'f', tags: 'sbm' }
+              @run()
+              @payload = @sendbeacon_spy.args[0][1]
+
+            it 'should include the sbm tags in the metadata tags', ->
+              expect(@payload.metadata.tags).to.equal 'sbm,foo'
+
+          context 'when both sbm and sbm_tag params are set', ->
+            before ->
+              @data = JSON.stringify({ sbm: true, sbm_tag: 'foo' })
+              @session.metadata = { app_type: 'web', cp: 'f', tags: 'sbm' }
+              @run()
+              @payload = @sendbeacon_spy.args[0][1]
+
+            it 'should include the sbm tags in the metadata tags', ->
+              expect(@payload.metadata.tags).to.equal 'sbm,foo'
+
+        context 'when an sbm_tag already exists in metadata tags', ->
+          context 'when the sbm params are not set', ->
+            before ->
+              @data = JSON.stringify({})
+              @session.metadata = { app_type: 'web', cp: 'f', tags: 'foo' }
+              @run()
+              @payload = @sendbeacon_spy.args[0][1]
+
+            it 'should not include sbm tags in the metadata tags', ->
+              expect(@payload.metadata.tags).to.equal 'foo'
+
+          context 'when the sbm param is set', ->
+            before ->
+              @data = JSON.stringify({ sbm: true })
+              @session.metadata = { app_type: 'web', cp: 'f', tags: 'foo' }
+              @run()
+              @payload = @sendbeacon_spy.args[0][1]
+
+            it 'should include the sbm tag in the metadata tags', ->
+              expect(@payload.metadata.tags).to.equal 'foo,sbm'
+
+          context 'when an sbm_tag param is set', ->
+            before ->
+              @data = JSON.stringify({ sbm_tag: 'foo' })
+              @session.metadata = { app_type: 'web', cp: 'f', tags: 'foo' }
+              @run()
+              @payload = @sendbeacon_spy.args[0][1]
+
+            it 'should include the sbm tag in the metadata tags only once', ->
+              expect(@payload.metadata.tags).to.equal 'foo'
+
+          context 'when both sbm and sbm_tag params are set', ->
+            before ->
+              @data = JSON.stringify({ sbm: true, sbm_tag: 'foo' })
+              @session.metadata = { app_type: 'web', cp: 'f', tags: 'foo' }
+              @run()
+              @payload = @sendbeacon_spy.args[0][1]
+
+            it 'should include the sbm tag in the metadata tags', ->
+              expect(@payload.metadata.tags).to.equal 'foo,sbm'
 
     describe 'ecommerce', ->
       beforeEach ->
