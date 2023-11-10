@@ -35,8 +35,8 @@ define [
         @_live()
 
     ###
-    Replaces our queue appending global function with one which immediately
-    runs commands. Intended for programmatic usage and/or lazy command declaration.
+    Replaces our queue appending global function with one which immediately runs
+    commands. Intended for programmatic usage and/or lazy command declaration.
     ###
     _live: ->
       @actions.run()
