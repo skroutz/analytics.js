@@ -65,7 +65,7 @@ describe 'PluginsManager', ->
       @subject.session = @session
 
     context 'when action is set to trigger a plugin', ->
-      xcontext 'and plugin is enabled', ->
+      context 'and plugin is enabled', ->
         beforeEach -> @plugin = (plugin for plugin in @plugins_response.plugins when plugin.name is 'analytics_plugin')[0]
 
         it 'retrieves the enabled plugins', ->
@@ -156,24 +156,24 @@ describe 'PluginsManager', ->
         @plugin_2 = (plugin for plugin in @plugins_response.plugins when plugin.name is 'analytics_plugin_2')[0]
         @not_enabled_plugin = (plugin for plugin in @plugins_response.plugins when plugin.name is 'not_enabled_plugin')[0]
 
-      xit 'retrieves the enabled plugins', ->
+      it 'retrieves the enabled plugins', ->
         data = shop_code: @session.shop_code
         @subject.notify('cancelOrder', { order_id: 1 })
 
         expect(@jsonp_fetch_stub.withArgs(@plugins_settings.general.fetch_plugins_url, data).calledOnce).to.be.true
 
-      xit 'caches the retrieved plugins', ->
+      it 'caches the retrieved plugins', ->
         @subject.notify('cancelOrder', { order_id: 1 })
 
         expect(@subject.enabled_plugins).to.equal(@plugins_response.plugins)
 
-      xit 'loads the plugins', ->
+      it 'loads the plugins', ->
         @subject.notify('cancelOrder', { order_id: 1 })
 
         expect(@jsonp_load_stub.withArgs(@plugins_settings.plugins.analytics_plugin.url).calledOnce).to.be.true
         expect(@jsonp_load_stub.withArgs(@plugins_settings.plugins.analytics_plugin_2.url).calledOnce).to.be.true
 
-      xit 'makes analytics settings available to the plugins', ->
+      it 'makes analytics settings available to the plugins', ->
         @subject.notify('cancelOrder', { order_id: 1 })
 
         settings =
@@ -185,7 +185,7 @@ describe 'PluginsManager', ->
         expect(window.sa_plugins.settings).to.eql(settings)
 
       context 'when data is an object', ->
-        xit 'makes data public', ->
+        it 'makes data public', ->
           @subject.notify('cancelOrder', { order_id: 1 })
 
           expect(window.sa_plugins.analytics_plugin)
@@ -194,7 +194,7 @@ describe 'PluginsManager', ->
             .to.deep.equal({ order_id: 1, shop_code: @session.shop_code, analytics_session: @session.analytics_session, configuration: @plugin_2.configuration, data: @plugin_2.data })
 
       context 'when data is json stringified', ->
-        xit 'makes data public', ->
+        it 'makes data public', ->
           @subject.notify('cancelOrder', JSON.stringify({ order_id: 1 }))
 
           expect(window.sa_plugins.analytics_plugin)
@@ -216,11 +216,11 @@ describe 'PluginsManager', ->
           @subject.notify('cancelOrder', { order_id: 1 })
           @subject.notify('cancelOrder', { order_id: 1 })
 
-        xit 'loads the plugins only once', ->
+        it 'loads the plugins only once', ->
           expect(@jsonp_load_stub.withArgs(@plugins_settings.plugins.analytics_plugin.url).calledOnce).to.be.true
           expect(@jsonp_load_stub.withArgs(@plugins_settings.plugins.analytics_plugin_2.url).calledOnce).to.be.true
 
-        xit 'does not make multiple api calls', ->
+        it 'does not make multiple api calls', ->
           data = shop_code: @session.shop_code
           expect(@jsonp_fetch_stub.withArgs(@plugins_settings.general.fetch_plugins_url, data).calledOnce).to.be.true
 
