@@ -1,7 +1,10 @@
 describe 'OrderStash', ->
+  originalWindow = window.parent
+  pluginWindow = window.parent
+
   cleanupDom = ->
     # Cleanup rendered plugins and stylesheets
-    [].forEach.call window.parent.document.querySelectorAll('#sa-order-stash-plugin, #sa-order-stash-style'), (e) ->
+    [].forEach.call pluginWindow.document.querySelectorAll('#sa-order-stash-plugin, #sa-order-stash-style'), (e) ->
       e.parentNode.removeChild e
 
   renderPlugin = (done, cb) ->
@@ -36,16 +39,29 @@ describe 'OrderStash', ->
           elements_to_hide: []
 
     renderPlugin done, =>
-      @subject = window.parent.document.getElementById('sa-order-stash-plugin')
+      @subject = pluginWindow.document.getElementById('sa-order-stash-plugin')
 
   afterEach -> cleanupDom()
 
   describe '.constructor', ->
     it 'adds the plugin style to the head', ->
-      expect(window.parent.document.getElementById('sa-order-stash-style')).to.exist
+      expect(pluginWindow.document.getElementById('sa-order-stash-style')).to.exist
 
     it 'adds the plugin markup to the body', ->
-      expect(window.parent.document.getElementById('sa-order-stash-plugin')).to.exist
+      expect(pluginWindow.document.getElementById('sa-order-stash-plugin')).to.exist
+
+    context 'when window.parent.document is missing', ->
+      beforeEach (done) ->
+        window.parent = null
+
+        renderPlugin done, =>
+          @subject = window.top.document.getElementById('sa-order-stash-plugin')
+
+      afterEach ->
+        window.parent = originalWindow
+
+      it 'adds the plugin style to the head', ->
+        expect(@subject).to.exist
 
     context 'when order_id is "null" string', ->
       beforeEach (done) ->
@@ -54,10 +70,10 @@ describe 'OrderStash', ->
         @subject.parentNode.removeChild(@subject)
 
         renderPlugin done, =>
-          @subject = window.parent.document.getElementById('sa-order-stash-plugin')
+          @subject = pluginWindow.document.getElementById('sa-order-stash-plugin')
 
       it 'does not add the plugin markup to the body', ->
-        expect(window.parent.document.getElementById('sa-order-stash-plugin')).to.not.exist
+        expect(pluginWindow.document.getElementById('sa-order-stash-plugin')).to.not.exist
 
     context 'when order_id is empty string', ->
       beforeEach (done) ->
@@ -66,10 +82,10 @@ describe 'OrderStash', ->
         @subject.parentNode.removeChild(@subject)
 
         renderPlugin done, =>
-          @subject = window.parent.document.getElementById('sa-order-stash-plugin')
+          @subject = pluginWindow.document.getElementById('sa-order-stash-plugin')
 
       it 'does not add the plugin markup to the body', ->
-        expect(window.parent.document.getElementById('sa-order-stash-plugin')).to.not.exist
+        expect(pluginWindow.document.getElementById('sa-order-stash-plugin')).to.not.exist
 
     context 'when order_id is undefined', ->
       beforeEach (done) ->
@@ -78,10 +94,10 @@ describe 'OrderStash', ->
         @subject.parentNode.removeChild(@subject)
 
         renderPlugin done, =>
-          @subject = window.parent.document.getElementById('sa-order-stash-plugin')
+          @subject = pluginWindow.document.getElementById('sa-order-stash-plugin')
 
       it 'does not add the plugin markup to the body', ->
-        expect(window.parent.document.getElementById('sa-order-stash-plugin')).to.not.exist
+        expect(pluginWindow.document.getElementById('sa-order-stash-plugin')).to.not.exist
 
   describe 'click dismiss button', ->
     beforeEach -> click_element @subject.querySelectorAll('#sa-order-stash-dismiss')[0]
@@ -103,7 +119,7 @@ describe 'OrderStash', ->
         @subject.style.animation = null
 
       it 'removes the element', ->
-        expect(window.parent.document.getElementById('sa-order-stash-plugin')).
+        expect(pluginWindow.document.getElementById('sa-order-stash-plugin')).
           to.be.null
 
   describe 'click why button', ->
@@ -157,52 +173,52 @@ describe 'OrderStash', ->
       beforeEach (done) ->
         window.sa_plugins.settings.plugins.order_stash.elements_to_hide = ['#sa-another-plugin']
 
-        @plugin = window.parent.document.createElement('div')
+        @plugin = pluginWindow.document.createElement('div')
         @plugin.id = 'sa-another-plugin'
 
-        window.parent.document.body.appendChild(@plugin)
+        pluginWindow.document.body.appendChild(@plugin)
 
         renderPlugin(done)
 
       afterEach ->
         window.sa_plugins.settings.plugins.order_stash.elements_to_hide = []
-        window.parent.document.body.removeChild(@plugin)
+        pluginWindow.document.body.removeChild(@plugin)
 
       it 'hides specified element', ->
-        expect(window.parent.getComputedStyle(@plugin).display).to.eql('none')
+        expect(pluginWindow.getComputedStyle(@plugin).display).to.eql('none')
 
     context 'when there are no elements to hide', ->
       beforeEach (done) ->
         window.sa_plugins.settings.plugins.order_stash.elements_to_hide = []
 
-        @plugin = window.parent.document.createElement('div')
+        @plugin = pluginWindow.document.createElement('div')
         @plugin.id = 'sa-another-plugin'
 
-        window.parent.document.body.appendChild(@plugin)
+        pluginWindow.document.body.appendChild(@plugin)
 
         renderPlugin(done)
 
       afterEach ->
         window.sa_plugins.settings.plugins.order_stash.elements_to_hide = []
-        window.parent.document.body.removeChild(@plugin)
+        pluginWindow.document.body.removeChild(@plugin)
 
       it 'does not hide any element', ->
-        expect(window.parent.getComputedStyle(@plugin).display).to.not.eql('none')
+        expect(pluginWindow.getComputedStyle(@plugin).display).to.not.eql('none')
 
     context 'when there is no config for elements_to_hide', ->
       beforeEach (done) ->
         window.sa_plugins.settings.plugins.order_stash.elements_to_hide = null
 
-        @plugin = window.parent.document.createElement('div')
+        @plugin = pluginWindow.document.createElement('div')
         @plugin.id = 'sa-another-plugin'
 
-        window.parent.document.body.appendChild(@plugin)
+        pluginWindow.document.body.appendChild(@plugin)
 
         renderPlugin(done)
 
       afterEach ->
         window.sa_plugins.settings.plugins.order_stash.elements_to_hide = []
-        window.parent.document.body.removeChild(@plugin)
+        pluginWindow.document.body.removeChild(@plugin)
 
       it 'does not hide any element', ->
-        expect(window.parent.getComputedStyle(@plugin).display).to.not.eql('none')
+        expect(pluginWindow.getComputedStyle(@plugin).display).to.not.eql('none')

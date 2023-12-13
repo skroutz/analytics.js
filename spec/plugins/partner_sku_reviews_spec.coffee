@@ -1,5 +1,7 @@
 describe 'PartnerSkuReviews', ->
-  parent_doc = window.parent.document
+  originalWindow = window.parent
+  pluginWindow = window.parent
+  parent_doc = pluginWindow.document
 
   PRODUCT_REVIEWS = {
     'displayable_reviews_id': {
@@ -231,7 +233,7 @@ describe 'PartnerSkuReviews', ->
     callback = /&callback=(.*?)(&|$)/.exec(url)[1]
 
     # exec JSONP callback
-    window.parent[callback](product_information)
+    pluginWindow[callback](product_information)
 
   cleanupDom = ->
     removeListeners()
@@ -275,8 +277,8 @@ describe 'PartnerSkuReviews', ->
           url: 'url'
 
   addProductReviewsElement = (type, product_id) ->
-    parent_doc = window.parent.document
-    element = window.parent.document.createElement('div')
+    parent_doc = pluginWindow.document
+    element = pluginWindow.document.createElement('div')
     element.id = "@@flavor-product-reviews-#{type}"
     element.setAttribute('data-product-id', product_id)
     parent_doc.body.appendChild(element)
@@ -308,7 +310,7 @@ describe 'PartnerSkuReviews', ->
 
       orginalAddEventListener.apply this, arguments
 
-  after -> window.parent.document.addEventListener = orginalAddEventListener
+  after -> pluginWindow.document.addEventListener = orginalAddEventListener
 
   afterEach ->
     cleanupDom()
@@ -316,6 +318,18 @@ describe 'PartnerSkuReviews', ->
     delete window.sa_plugins
 
   describe '.constructor', ->
+    context 'when window.parent.document is missing', ->
+      beforeEach (done) ->
+        window.parent = null
+
+        prepare 'inline', 'extended', 'inexistent', {}, done
+
+      afterEach ->
+        window.parent = originalWindow
+
+      it 'adds the plugin style to the head', ->
+        expect(window.top.document.getElementById('@@flavor-product-reviews-extended')).to.exist
+
     context 'when an inexistent product_id is detected', ->
       beforeEach (done) ->
         prepare 'inline', 'extended', 'inexistent', {}, done

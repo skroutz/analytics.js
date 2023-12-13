@@ -415,7 +415,11 @@ class PartnerSkuReviews
   asset_url = (source) -> "#{settings.url.base}/assets/#{source}"
 
   constructor: ->
-    @parent_doc = window.parent.document
+    @plugin_window = if window.parent?.document
+                       window.parent
+                     else
+                       window.top
+    @parent_doc = @plugin_window.document
     @onDOMReady =>
       @head = @parent_doc.getElementsByTagName('head')[0]
       @_renderAll()
@@ -491,11 +495,11 @@ class PartnerSkuReviews
     script.charset = 'utf-8'
     script.async = true
 
-    window.parent['sa_jsonp_sku_reviews_fetch'] = (response) =>
+    @plugin_window['sa_jsonp_sku_reviews_fetch'] = (response) =>
       callback(response)
       # cleanup
       script.parentNode.removeChild(script)
-      delete window.parent['sa_jsonp_sku_reviews_fetch']
+      delete @plugin_window['sa_jsonp_sku_reviews_fetch']
 
     @head.appendChild(script)
 
