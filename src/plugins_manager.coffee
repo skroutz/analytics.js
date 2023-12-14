@@ -21,7 +21,6 @@ define [
     @param [Object, String] data Any additional data required by the plugins
     ###
     notify: (action, data) ->
-      return
       @_fetchEnabledPlugins().then =>
         plugins = PluginsSettings.triggers[action]
         return unless plugins
