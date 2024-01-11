@@ -60,3 +60,4 @@ params:
   metadata: 'metadata'
   actions: 'actions'
   cookie_policy: 'cp'
+  cookie_type: 'ct'

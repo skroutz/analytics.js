@@ -26,6 +26,10 @@ VALID_LINE_ITEM_DATA_2 = {
 }
 VALID_LINE_ITEM_DATA_2_STRINGIFIED = JSON.stringify(VALID_LINE_ITEM_DATA_2)
 
+clear_all_cookies = ->
+  document.cookie.split(/;\s/g).forEach (cookie)->
+    document.cookie = "#{cookie.split('=')[0]}= ;expires=Thu, 01 Jan 1970 00:00:01 GMT"
+
 api_session_promise_tests = ->
   context 'when session retrieval fulfils', ->
     beforeEach ->
@@ -68,7 +72,7 @@ action_reporting_tests = (reported_position) ->
       p = @settings.params
       expect(@payload).to.have.keys p.url, p.referrer,
                                     p.shop_code, p.cookie_policy, p.metadata,
-                                    p.actions
+                                    p.actions, p.cookie_type
 
     it 'has proper data in url key', ->
       expect(@payload.url).to.equal @settings.url.current
@@ -105,6 +109,32 @@ action_reporting_tests = (reported_position) ->
         category: @category
         type: @type
         data: JSON.stringify(data)
+
+  describe 'cookie_type', ->
+    context 'when 1st party cookie exists', ->
+      beforeEach ->
+        # Clear all cookies
+        clear_all_cookies()
+
+        # Set basic 1st party cookie
+        document.cookie = "#{@settings.cookies.basic.session.name}=bar;"
+
+        @run()
+        @payload = @sendbeacon_spy.args[0][1]
+
+      it 'has proper data in cookie_type key', ->
+        expect(@payload.ct).to.equal '1'
+
+    context 'when 1st party cookie does not exist', ->
+      beforeEach ->
+        # Clear all cookies
+        clear_all_cookies()
+
+        @run()
+        @payload = @sendbeacon_spy.args[0][1]
+
+      it 'has proper data in cookie_type key', ->
+        expect(@payload.ct).to.equal '3'
 
 describe 'ActionsManager', ->
   before (done) ->

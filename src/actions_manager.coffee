@@ -2,9 +2,10 @@ define [
   'settings'
   'reporter'
   'runnable'
+  'biskoto'
   'validator'
   'analytics_url'
-], (Settings, Reporter, Runnable, Validator, AnalyticsUrl) ->
+], (Settings, Reporter, Runnable, Biskoto, Validator, AnalyticsUrl) ->
   class ActionsManager
     ActionsManager::[key] = method for key, method of Runnable
 
@@ -81,6 +82,7 @@ define [
       payload[params.shop_code] = @session.shop_code
       payload[params.metadata] = @_buildMetadata(JSON.parse(data))
       payload[params.cookie_policy] = @session.cookie_policy
+      payload[params.cookie_type] = @_determineCookieType()
       payload[params.actions] = [{
         category: category
         type: type
@@ -111,5 +113,8 @@ define [
       meta.tags = tags.join() if tags
 
       meta
+
+    _determineCookieType: ->
+      if Biskoto.get(Settings.cookies.basic.session.name) then '1' else '3'
 
   return ActionsManager

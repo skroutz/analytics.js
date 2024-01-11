@@ -38,6 +38,7 @@ define ->
       metadata: '@@params.metadata'
       actions: '@@params.actions'
       cookie_policy: '@@params.cookie_policy'
+      cookie_type: '@@params.cookie_type'
 
     ###
     Cookies
