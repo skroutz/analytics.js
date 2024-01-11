@@ -1,4 +1,4 @@
-FROM node:10.19.0
+FROM node:10.19.0-buster
 LABEL maintainer="analytics@skroutz.gr"
 RUN apt-get -qq update
 RUN rm /usr/local/bin/yarn && \
